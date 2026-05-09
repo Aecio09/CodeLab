@@ -26,7 +26,7 @@ public class SecurityConfig {
                         session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
                 )
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/", "/login", "/register", "/oauth2/**", "/images/**").permitAll()
+                        .requestMatchers("/", "/login", "/register", "/oauth2/**", "/images/**", "/uploads/**").permitAll()
                         .anyRequest().authenticated()
                 )
                  .formLogin(form -> form

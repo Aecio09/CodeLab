@@ -129,6 +129,42 @@
             cursor: not-allowed;
         }
 
+        .btn-primary {
+            width: 100%;
+            padding: 10px;
+            border: none;
+            border-radius: 4px;
+            background-color: #1a73e8;
+            color: #ffffff;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-top: 5px;
+        }
+
+        .btn-primary:hover {
+            background-color: #1669c1;
+        }
+
+        .btn-primary:active {
+            background-color: #1257a6;
+            transform: scale(0.98);
+        }
+
+        .link-register {
+            display: block;
+            text-align: center;
+            margin-top: 15px;
+            font-size: 13px;
+            color: #1a73e8;
+            text-decoration: none;
+        }
+
+        .link-register:hover {
+            text-decoration: underline;
+        }
+
     </style>
 </head>
 <body>
@@ -136,16 +172,24 @@
 <div class="login-container">
     <h2>Login</h2>
 
-    <form>
+    <form method="post" action="/login">
         <div class="input-group">
             <label>Email</label>
-            <input type="email" placeholder="seu@email.com" required>
+            <input type="email" name="username" required>
         </div>
 
         <div class="input-group">
             <label>Senha</label>
-            <input type="password" placeholder="********" required>
+            <input type="password" name="password" required>
         </div>
+
+        <button type="submit" class="btn-primary">
+            Entrar
+        </button>
+
+        <a href="/register" class="link-register">
+            Criar conta
+        </a>
     </form>
 
     <div class="divider">ou</div>
