@@ -1,0 +1,135 @@
+{
+  "questions" : [ {
+    "questionBody" : "Imprimir o perímetro de um triângulo equilátero",
+    "type" : "PRACTICAL",
+    "difficulty" : "EASY",
+    "requiredUsage" : null,
+    "topic" : "OPERADORES_TIPOS_E_VARIAVEIS"
+  }, {
+    "questionBody" : "Imprimir o perímetro de um quadrado",
+    "type" : "PRACTICAL",
+    "difficulty" : "EASY",
+    "requiredUsage" : null,
+    "topic" : "OPERADORES_TIPOS_E_VARIAVEIS"
+  }, {
+    "questionBody" : "Imprimir o perímetro de um retângulo",
+    "type" : "PRACTICAL",
+    "difficulty" : "EASY",
+    "requiredUsage" : null,
+    "topic" : "OPERADORES_TIPOS_E_VARIAVEIS"
+  }, {
+    "questionBody" : "Imprimir o perímetro de um pentágono",
+    "type" : "PRACTICAL",
+    "difficulty" : "EASY",
+    "requiredUsage" : null,
+    "topic" : "OPERADORES_TIPOS_E_VARIAVEIS"
+  }, {
+    "questionBody" : "Imprimir o perímetro de um hexágono",
+    "type" : "PRACTICAL",
+    "difficulty" : "EASY",
+    "requiredUsage" : null,
+    "topic" : "OPERADORES_TIPOS_E_VARIAVEIS"
+  }, {
+    "questionBody" : "Converter segundos em horas",
+    "type" : "PRACTICAL",
+    "difficulty" : "EASY",
+    "requiredUsage" : null,
+    "topic" : "OPERADORES_TIPOS_E_VARIAVEIS"
+  }, {
+    "questionBody" : "Solucionar a equação: f(x) = x² + 2x – 3",
+    "type" : "PRACTICAL",
+    "difficulty" : "EASY",
+    "requiredUsage" : null,
+    "topic" : "OPERADORES_TIPOS_E_VARIAVEIS"
+  }, {
+    "questionBody" : "Solucionar a equação: f(x) = x³ + x² + 3x - 25",
+    "type" : "PRACTICAL",
+    "difficulty" : "EASY",
+    "requiredUsage" : null,
+    "topic" : "OPERADORES_TIPOS_E_VARIAVEIS"
+  }, {
+    "questionBody" : "Imprimir a média de seis números",
+    "type" : "PRACTICAL",
+    "difficulty" : "EASY",
+    "requiredUsage" : null,
+    "topic" : "OPERADORES_TIPOS_E_VARIAVEIS"
+  }, {
+    "questionBody" : "Imprimir a média ponderada de quatro números",
+    "type" : "PRACTICAL",
+    "difficulty" : "EASY",
+    "requiredUsage" : null,
+    "topic" : "OPERADORES_TIPOS_E_VARIAVEIS"
+  }, {
+    "questionBody" : "Imprimir o índice de Massa Corporal (peso dividido pelo quadrado da altura)",
+    "type" : "PRACTICAL",
+    "difficulty" : "EASY",
+    "requiredUsage" : null,
+    "topic" : "OPERADORES_TIPOS_E_VARIAVEIS"
+  }, {
+    "questionBody" : "Imprimir o perímetro de um círculo (2 vezes PI vezes raio)",
+    "type" : "PRACTICAL",
+    "difficulty" : "EASY",
+    "requiredUsage" : null,
+    "topic" : "OPERADORES_TIPOS_E_VARIAVEIS"
+  }, {
+    "questionBody" : "Solucionar a equação: f(x, z) = x³ + z² + 3xz - 25",
+    "type" : "PRACTICAL",
+    "difficulty" : "EASY",
+    "requiredUsage" : null,
+    "topic" : "OPERADORES_TIPOS_E_VARIAVEIS"
+  }, {
+    "questionBody" : "Imprimir o volume de um cilindro (área da base vezes a altura)",
+    "type" : "PRACTICAL",
+    "difficulty" : "EASY",
+    "requiredUsage" : null,
+    "topic" : "OPERADORES_TIPOS_E_VARIAVEIS"
+  }, {
+    "questionBody" : "Imprimir o volume de uma caixa (base vezes altura vezes profundidade)",
+    "type" : "PRACTICAL",
+    "difficulty" : "EASY",
+    "requiredUsage" : null,
+    "topic" : "OPERADORES_TIPOS_E_VARIAVEIS"
+  }, {
+    "questionBody" : "Imprimir área de um triângulo isósceles (base vezes altura dividido por dois)",
+    "type" : "PRACTICAL",
+    "difficulty" : "EASY",
+    "requiredUsage" : null,
+    "topic" : "OPERADORES_TIPOS_E_VARIAVEIS"
+  }, {
+    "questionBody" : "Escolher o maior entre dois números",
+    "type" : "PRACTICAL",
+    "difficulty" : "MEDIUM",
+    "requiredUsage" : null,
+    "topic" : "OPERADORES_TIPOS_E_VARIAVEIS"
+  }, {
+    "questionBody" : "Computar as raízes de uma equação do segundo grau",
+    "type" : "PRACTICAL",
+    "difficulty" : "MEDIUM",
+    "requiredUsage" : null,
+    "topic" : "OPERADORES_TIPOS_E_VARIAVEIS"
+  }, {
+    "questionBody" : "Computar a distância entre dois pontos tridimensionais",
+    "type" : "PRACTICAL",
+    "difficulty" : "HARD",
+    "requiredUsage" : null,
+    "topic" : "OPERADORES_TIPOS_E_VARIAVEIS"
+  }, {
+    "questionBody" : "Computar o valor da hipotenusa em um triângulo retângulo ",
+    "type" : "PRACTICAL",
+    "difficulty" : "MEDIUM",
+    "requiredUsage" : null,
+    "topic" : "OPERADORES_TIPOS_E_VARIAVEIS"
+  }, {
+    "questionBody" : "Trocar o valor de duas variáveis",
+    "type" : "PRACTICAL",
+    "difficulty" : "MEDIUM",
+    "requiredUsage" : null,
+    "topic" : "OPERADORES_TIPOS_E_VARIAVEIS"
+  }, {
+    "questionBody" : "Corrigir o programa que computar a média de 4 números",
+    "type" : "PRACTICAL",
+    "difficulty" : "EASY",
+    "requiredUsage" : null,
+    "topic" : "OPERADORES_TIPOS_E_VARIAVEIS"
+  } ]
+}

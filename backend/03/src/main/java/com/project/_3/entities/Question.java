@@ -48,9 +48,99 @@ public class Question {
     }
 
     public enum RequiredUsage {
-        WHILE,
+
+        // Condicionais
+        IF,
+        ELSE,
+        SWITCH,
+
+        // Loops
         FOR,
-        IF
+        WHILE,
+        DO_WHILE,
+        FOREACH,
+
+        // Funções
+        FUNCTION,
+        RETURN,
+        RECURSION,
+
+        // Variáveis
+        VARIABLE,
+        CONST,
+        LET,
+
+        // Tipos
+        STRING,
+        NUMBER,
+        BOOLEAN,
+        ARRAY,
+        OBJECT,
+
+        // Operadores
+        COMPARISON,
+        LOGICAL_OPERATOR,
+        ARITHMETIC_OPERATOR,
+
+        // Estruturas
+        CLASS,
+        INTERFACE,
+        ENUM,
+
+        // Manipulação de arrays
+        ARRAY_PUSH,
+        ARRAY_POP,
+        ARRAY_MAP,
+        ARRAY_FILTER,
+        ARRAY_FIND,
+        ARRAY_REDUCE,
+
+        // Manipulação de strings
+        STRING_CONCAT,
+        TEMPLATE_LITERAL,
+
+        // Funções modernas
+        ARROW_FUNCTION,
+        ASYNC,
+        AWAIT,
+        PROMISE,
+
+        // Tratamento de erros
+        TRY_CATCH,
+        THROW,
+
+        // Objetos
+        OBJECT_DESTRUCTURING,
+        SPREAD_OPERATOR,
+
+        // Imports
+        IMPORT,
+        EXPORT,
+
+        // Entrada/Saída
+        CONSOLE_LOG,
+
+        // Matemática
+        MATH_RANDOM,
+        MATH_FLOOR,
+        MATH_CEIL,
+
+        // Algoritmos
+        SORT,
+        SEARCH,
+
+        // Boas práticas
+        TYPE_ANNOTATION,
+
+        // Complexidade / Estrutura
+        NESTED_LOOP,
+        CONDITIONAL_INSIDE_LOOP,
+
+        // Especiais educacionais
+        NO_FOR_ALLOWED,
+        NO_WHILE_ALLOWED,
+        NO_IF_ALLOWED,
+        NO_RECURSION_ALLOWED
     }
 
     public enum Topics {

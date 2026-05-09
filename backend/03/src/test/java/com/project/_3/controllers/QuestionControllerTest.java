@@ -3,6 +3,7 @@ package com.project._3.controllers;
 import com.project._3.dto.QuestionCreateRequest;
 import com.project._3.entities.Question;
 import com.project._3.services.QuestionService;
+import com.project._3.services.QuestionSeedImportService;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -20,7 +21,8 @@ import static org.mockito.Mockito.when;
 class QuestionControllerTest {
 
     private final QuestionService questionService = mock(QuestionService.class);
-    private final QuestionController questionController = new QuestionController(questionService);
+    private final QuestionSeedImportService questionSeedImportService = mock(QuestionSeedImportService.class);
+    private final QuestionController questionController = new QuestionController(questionService, questionSeedImportService);
 
     @Test
     void createQuestionShouldReturnCreatedQuestion() {
@@ -121,4 +123,3 @@ class QuestionControllerTest {
         return question;
     }
 }
-
