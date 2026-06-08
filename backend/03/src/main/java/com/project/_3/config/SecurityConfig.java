@@ -44,6 +44,7 @@ public class SecurityConfig {
                 )
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/", "/login", "/api/users/register", "/register", "/oauth2/**", "/images/**", "/uploads/**").permitAll()
+                        .requestMatchers("/questions").authenticated()
                         .anyRequest().authenticated()
                 )
                 .exceptionHandling(exceptions -> exceptions
@@ -51,14 +52,14 @@ public class SecurityConfig {
                 )
                  .formLogin(form -> form
                          .loginPage("/login")
-                         .defaultSuccessUrl(frontendUrl + "/perfil", true)
+                         .defaultSuccessUrl(frontendUrl , true)
                          .permitAll()
                  );
                  
          if (!"test".equals(activeProfile)) {
              http.oauth2Login(oauth2login -> {
                   oauth2login.loginPage("/login")
-                         .defaultSuccessUrl(frontendUrl + "/perfil", true);
+                         .defaultSuccessUrl(frontendUrl     , true);
               });
           }
         return http.build();

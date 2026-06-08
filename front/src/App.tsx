@@ -174,6 +174,23 @@ function LoginPage({ registered }: LoginPageProps) {
   const [password, setPassword] = useState('')
   const [submitting, setSubmitting] = useState(false)
 
+
+  useEffect(() => {
+    fetch(`${API_BASE_URL}/api/users/me`, { credentials: 'include' })
+        .then(async (response) => {
+          if (response.ok) {
+            const data = await response.json()
+            if (data.role === 'ADMIN') {
+              window.location.href = '/admin/questions'
+            } else {
+              window.location.href = '/trilha'
+            }
+          }
+        })
+        .catch(() => {
+        })
+  }, [])
+
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     setSubmitting(true)
@@ -637,14 +654,18 @@ function ProfilePage() {
     }
   }
 
-  const handleLogout = () => {
-    const form = document.createElement('form')
-    form.method = 'POST'
-    form.action = `${API_BASE_URL}/logout`
-    form.style.display = 'none'
-    document.body.appendChild(form)
-    form.submit()
-  }
+  const handleLogout = async () => {
+    try {
+      await fetch(`${API_BASE_URL}/logout`, {
+        method: 'POST',
+        credentials: 'include',
+      });
+    } catch (err) {
+      console.error("Erro ao deslogar no servidor:", err);
+    } finally {
+      window.location.href = '/';
+    }
+  };
 
   if (redirecting) {
     return <main className="flex-grow flex items-center justify-center text-on-surface-variant">Redirecionando para o painel admin...</main>
@@ -879,14 +900,18 @@ function AdminQuestionsPage() {
     return 'Difícil'
   }, [questions])
 
-  const handleLogout = () => {
-    const formElement = document.createElement('form')
-    formElement.method = 'POST'
-    formElement.action = `${API_BASE_URL}/logout`
-    formElement.style.display = 'none'
-    document.body.appendChild(formElement)
-    formElement.submit()
-  }
+  const handleLogout = async () => {
+    try {
+      await fetch(`${API_BASE_URL}/logout`, {
+        method: 'POST',
+        credentials: 'include',
+      });
+    } catch (err) {
+      console.error("Erro ao deslogar no servidor:", err);
+    } finally {
+      window.location.href = '/';
+    }
+  };
 
   const handleEdit = (question: QuestionItem) => {
     setSelectedQuestion(question)
@@ -1348,10 +1373,10 @@ function AdminPlaygroundPage({ questionId }: { questionId: number }) {
         const me = (await meResponse.json()) as UserProfile
         if (cancelled) return
         setProfile(me)
-        if (me.role !== 'ADMIN') {
-          window.location.href = '/perfil'
-          return
-        }
+       // if (me.role !== 'ADMIN') {
+        //  window.location.href = '/perfil'
+        //  return
+       // }
 
         const questionResponse = await fetch(`${API_BASE_URL}/questions/${questionId}`, {
           credentials: 'include',
@@ -1546,34 +1571,200 @@ function AdminPlaygroundPage({ questionId }: { questionId: number }) {
   )
 }
 
-function App() {
+function StudentPathPage() {
+  const API_BASE_URL = 'http://localhost:8080'
+  const [user, setUser] = useState<any>(null)
+  const [questions, setQuestions] = useState<any[]>([])
+
+  useEffect(() => {
+    // Puxa o usuário para exibir foto/nome e barrar quem não está logado
+    fetch(`${API_BASE_URL}/api/users/me`, { credentials: 'include' })
+        .then((res) => {
+          if (res.ok) return res.json()
+          throw new Error('Não autenticado')
+        })
+        .then((data) => setUser(data))
+        .catch(() => { window.location.href = '/' })
+
+    // Puxa as questões do banco para pegar os IDs
+    fetch(`${API_BASE_URL}/questions`, { credentials: 'include' })
+        .then((res) => res.ok ? res.json() : [])
+        .then((data) => setQuestions(data || []))
+  }, [])
+
+  const handleLogout = async () => {
+    try {
+      await fetch(`${API_BASE_URL}/logout`, { method: 'POST', credentials: 'include' })
+    } finally {
+      window.location.href = '/'
+    }
+  }
+
+  // Lógica de clique na trilha
+  const handleNavigateToPlayground = (topicKey: string) => {
+    console.log("Tópico clicado:", topicKey);
+    console.log("Questões carregadas:", questions);
+
+    const questionFromTopic = questions.find((q) => {
+      const qTopic = (q.topic || "").toString().toUpperCase().trim();
+      const targetTopic = topicKey.toUpperCase().trim();
+
+      console.log(`Comparando: ${qTopic} com ${targetTopic}`);
+      return qTopic === targetTopic;
+    });
+
+    if (questionFromTopic) {
+      console.log("Questão encontrada:", questionFromTopic);
+      window.location.href = `/admin/questions/${questionFromTopic.id}/playground`;
+    } else {
+      alert(`Nenhuma questão encontrada para o tópico: ${topicKey}. Verifique o console (F12) para ver os tópicos disponíveis.`);
+    }
+  }
+
+  if (!user) return <div className="flex min-h-screen items-center justify-center bg-[#0e1512] text-[#72db9f] animate-pulse">Carregando Trilha...</div>
+
+  const photoUrl = user.photo || 'https://lh3.googleusercontent.com/aida-public/AB6AXuAp3BkeCN4Ob2TbvINS9OiWR-h28Mm_1YCP3t3UzUChVENbVCfx5_KWm83aoujbIXC1-OYEyUTosshLx8WAkP9Q6VEN7AWd7sbTdfwd3zIme-GjggGm3RtI44dLDX3ANMILnNss3fxV-bk_kG0k0ddfLaVcQOT9jOseqeFAprZNTHhtlVIYTFBvWEwPQR6UkiPWi1sikZ02EvmlmkwQPCVDOnUxVzHDvTluBL_ZzNKnpfMoUCObsMPlL8nS-aO0GGxEZdQTdxERfRM'
+
+  return (
+      <div className="flex min-h-screen w-full bg-[#0e1512] text-[#dde4df] font-sans absolute top-0 left-0 z-50">
+
+        {/* Sidebar do Estudante */}
+        <aside className="fixed left-0 top-0 h-full flex flex-col py-6 px-4 border-r border-[#3e4941] bg-[#161d1a] w-64 z-50">
+          <div className="flex items-center gap-3 mb-8 px-2">
+            <div className="w-10 h-10 rounded-lg bg-[#72db9f] flex items-center justify-center">
+              <span className="material-symbols-outlined text-[#003920]">terminal</span>
+            </div>
+            <div>
+              <h1 className="text-lg font-bold text-[#72db9f]">CodeLab</h1>
+              <p className="text-xs text-[#bdcabe]">Trilha de Aprendizado</p>
+            </div>
+          </div>
+          <nav className="flex-1 space-y-1">
+            <button className="w-full flex items-center gap-3 bg-[#3c4a43] text-[#aab9b0] rounded-lg px-4 py-2 text-left font-semibold text-sm">
+              <span className="material-symbols-outlined">menu_book</span>
+              Trilha Atual
+            </button>
+            <button onClick={() => window.location.href = '/perfil'} className="w-full flex items-center gap-3 text-[#bdcabe] hover:text-[#dde4df] px-4 py-2 hover:bg-[#2f3633] rounded-lg text-left font-semibold text-sm transition-all">
+              <span className="material-symbols-outlined">account_circle</span>
+              Meu Perfil
+            </button>
+          </nav>
+          <div className="mt-auto pt-4">
+            <button onClick={handleLogout} className="w-full flex items-center justify-center gap-2 bg-[#93000a] text-[#ffdad6] hover:bg-[#690005] px-4 py-2 rounded-lg text-sm font-bold transition-colors">
+              <span className="material-symbols-outlined text-[18px]">logout</span>
+              Sair
+            </button>
+          </div>
+        </aside>
+
+        {/* Painel Central */}
+        <main className="flex-1 ml-64 flex flex-col relative min-h-screen">
+          <header className="sticky top-0 z-40 w-full flex justify-between items-center h-16 px-6 bg-[#0e1512]/80 backdrop-blur-md border-b border-[#3e4941]">
+            <div className="flex items-center gap-6">
+              <div className="flex items-center gap-2 bg-[#1a211e] px-3 py-1 rounded-full border border-[#3e4941]">
+                <span className="material-symbols-outlined text-orange-500">local_fire_department</span>
+                <span className="text-md font-bold text-[#dde4df]">12</span>
+              </div>
+              <div className="flex items-center gap-2 bg-[#1a211e] px-3 py-1 rounded-full border border-[#3e4941]">
+                <span className="material-symbols-outlined text-yellow-500">stars</span>
+                <span className="text-md font-bold text-[#dde4df]">2,450</span>
+              </div>
+            </div>
+            <div className="flex items-center gap-4">
+              <button onClick={() => window.location.href = '/perfil'} className="w-10 h-10 rounded-full border-2 border-[#72db9f] p-0.5 overflow-hidden transition-transform hover:scale-105">
+                <img alt="Profile" className="w-full h-full rounded-full object-cover" src={photoUrl} />
+              </button>
+            </div>
+          </header>
+
+          <div className="flex flex-row w-full max-w-7xl mx-auto h-full flex-1">
+            <div className="flex-1 relative pb-12">
+              <div className="sticky top-16 z-30 bg-[#0e1512]/60 backdrop-blur-sm py-6 px-8 mb-8 border-b border-[#3e4941]/30">
+                <div className="max-w-2xl mx-auto">
+                  <span className="text-xs text-[#72db9f] uppercase tracking-widest block mb-1">Unidade 1</span>
+                  <h2 className="text-2xl font-bold text-[#dde4df] mb-2">Fundamentos da Programação</h2>
+                  <div className="w-full bg-[#2f3633] h-3 rounded-full overflow-hidden">
+                    <div className="bg-[#72db9f] h-full rounded-full w-[65%]"></div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="relative py-12 flex flex-col items-center gap-24 min-h-[700px]">
+                <svg className="absolute top-0 left-1/2 -translate-x-1/2 w-48 h-full pointer-events-none" preserveAspectRatio="none">
+                  <path className="stroke-[#2d3a34] stroke-[8] fill-none" style={{ strokeDasharray: '8 8' }} d="M 96,0 C 180,100 20,200 96,300 C 180,400 20,500 96,600" />
+                </svg>
+
+                {/* Nó: Variáveis */}
+                <div className="relative z-10 flex flex-col items-center">
+                  <button onClick={() => handleNavigateToPlayground('OPERADORES_TIPOS_E_VARIAVEIS')} className="w-24 h-24 rounded-full bg-[#72db9f] flex items-center justify-center text-[#003920] shadow-lg transform hover:scale-110 transition-transform focus:outline-none">
+                    <span className="material-symbols-outlined text-[40px]">variables</span>
+                  </button>
+                  <div className="mt-2 bg-[#1a211e] border border-[#3e4941] px-3 py-1 rounded-xl">
+                    <span className="text-xs font-semibold text-[#72db9f]">Variáveis</span>
+                  </div>
+                </div>
+
+                {/* Nó: Condicionais   */}
+                <div className="relative z-10 flex flex-col items-center translate-x-16">
+                  <button onClick={() => handleNavigateToPlayground('EXECUCAO_CONDICIONAL')} className="w-24 h-24 rounded-full bg-[#72db9f] flex items-center justify-center text-[#003920] shadow-lg transform hover:scale-110 transition-transform focus:outline-none">
+                    <span className="material-symbols-outlined text-[40px]">data_object</span>
+                  </button>
+                  <div className="mt-2 bg-[#1a211e] border border-[#3e4941] px-3 py-1 rounded-xl">
+                    <span className="text-xs font-semibold text-[#72db9f]">Condicionais</span>
+                  </div>
+                </div>
+
+                {/* Nó: Laços */}
+                <div className="relative z-10 flex flex-col items-center -translate-x-16">
+                  <button onClick={() => handleNavigateToPlayground('LACOS')} className="w-28 h-28 rounded-full bg-[#37a36c] flex items-center justify-center text-[#002110] shadow-2xl transform hover:scale-110 transition-transform border-4 border-[#72db9f] focus:outline-none animate-[pulse_2s_infinite]">
+                    <span className="material-symbols-outlined text-[48px]">alt_route</span>
+                  </button>
+                  <div className="mt-3 bg-[#72db9f] px-4 py-2 rounded-2xl shadow-xl animate-bounce">
+                    <span className="text-sm font-bold text-[#003920]">Laços</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </main>
+      </div>
+  )
+}
+
+
+export default function App() {
   const currentPath = window.location.pathname
   const isRegisterPage = currentPath === '/register'
   const isProfilePage = currentPath === '/perfil'
   const isAdminQuestionsPage = currentPath === '/admin/questions'
+  const isStudentPathPage = currentPath === '/trilha'
+
   const adminPlaygroundMatch = currentPath.match(/^\/admin\/questions\/(\d+)\/playground$/)
   const playgroundQuestionId = adminPlaygroundMatch ? Number(adminPlaygroundMatch[1]) : null
+
   const registered = useMemo(() => {
     const params = new URLSearchParams(window.location.search)
     return params.get('registered') === '1'
   }, [])
 
   return (
-    <div className="bg-background font-body-md text-on-background min-h-screen flex flex-col antialiased">
-      {isRegisterPage ? (
-        <RegisterPage />
-      ) : playgroundQuestionId ? (
-        <AdminPlaygroundPage questionId={playgroundQuestionId} />
-      ) : isAdminQuestionsPage ? (
-        <AdminQuestionsPage />
-      ) : isProfilePage ? (
-        <ProfilePage />
-      ) : (
-        <LoginPage registered={registered} />
-      )}
-      <BackgroundDecor />
-    </div>
+      <div className="bg-background font-body-md text-on-background min-h-screen flex flex-col antialiased">
+        {isRegisterPage ? (
+            <RegisterPage />
+        ) : playgroundQuestionId ? (
+            <AdminPlaygroundPage questionId={playgroundQuestionId} />
+        ) : isAdminQuestionsPage ? (
+            <AdminQuestionsPage />
+        ) : isProfilePage ? (
+            <ProfilePage />
+        ) : isStudentPathPage ? (
+            <StudentPathPage />
+        ) : (
+            <LoginPage registered={registered} />
+        )}
+        <BackgroundDecor />
+      </div>
   )
 }
 
-export default App
+
