@@ -32,8 +32,8 @@ public class Question {
     @Column(nullable = false)
     private Topics topic;
 
-
-
+    @Column(length = 5000)
+    private String starterCode;
 
 
     public enum QuestionType {

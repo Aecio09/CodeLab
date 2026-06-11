@@ -16,10 +16,11 @@ public class InitiConfig {
                                      QuestionService questionService) {
         return args -> {
             boolean created = adminCreationService.createAdminIfNotExists();
-            if (created) {
-                System.out.println("Admin criado com sucesso!");
+            boolean created2 = adminCreationService.createUserIfNotExist();
+            if (created && created2) {
+                System.out.println("Admin e user criado com sucesso!");
             } else {
-                System.out.println("Admin já existe, pulando criação.");
+                System.out.println("Admin ou user já existe, pulando criação.");
             }
 
             var seedQuestions = questionSeedStore.readSeedQuestions();

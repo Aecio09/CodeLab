@@ -22,22 +22,30 @@ public class AnswerService {
     private final QuestionService questionService;
     private final CodeVerificationService codeVerificationService;
     private final AiVerificationService aiVerificationService;
+    private final com.project._3.repositories.UserRepository userRepository;
 
     public AnswerService(AnswerRepository answerRepository,
                          QuestionService questionService,
                          CodeVerificationService codeVerificationService,
-                         AiVerificationService aiVerificationService) {
+                         AiVerificationService aiVerificationService,
+                         com.project._3.repositories.UserRepository userRepository) {
         this.answerRepository = answerRepository;
         this.questionService = questionService;
         this.codeVerificationService = codeVerificationService;
         this.aiVerificationService = aiVerificationService;
+        this.userRepository = userRepository;
     }
 
-    public Answer createAnswer(AnswerCreateRequest request) {
+    public Answer createAnswer(AnswerCreateRequest request, java.security.Principal principal) {
         Answer answer = new Answer();
         answer.setAnswerBody(request.answerBody());
         Question question = questionService.getQuestionById(request.questionId());
         answer.setQuestion(question);
+        
+        if (principal != null) {
+            userRepository.findByEmail(principal.getName()).ifPresent(answer::setUser);
+        }
+
         Answer savedAnswer = answerRepository.save(answer);
         
         // Verifica resposta no serviço de verificação de código
@@ -46,13 +54,18 @@ public class AnswerService {
         return savedAnswer;
     }
 
-    public Answer updateAnswer(long id, AnswerCreateRequest request) {
+    public Answer updateAnswer(long id, AnswerCreateRequest request, java.security.Principal principal) {
         Answer answer = answerRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Answer not found with id: " + id));
 
         answer.setAnswerBody(request.answerBody());
         Question question = questionService.getQuestionById(request.questionId());
         answer.setQuestion(question);
+
+        if (principal != null) {
+            userRepository.findByEmail(principal.getName()).ifPresent(answer::setUser);
+        }
+
         Answer updatedAnswer = answerRepository.save(answer);
         
         // Verifica resposta no serviço de verificação de código
@@ -76,7 +89,9 @@ public class AnswerService {
     public List<Answer> getAllAnswers() {
         return answerRepository.findAll();
     }
-
+    public List<Answer> getUserAnswersById(long id){
+    return answerRepository.findByUserId(id);
+  }
     private void verifyAnswer(Answer answer, Question question) {
         AnswerVerificationRequestDto verificationRequest = new AnswerVerificationRequestDto(
                 answer.getId(),

@@ -37,7 +37,7 @@ public class UserController {
     @PreAuthorize("hasAuthority('ADMIN') or #principal.name == authentication.name")
     public ResponseEntity<UserDto> getCurrentUser(Principal principal) {
         return repository.findByEmail(principal.getName())
-                .map(u -> new UserDto(u.getId(), u.getName(), u.getEmail(), u.getPhoto(), u.getRole().name()))
+                .map(u -> new UserDto(u.getId(), u.getName(), u.getEmail(), u.getPhoto(), u.getRole().name(), u.getUserStreak(), u.getUserPoints()))
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
@@ -62,7 +62,7 @@ public class UserController {
         }
 
         repository.save(u);
-        return ResponseEntity.ok(new UserDto(u.getId(), u.getName(), u.getEmail(), u.getPhoto(), u.getRole().name()));
+        return ResponseEntity.ok(new UserDto(u.getId(), u.getName(), u.getEmail(), u.getPhoto(), u.getRole().name(), u.getUserStreak(), u.getUserPoints()));
     }
 
     @DeleteMapping("/perfil")
@@ -91,7 +91,7 @@ public class UserController {
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<List<UserDto>> getAllUsers() {
              return ResponseEntity.ok(repository.findAll().stream()
-                            .map(u -> new UserDto(u.getId(), u.getName(), u.getEmail(), u.getPhoto(), u.getRole().name()))
+                            .map(u -> new UserDto(u.getId(), u.getName(), u.getEmail(), u.getPhoto(), u.getRole().name(), u.getUserStreak(), u.getUserPoints()))
                              .toList());
     }
 }

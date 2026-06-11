@@ -31,10 +31,66 @@ public class QuestionController {
 
     private final QuestionService questionService;
     private final QuestionSeedImportService questionSeedImportService;
+    private final com.project._3.services.TrailService trailService;
+    private final com.project._3.repositories.UserRepository userRepository;
 
-    public QuestionController(QuestionService questionService, QuestionSeedImportService questionSeedImportService) {
+    public QuestionController(QuestionService questionService, 
+                              QuestionSeedImportService questionSeedImportService,
+                              com.project._3.services.TrailService trailService,
+                              com.project._3.repositories.UserRepository userRepository) {
         this.questionService = questionService;
         this.questionSeedImportService = questionSeedImportService;
+        this.trailService = trailService;
+        this.userRepository = userRepository;
+    }
+
+    @GetMapping("/next")
+    public ResponseEntity<Question> getNextQuestion(@RequestParam("topic") Question.Topics topic, java.security.Principal principal) {
+        if (principal == null) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+
+        return userRepository.findByEmail(principal.getName())
+                .map(user -> {
+                    var progress = trailService.getStudentProgress(user.getId());
+                    var topicStatusOpt = progress.stream()
+                            .filter(p -> p.topicName().equals(topic.name()))
+                            .findFirst();
+
+                    if (topicStatusOpt.isEmpty()) {
+                        System.err.println("Topic not found in trail progress: " + topic.name());
+                        return ResponseEntity.status(HttpStatus.BAD_REQUEST).<Question>build();
+                    }
+
+                    var topicStatus = topicStatusOpt.get();
+
+                    if (topicStatus.status().equals("LOCKED")) {
+                        return ResponseEntity.status(HttpStatus.FORBIDDEN).<Question>build();
+                    }
+
+                    var difficulty = questionService.determineDifficulty(topicStatus.currentLesson(), topicStatus.totalLessons());
+                    
+                    System.out.println("Searching next question for user " + user.getId() + " topic " + topic + " diff " + difficulty);
+
+                    var nextQuestion = questionService.findNextQuestionForUser(user.getId(), topic, difficulty);
+                    
+                    if (nextQuestion.isEmpty()) {
+                        System.out.println("No question found for ideal difficulty, trying fallback...");
+                        for (Question.DifficultyLevel altDiff : Question.DifficultyLevel.values()) {
+                            nextQuestion = questionService.findNextQuestionForUser(user.getId(), topic, altDiff);
+                            if (nextQuestion.isPresent()) {
+                                System.out.println("Found fallback question with difficulty: " + altDiff);
+                                break;
+                            }
+                        }
+                    }
+
+                    return nextQuestion
+                            .map(ResponseEntity::ok)
+                            .orElseGet(() -> {
+                                System.err.println("REALLY NO QUESTIONS FOUND for topic: " + topic);
+                                return ResponseEntity.notFound().build();
+                            });
+                })
+                .orElse(ResponseEntity.notFound().build());
     }
 
     @PostMapping

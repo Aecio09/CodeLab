@@ -24,6 +24,7 @@ public class QuestionService {
         question.setDifficulty(request.difficulty());
         question.setRequiredUsage(request.requiredUsage());
         question.setTopic(request.topic());
+        question.setStarterCode(request.starterCode());
         return questionRepository.save(question);
     }
 
@@ -36,6 +37,7 @@ public class QuestionService {
         question.setDifficulty(request.difficulty());
         question.setRequiredUsage(request.requiredUsage());
         question.setTopic(request.topic());
+        question.setStarterCode(request.starterCode());
         return questionRepository.save(question);
     }
 
@@ -53,6 +55,17 @@ public class QuestionService {
 
     public List<Question> getAllQuestions() {
         return questionRepository.findAll();
+    }
+
+    public Question.DifficultyLevel determineDifficulty(int currentLesson, int totalLessons) {
+        float progress = (float) currentLesson / totalLessons;
+        if (progress <= 0.35f) return Question.DifficultyLevel.EASY;
+        if (progress <= 0.75f) return Question.DifficultyLevel.MEDIUM;
+        return Question.DifficultyLevel.HARD;
+    }
+
+    public java.util.Optional<Question> findNextQuestionForUser(Long userId, Question.Topics topic, Question.DifficultyLevel difficulty) {
+        return questionRepository.findNextQuestionForUser(userId, topic, difficulty);
     }
 
     public int importSeedQuestionsIfMissing(List<QuestionCreateRequest> seedQuestions) {

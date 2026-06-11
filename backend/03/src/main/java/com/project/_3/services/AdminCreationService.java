@@ -36,4 +36,21 @@ public class AdminCreationService {
 
         return true;
     }
+    public boolean createUserIfNotExist() {
+        Optional<User> userExists = userRepository.findByEmail("user@gmail.com");
+
+        if(userExists.isPresent()) {
+            return false;
+        }
+        User simpleUser = new User();
+        simpleUser.setName("firstUser");
+        simpleUser.setEmail("user@gmail.com");
+        simpleUser.setPassword(passwordEncoder.encode("user123"));
+        simpleUser.setRole(Role.USER);
+        simpleUser.setUserStreak(0);
+        simpleUser.setUserPoints(0.0f);
+        userRepository.save(simpleUser);
+
+        return true;
+    }
 }

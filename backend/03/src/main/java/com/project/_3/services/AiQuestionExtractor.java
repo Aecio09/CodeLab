@@ -17,6 +17,7 @@ import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.HashMap;
 
 @Service
 public class AiQuestionExtractor {
@@ -43,22 +44,22 @@ public class AiQuestionExtractor {
                 "model", MODEL,
                 "messages", List.of(
                         Map.of("role", "system", "content", """
-                                Você deve retornar SOMENTE JSON válido, sem markdown, sem texto extra e sem blocos de código.
-                                Estrutura obrigatória:
-                                {"questions":[{"questionBody":"...","type":"...","difficulty":"...","requiredUsage":"...","topic":"..."}]}
-                                Regras críticas:
-                                - Use apenas 1 valor por campo de enum.
-                                - NÃO use placeholders com barra vertical como "A|B|C".
-                                - NÃO use descrições em português nos campos de enum.
-                                Valores permitidos:
-                                - type: MULTIPLE_CHOICE ou PRACTICAL
-                                - difficulty: EASY, MEDIUM, HARD
-                                - topic: OPERADORES_TIPOS_E_VARIAVEIS, EXECUCAO_CONDICIONAL, OPERADORES_LOGICOS, LACOS, SUBPROGRAMAS, VETORES, ARRAYS, TIPOS_CRIADOS_PELO_PROGRAMADOR
-                                - requiredUsage: um valor exato do enum de RequiredUsage ou null
-                                Exemplo válido:
-                                {"questionBody":"...","type":"PRACTICAL","difficulty":"MEDIUM","requiredUsage":"FOR","topic":"LACOS"}
+                                Você é um extrator de questões técnico e RIGOROSO. 
+                                Você deve retornar APENAS um objeto JSON no formato especificado abaixo.
+                                
+                                ESTRUTURA OBRIGATÓRIA:
+                                {"questions":[{"questionBody":"...","type":"...","difficulty":"...","requiredUsage":"...","topic":"...","starterCode":"..."}]}
+
+                                REGRAS INVIOLÁVEIS:
+                                1. O campo "type" DEVE ser EXCLUSIVAMENTE "PRACTICAL" ou "MULTIPLE_CHOICE". 
+                                   NUNCA use termos descritivos como "Array 1D", "Exercício", "Algoritmo" ou "Lógica" neste campo.
+                                2. O campo "topic" DEVE ser EXATAMENTE um destes 8 valores:
+                                   OPERADORES_TIPOS_E_VARIAVEIS, EXECUCAO_CONDICIONAL, OPERADORES_LOGICOS, LACOS, SUBPROGRAMAS, VETORES, ARRAYS, TIPOS_CRIADOS_PELO_PROGRAMADOR.
+                                3. O campo "difficulty" DEVE ser "EASY", "MEDIUM" ou "HARD".
+                                4. Se houver código para o aluno completar ou corrigir, esse código DEVE ir para "starterCode".
+                                5. Retorne APENAS o JSON. Sem markdown, sem preâmbulos e sem explicações.
                                 """),
-                        Map.of("role", "user", "content", "Extraia as questões do texto abaixo e devolva apenas o JSON.\nTexto:\n" + text)
+                        Map.of("role", "user", "content", "Extraia as questões seguindo rigorosamente as REGRAS INVIOLÁVEIS. Texto:\n" + text)
                 )
         );
 
@@ -98,7 +99,8 @@ public class AiQuestionExtractor {
                         parseQuestionType(node),
                         parseDifficulty(node),
                         parseOptionalRequiredUsage(node),
-                        parseTopic(node)
+                        parseTopic(node),
+                        node.path("starterCode").asText(null)
                 ));
             }
             return questions;
@@ -142,34 +144,55 @@ public class AiQuestionExtractor {
 
     private Question.QuestionType parseQuestionType(JsonNode node) {
         String value = requiredText(node, "type");
-        return parseRequiredEnum(value, "type", Question.QuestionType.class, Map.of(
-                "MULTIPLA_ESCOLHA", "MULTIPLE_CHOICE",
-                "MULTIPLA ESCOLHA", "MULTIPLE_CHOICE",
-                "MULTIPLE CHOICE", "MULTIPLE_CHOICE",
-                "PRATICA", "PRACTICAL",
-                "PRACTICA", "PRACTICAL"
-        ));
+        Map<String, String> aliases = new HashMap<>();
+        aliases.put("MULTIPLA_ESCOLHA", "MULTIPLE_CHOICE");
+        aliases.put("MULTIPLA ESCOLHA", "MULTIPLE_CHOICE");
+        aliases.put("MULTIPLE CHOICE", "MULTIPLE_CHOICE");
+        aliases.put("TEORICA", "MULTIPLE_CHOICE");
+        aliases.put("TEORICO", "MULTIPLE_CHOICE");
+        aliases.put("PRATICA", "PRACTICAL");
+        aliases.put("PRACTICA", "PRACTICAL");
+        aliases.put("EXERCICIO", "PRACTICAL");
+        aliases.put("DESAFIO", "PRACTICAL");
+        aliases.put("CODIGO", "PRACTICAL");
+        
+        return parseRequiredEnum(value, "type", Question.QuestionType.class, aliases);
     }
 
     private Question.DifficultyLevel parseDifficulty(JsonNode node) {
         String value = requiredText(node, "difficulty");
-        return parseRequiredEnum(value, "difficulty", Question.DifficultyLevel.class, Map.of(
-                "FACIL", "EASY",
-                "MEDIO", "MEDIUM",
-                "MEDIA", "MEDIUM",
-                "DIFICIL", "HARD"
-        ));
+        Map<String, String> aliases = new HashMap<>();
+        aliases.put("FACIL", "EASY");
+        aliases.put("SIMPLE", "EASY");
+        aliases.put("MEDIO", "MEDIUM");
+        aliases.put("MEDIA", "MEDIUM");
+        aliases.put("INTERMEDIARIO", "MEDIUM");
+        aliases.put("DIFICIL", "HARD");
+        aliases.put("AVANCADO", "HARD");
+        aliases.put("COMPLEXO", "HARD");
+        
+        return parseRequiredEnum(value, "difficulty", Question.DifficultyLevel.class, aliases);
     }
 
     private Question.Topics parseTopic(JsonNode node) {
         String value = requiredText(node, "topic");
-        return parseRequiredEnum(value, "topic", Question.Topics.class, Map.of(
-                "OPERADORES TIPOS E VARIAVEIS", "OPERADORES_TIPOS_E_VARIAVEIS",
-                "OPERADORES_LOGICOS", "OPERADORES_LOGICOS",
-                "EXECUCAO CONDICIONAL", "EXECUCAO_CONDICIONAL",
-                "TIPOS_CRIADOS_PELO_PROGRAMADOR", "TIPOS_CRIADOS_PELO_PROGRAMADOR",
-                "TIPOS CRIADOS PELO PROGRAMADOR", "TIPOS_CRIADOS_PELO_PROGRAMADOR"
-        ));
+        Map<String, String> aliases = new HashMap<>();
+        aliases.put("OPERADORES TIPOS E VARIAVEIS", "OPERADORES_TIPOS_E_VARIAVEIS");
+        aliases.put("OPERADORES TIPOS VARIAVEIS", "OPERADORES_TIPOS_E_VARIAVEIS");
+        aliases.put("OPERADORES_LOGICOS", "OPERADORES_LOGICOS");
+        aliases.put("LOGICA", "OPERADORES_LOGICOS");
+        aliases.put("EXECUCAO CONDICIONAL", "EXECUCAO_CONDICIONAL");
+        aliases.put("CONDICIONAIS", "EXECUCAO_CONDICIONAL");
+        aliases.put("LACOS_DE_REPETICAO", "LACOS");
+        aliases.put("LOOPS", "LACOS");
+        aliases.put("REPETICAO", "LACOS");
+        aliases.put("FUNCOES", "SUBPROGRAMAS");
+        aliases.put("MATRIZES", "ARRAYS");
+        aliases.put("TIPOS_CRIADOS_PELO_PROGRAMADOR", "TIPOS_CRIADOS_PELO_PROGRAMADOR");
+        aliases.put("TIPOS CRIADOS PELO PROGRAMADOR", "TIPOS_CRIADOS_PELO_PROGRAMADOR");
+        aliases.put("STRUCTS", "TIPOS_CRIADOS_PELO_PROGRAMADOR");
+
+        return parseRequiredEnum(value, "topic", Question.Topics.class, aliases);
     }
 
     private Question.RequiredUsage parseOptionalRequiredUsage(JsonNode node) {

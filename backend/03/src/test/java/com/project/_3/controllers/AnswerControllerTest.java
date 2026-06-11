@@ -5,6 +5,7 @@ import com.project._3.entities.Answer;
 import com.project._3.services.AnswerService;
 import org.junit.jupiter.api.Test;
 
+import java.security.Principal;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -21,6 +22,7 @@ class AnswerControllerTest {
 
     private final AnswerService answerService = mock(AnswerService.class);
     private final AnswerController answerController = new AnswerController(answerService);
+    private final Principal principal = mock(Principal.class);
 
     @Test
     void createAnswerShouldReturnCreatedAnswer() {
@@ -29,13 +31,13 @@ class AnswerControllerTest {
         createdAnswer.setId(10L);
         createdAnswer.setAnswerBody(request.answerBody());
 
-        when(answerService.createAnswer(any(AnswerCreateRequest.class))).thenReturn(createdAnswer);
+        when(answerService.createAnswer(any(AnswerCreateRequest.class), any(Principal.class))).thenReturn(createdAnswer);
 
-        var response = answerController.createAnswer(request);
+        var response = answerController.createAnswer(request, principal);
 
         assertEquals(201, response.getStatusCode().value());
         assertSame(createdAnswer, response.getBody());
-        verify(answerService).createAnswer(request);
+        verify(answerService).createAnswer(request, principal);
     }
 
     @Test
@@ -45,13 +47,13 @@ class AnswerControllerTest {
         updatedAnswer.setId(11L);
         updatedAnswer.setAnswerBody(request.answerBody());
 
-        when(answerService.updateAnswer(eq(11L), any(AnswerCreateRequest.class))).thenReturn(updatedAnswer);
+        when(answerService.updateAnswer(eq(11L), any(AnswerCreateRequest.class), any(Principal.class))).thenReturn(updatedAnswer);
 
-        var response = answerController.updateAnswer(11L, request);
+        var response = answerController.updateAnswer(11L, request, principal);
 
         assertEquals(200, response.getStatusCode().value());
         assertSame(updatedAnswer, response.getBody());
-        verify(answerService).updateAnswer(11L, request);
+        verify(answerService).updateAnswer(11L, request, principal);
     }
 
     @Test
@@ -96,4 +98,3 @@ class AnswerControllerTest {
         verify(answerService).deleteAnswer(14L);
     }
 }
-

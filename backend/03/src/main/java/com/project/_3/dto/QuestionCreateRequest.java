@@ -19,7 +19,9 @@ public record QuestionCreateRequest(
         Question.RequiredUsage requiredUsage,
 
         @NotNull
-        Question.Topics topic
+        Question.Topics topic,
+
+        @Size(max = 5000)
+        String starterCode
 ) {
 }
-

@@ -4,258 +4,364 @@
     "type" : "PRACTICAL",
     "difficulty" : "EASY",
     "requiredUsage" : null,
-    "topic" : "OPERADORES_TIPOS_E_VARIAVEIS"
+    "topic" : "OPERADORES_TIPOS_E_VARIAVEIS",
+    "starterCode" : null
   }, {
     "questionBody" : "Imprimir o perímetro de um quadrado",
     "type" : "PRACTICAL",
     "difficulty" : "EASY",
     "requiredUsage" : null,
-    "topic" : "OPERADORES_TIPOS_E_VARIAVEIS"
+    "topic" : "OPERADORES_TIPOS_E_VARIAVEIS",
+    "starterCode" : null
   }, {
     "questionBody" : "Imprimir o perímetro de um retângulo",
     "type" : "PRACTICAL",
     "difficulty" : "EASY",
     "requiredUsage" : null,
-    "topic" : "OPERADORES_TIPOS_E_VARIAVEIS"
+    "topic" : "OPERADORES_TIPOS_E_VARIAVEIS",
+    "starterCode" : null
   }, {
     "questionBody" : "Imprimir o perímetro de um pentágono",
     "type" : "PRACTICAL",
     "difficulty" : "EASY",
     "requiredUsage" : null,
-    "topic" : "OPERADORES_TIPOS_E_VARIAVEIS"
+    "topic" : "OPERADORES_TIPOS_E_VARIAVEIS",
+    "starterCode" : null
   }, {
     "questionBody" : "Imprimir o perímetro de um hexágono",
     "type" : "PRACTICAL",
     "difficulty" : "EASY",
     "requiredUsage" : null,
-    "topic" : "OPERADORES_TIPOS_E_VARIAVEIS"
+    "topic" : "OPERADORES_TIPOS_E_VARIAVEIS",
+    "starterCode" : null
   }, {
     "questionBody" : "Converter segundos em horas",
     "type" : "PRACTICAL",
     "difficulty" : "EASY",
     "requiredUsage" : null,
-    "topic" : "OPERADORES_TIPOS_E_VARIAVEIS"
+    "topic" : "OPERADORES_TIPOS_E_VARIAVEIS",
+    "starterCode" : null
   }, {
     "questionBody" : "Solucionar a equação: f(x) = x² + 2x – 3",
     "type" : "PRACTICAL",
     "difficulty" : "EASY",
     "requiredUsage" : null,
-    "topic" : "OPERADORES_TIPOS_E_VARIAVEIS"
+    "topic" : "OPERADORES_TIPOS_E_VARIAVEIS",
+    "starterCode" : null
   }, {
     "questionBody" : "Solucionar a equação: f(x) = x³ + x² + 3x - 25",
     "type" : "PRACTICAL",
     "difficulty" : "EASY",
     "requiredUsage" : null,
-    "topic" : "OPERADORES_TIPOS_E_VARIAVEIS"
+    "topic" : "OPERADORES_TIPOS_E_VARIAVEIS",
+    "starterCode" : null
   }, {
     "questionBody" : "Imprimir a média de seis números",
     "type" : "PRACTICAL",
     "difficulty" : "EASY",
     "requiredUsage" : null,
-    "topic" : "OPERADORES_TIPOS_E_VARIAVEIS"
+    "topic" : "OPERADORES_TIPOS_E_VARIAVEIS",
+    "starterCode" : null
   }, {
     "questionBody" : "Imprimir a média ponderada de quatro números",
     "type" : "PRACTICAL",
     "difficulty" : "EASY",
     "requiredUsage" : null,
-    "topic" : "OPERADORES_TIPOS_E_VARIAVEIS"
+    "topic" : "OPERADORES_TIPOS_E_VARIAVEIS",
+    "starterCode" : null
   }, {
     "questionBody" : "Imprimir o índice de Massa Corporal (peso dividido pelo quadrado da altura)",
     "type" : "PRACTICAL",
     "difficulty" : "EASY",
     "requiredUsage" : null,
-    "topic" : "OPERADORES_TIPOS_E_VARIAVEIS"
+    "topic" : "OPERADORES_TIPOS_E_VARIAVEIS",
+    "starterCode" : null
   }, {
     "questionBody" : "Imprimir o perímetro de um círculo (2 vezes PI vezes raio)",
     "type" : "PRACTICAL",
     "difficulty" : "EASY",
     "requiredUsage" : null,
-    "topic" : "OPERADORES_TIPOS_E_VARIAVEIS"
+    "topic" : "OPERADORES_TIPOS_E_VARIAVEIS",
+    "starterCode" : null
   }, {
     "questionBody" : "Solucionar a equação: f(x, z) = x³ + z² + 3xz - 25",
     "type" : "PRACTICAL",
     "difficulty" : "EASY",
     "requiredUsage" : null,
-    "topic" : "OPERADORES_TIPOS_E_VARIAVEIS"
+    "topic" : "OPERADORES_TIPOS_E_VARIAVEIS",
+    "starterCode" : null
   }, {
     "questionBody" : "Imprimir o volume de um cilindro (área da base vezes a altura)",
     "type" : "PRACTICAL",
     "difficulty" : "EASY",
     "requiredUsage" : null,
-    "topic" : "OPERADORES_TIPOS_E_VARIAVEIS"
+    "topic" : "OPERADORES_TIPOS_E_VARIAVEIS",
+    "starterCode" : null
   }, {
     "questionBody" : "Imprimir o volume de uma caixa (base vezes altura vezes profundidade)",
     "type" : "PRACTICAL",
     "difficulty" : "EASY",
     "requiredUsage" : null,
-    "topic" : "OPERADORES_TIPOS_E_VARIAVEIS"
+    "topic" : "OPERADORES_TIPOS_E_VARIAVEIS",
+    "starterCode" : null
   }, {
     "questionBody" : "Imprimir área de um triângulo isósceles (base vezes altura dividido por dois)",
     "type" : "PRACTICAL",
     "difficulty" : "EASY",
     "requiredUsage" : null,
-    "topic" : "OPERADORES_TIPOS_E_VARIAVEIS"
+    "topic" : "OPERADORES_TIPOS_E_VARIAVEIS",
+    "starterCode" : null
   }, {
     "questionBody" : "Escolher o maior entre dois números",
     "type" : "PRACTICAL",
     "difficulty" : "MEDIUM",
     "requiredUsage" : null,
-    "topic" : "OPERADORES_TIPOS_E_VARIAVEIS"
+    "topic" : "OPERADORES_TIPOS_E_VARIAVEIS",
+    "starterCode" : null
   }, {
     "questionBody" : "Computar as raízes de uma equação do segundo grau",
     "type" : "PRACTICAL",
     "difficulty" : "MEDIUM",
     "requiredUsage" : null,
-    "topic" : "OPERADORES_TIPOS_E_VARIAVEIS"
+    "topic" : "OPERADORES_TIPOS_E_VARIAVEIS",
+    "starterCode" : null
   }, {
     "questionBody" : "Computar a distância entre dois pontos tridimensionais",
     "type" : "PRACTICAL",
     "difficulty" : "HARD",
     "requiredUsage" : null,
-    "topic" : "OPERADORES_TIPOS_E_VARIAVEIS"
+    "topic" : "OPERADORES_TIPOS_E_VARIAVEIS",
+    "starterCode" : null
   }, {
     "questionBody" : "Computar o valor da hipotenusa em um triângulo retângulo ",
     "type" : "PRACTICAL",
     "difficulty" : "MEDIUM",
     "requiredUsage" : null,
-    "topic" : "OPERADORES_TIPOS_E_VARIAVEIS"
+    "topic" : "OPERADORES_TIPOS_E_VARIAVEIS",
+    "starterCode" : null
   }, {
     "questionBody" : "Trocar o valor de duas variáveis",
     "type" : "PRACTICAL",
     "difficulty" : "MEDIUM",
     "requiredUsage" : null,
-    "topic" : "OPERADORES_TIPOS_E_VARIAVEIS"
+    "topic" : "OPERADORES_TIPOS_E_VARIAVEIS",
+    "starterCode" : null
   }, {
     "questionBody" : "Corrigir o programa que computar a média de 4 números",
     "type" : "PRACTICAL",
     "difficulty" : "EASY",
     "requiredUsage" : null,
-    "topic" : "OPERADORES_TIPOS_E_VARIAVEIS"
+    "topic" : "OPERADORES_TIPOS_E_VARIAVEIS",
+    "starterCode" : null
   }, {
     "questionBody" : "Testar se o quadrado de um número é maior do que ele multiplicado por 10;",
     "type" : "PRACTICAL",
     "difficulty" : "EASY",
     "requiredUsage" : null,
-    "topic" : "EXECUCAO_CONDICIONAL"
+    "topic" : "EXECUCAO_CONDICIONAL",
+    "starterCode" : null
   }, {
     "questionBody" : "Testar se um número é divisível por 3 e por 4 (tente fazer usando apenas if’s e else’s);",
     "type" : "PRACTICAL",
     "difficulty" : "MEDIUM",
     "requiredUsage" : "FOR",
-    "topic" : "EXECUCAO_CONDICIONAL"
+    "topic" : "EXECUCAO_CONDICIONAL",
+    "starterCode" : null
   }, {
     "questionBody" : "Testar se um número é divisível por 3 mas não por 4 (tente fazer usando apenas if’s e else’s);",
     "type" : "PRACTICAL",
     "difficulty" : "MEDIUM",
     "requiredUsage" : "WHILE",
-    "topic" : "EXECUCAO_CONDICIONAL"
+    "topic" : "EXECUCAO_CONDICIONAL",
+    "starterCode" : null
   }, {
     "questionBody" : "Testar se um número é divisível por 2 ou por 7 (tente fazer usando apenas if’s e else’s);",
     "type" : "PRACTICAL",
     "difficulty" : "MEDIUM",
     "requiredUsage" : null,
-    "topic" : "EXECUCAO_CONDICIONAL"
+    "topic" : "EXECUCAO_CONDICIONAL",
+    "starterCode" : null
   }, {
     "questionBody" : "Multiplicar dois números e verificar se o resultado é um número negativo;",
     "type" : "PRACTICAL",
     "difficulty" : "EASY",
     "requiredUsage" : null,
-    "topic" : "EXECUCAO_CONDICIONAL"
+    "topic" : "EXECUCAO_CONDICIONAL",
+    "starterCode" : null
   }, {
     "questionBody" : "Dividir dois números inteiros e verificar se o resultado é divisível por 10;",
     "type" : "PRACTICAL",
     "difficulty" : "EASY",
     "requiredUsage" : "FOR",
-    "topic" : "EXECUCAO_CONDICIONAL"
+    "topic" : "EXECUCAO_CONDICIONAL",
+    "starterCode" : null
   }, {
     "questionBody" : "Dividir a por b e verificar se o resultado é maior do que a;",
     "type" : "PRACTICAL",
     "difficulty" : "EASY",
     "requiredUsage" : null,
-    "topic" : "EXECUCAO_CONDICIONAL"
+    "topic" : "EXECUCAO_CONDICIONAL",
+    "starterCode" : null
   }, {
     "questionBody" : "Dado dois números, imprimir em ordem crescente;",
     "type" : "PRACTICAL",
     "difficulty" : "MEDIUM",
     "requiredUsage" : null,
-    "topic" : "EXECUCAO_CONDICIONAL"
+    "topic" : "EXECUCAO_CONDICIONAL",
+    "starterCode" : null
   }, {
     "questionBody" : "Dado dois números,  imprimir em ordem decrescente;",
     "type" : "PRACTICAL",
     "difficulty" : "MEDIUM",
     "requiredUsage" : "FOR",
-    "topic" : "EXECUCAO_CONDICIONAL"
+    "topic" : "EXECUCAO_CONDICIONAL",
+    "starterCode" : null
   }, {
     "questionBody" : "Elevar um número ao quadrado e informar se o resultado é maior do que 100.",
     "type" : "PRACTICAL",
     "difficulty" : "EASY",
     "requiredUsage" : null,
-    "topic" : "EXECUCAO_CONDICIONAL"
+    "topic" : "EXECUCAO_CONDICIONAL",
+    "starterCode" : null
   }, {
     "questionBody" : "Dados três números quaisquer, imprimi-los em ordem crescente;",
     "type" : "PRACTICAL",
     "difficulty" : "HARD",
     "requiredUsage" : null,
-    "topic" : "EXECUCAO_CONDICIONAL"
+    "topic" : "EXECUCAO_CONDICIONAL",
+    "starterCode" : null
   }, {
     "questionBody" : "Dados três números quaisquer, imprimi-los em ordem decrescente;",
     "type" : "PRACTICAL",
     "difficulty" : "HARD",
     "requiredUsage" : "FOR",
-    "topic" : "EXECUCAO_CONDICIONAL"
+    "topic" : "EXECUCAO_CONDICIONAL",
+    "starterCode" : null
   }, {
     "questionBody" : "Dados quatro notas, computar e classificar o valor da média das notas de um  estudante como aprovado (> 6), reprovado (< 4) e recuperação (caso contrário);",
     "type" : "PRACTICAL",
     "difficulty" : "HARD",
     "requiredUsage" : null,
-    "topic" : "EXECUCAO_CONDICIONAL"
+    "topic" : "EXECUCAO_CONDICIONAL",
+    "starterCode" : null
   }, {
     "questionBody" : "Dada a temperatura, classificá-la como fria (< 15), quente (> 30) e normal (caso contrário);",
     "type" : "PRACTICAL",
     "difficulty" : "HARD",
     "requiredUsage" : null,
-    "topic" : "EXECUCAO_CONDICIONAL"
+    "topic" : "EXECUCAO_CONDICIONAL",
+    "starterCode" : null
   }, {
     "questionBody" : "Computar o Índice de Massa Corporal (peso dividido pelo quadrado da altura) e classificar o resultado entre magreza (inferior a 18.5), saudável (entre 18.5 e 25), sobrepeso (acima de 25);",
     "type" : "PRACTICAL",
     "difficulty" : "HARD",
     "requiredUsage" : null,
-    "topic" : "EXECUCAO_CONDICIONAL"
+    "topic" : "EXECUCAO_CONDICIONAL",
+    "starterCode" : null
   }, {
     "questionBody" : "Dado o dia da semana, imprime as aulas que os estudantes do primeiro semestre terão no dia;",
     "type" : "PRACTICAL",
     "difficulty" : "HARD",
     "requiredUsage" : null,
-    "topic" : "EXECUCAO_CONDICIONAL"
+    "topic" : "EXECUCAO_CONDICIONAL",
+    "starterCode" : null
   }, {
     "questionBody" : "Converter o dia da semana (string) em um valor numérico (“domingo” -> 0, “segunda” -> 1, etc.);",
     "type" : "PRACTICAL",
     "difficulty" : "HARD",
     "requiredUsage" : null,
-    "topic" : "OPERADORES_TIPOS_E_VARIAVEIS"
+    "topic" : "OPERADORES_TIPOS_E_VARIAVEIS",
+    "starterCode" : null
   }, {
     "questionBody" : "Converter texto em um número inteiro (“um” -> 1, “dois” -> 2, até o número “cinco”);",
     "type" : "PRACTICAL",
     "difficulty" : "HARD",
     "requiredUsage" : null,
-    "topic" : "OPERADORES_TIPOS_E_VARIAVEIS"
+    "topic" : "OPERADORES_TIPOS_E_VARIAVEIS",
+    "starterCode" : null
   }, {
     "questionBody" : "Traduzir os pronomes (I, you, he, she, it, we e they) do Inglês para o Português;",
     "type" : "PRACTICAL",
     "difficulty" : "HARD",
     "requiredUsage" : null,
-    "topic" : "OPERADORES_TIPOS_E_VARIAVEIS"
+    "topic" : "OPERADORES_TIPOS_E_VARIAVEIS",
+    "starterCode" : null
   }, {
     "questionBody" : "Dado o nome de um dos integrantes da sua sala, imprimir o sobrenome da pessoa (ao menos 3 pessoas).",
     "type" : "PRACTICAL",
     "difficulty" : "HARD",
     "requiredUsage" : null,
-    "topic" : "OPERADORES_TIPOS_E_VARIAVEIS"
+    "topic" : "OPERADORES_TIPOS_E_VARIAVEIS",
+    "starterCode" : null
   }, {
     "questionBody" : "Corrigir todos os erros do programa e para cada erro encontrado faça um comentário explicando qual o erro e qual foi a solução encontrada: corrigir variáveis, imprimir resultados, etc.",
     "type" : "MULTIPLE_CHOICE",
     "difficulty" : "HARD",
     "requiredUsage" : null,
-    "topic" : "LACOS"
+    "topic" : "LACOS",
+    "starterCode" : null
+  }, {
+    "questionBody" : "Implemente subprogramas capazes de realizar as seguintes operações: (1.0) Dado um array de uma dimensão como parâmetro, retornar a multiplicação de seus elementos; (1.0) Dados dois arrays de uma dimensão como parâmetro, retornar a multiplicação de todos os elementos de ambos.",
+    "type" : "PRACTICAL",
+    "difficulty" : "EASY",
+    "requiredUsage" : null,
+    "topic" : "VETORES",
+    "starterCode" : "// implemente os subprogramas aqui"
+  }, {
+    "questionBody" : "Implemente subprogramas capazes de realizar as seguintes operações: (1.0) Dado um array de duas dimensões como parâmetro, retornar a multiplicação de seus elementos; (1.0) Dados dois arrays de duas dimensões como parâmetro, retornar a multiplicação dos elementos de ambos.",
+    "type" : "PRACTICAL",
+    "difficulty" : "EASY",
+    "requiredUsage" : null,
+    "topic" : "VETORES",
+    "starterCode" : "// implemente os subprogramas aqui"
+  }, {
+    "questionBody" : "Criar o tipo AssentoOnibus com ao menos 4 atributos.",
+    "type" : "PRACTICAL",
+    "difficulty" : "MEDIUM",
+    "requiredUsage" : null,
+    "topic" : "TIPOS_CRIADOS_PELO_PROGRAMADOR",
+    "starterCode" : "// implemente a definição do tipo AssentoOnibus aqui"
+  }, {
+    "questionBody" : "Criar um subprograma que, dado um AssentoOnibus, marque o mesmo como reservado.",
+    "type" : "PRACTICAL",
+    "difficulty" : "MEDIUM",
+    "requiredUsage" : null,
+    "topic" : "SUBPROGRAMAS",
+    "starterCode" : "// implemente o subprograma aqui"
+  }, {
+    "questionBody" : "Criar o tipo Onibus com ao menos 3 atributos.",
+    "type" : "PRACTICAL",
+    "difficulty" : "MEDIUM",
+    "requiredUsage" : null,
+    "topic" : "TIPOS_CRIADOS_PELO_PROGRAMADOR",
+    "starterCode" : "// implemente a definição do tipo Onibus aqui"
+  }, {
+    "questionBody" : "Criar um subprograma que, dado um Onibus como parâmetro, retorne a quantidade de assentos reservados no mesmo.",
+    "type" : "PRACTICAL",
+    "difficulty" : "HARD",
+    "requiredUsage" : null,
+    "topic" : "SUBPROGRAMAS",
+    "starterCode" : "// implemente o subprograma aqui"
+  }, {
+    "questionBody" : "O programa abaixo deveria implementar o tipo Blog com os atributos textos, títulos e autores, além do subprograma titulosPorAutor que, dado um Blog e um autor, retorne um array contendo todos os títulos de seus textos. Corrija todos os erros do programa e comente cada uma das correções.",
+    "type" : "PRACTICAL",
+    "difficulty" : "HARD",
+    "requiredUsage" : null,
+    "topic" : "VETORES",
+    "starterCode" : "class Blog { \n textos: string[] \n titulos : string[] \n autores : string[] \n } \n\n function titulosPorAutor(blog: Blog, autor : string) : string[] { \n   let resultado : string[] = [] \n   for (let i : number = 0; i < blog.autores; i++) { \n       if (blog.autores[i] == autor) { \n           resultado.push(blog.textos[i]) // push adiciona um item no fim do array \n       } \n   } \n   return autor \n }"
+  }, {
+    "questionBody" : "Qual o retorno do subprograma abaixo para a chamada title(\"okui.dje\")?",
+    "type" : "MULTIPLE_CHOICE",
+    "difficulty" : "EASY",
+    "requiredUsage" : null,
+    "topic" : "EXECUCAO_CONDICIONAL",
+    "starterCode" : ""
+  }, {
+    "questionBody" : "Implemente as classes de um jogo da velha, além das funções jogadaPC (que efetua uma jogada automaticamente pelo computador) e a função vencedor (identifica quando um jogador venceu).",
+    "type" : "PRACTICAL",
+    "difficulty" : "HARD",
+    "requiredUsage" : null,
+    "topic" : "SUBPROGRAMAS",
+    "starterCode" : "// implemente as classes e funções aqui"
   } ]
 }

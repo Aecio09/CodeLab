@@ -28,14 +28,14 @@ public class AnswerController {
     }
 
     @PostMapping
-    public ResponseEntity<Answer> createAnswer(@Valid @RequestBody AnswerCreateRequest request) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(answerService.createAnswer(request));
+    public ResponseEntity<Answer> createAnswer(@Valid @RequestBody AnswerCreateRequest request, java.security.Principal principal) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(answerService.createAnswer(request, principal));
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<Answer> updateAnswer(@PathVariable long id,
-                                               @Valid @RequestBody AnswerCreateRequest request) {
-        return ResponseEntity.ok(answerService.updateAnswer(id, request));
+                                               @Valid @RequestBody AnswerCreateRequest request, java.security.Principal principal) {
+        return ResponseEntity.ok(answerService.updateAnswer(id, request, principal));
     }
 
     @GetMapping("/{id}")
@@ -47,7 +47,10 @@ public class AnswerController {
     public ResponseEntity<List<Answer>> getAllAnswers() {
         return ResponseEntity.ok(answerService.getAllAnswers());
     }
-
+    @GetMapping("/user/{id}")
+    public ResponseEntity<List<Answer>> getAnswerByUserId(@PathVariable long id) {
+    return ResponseEntity.ok(answerService.getUserAnswersById(id));
+  }
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteAnswer(@PathVariable long id) {
         answerService.deleteAnswer(id);

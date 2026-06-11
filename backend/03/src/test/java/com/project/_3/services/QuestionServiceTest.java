@@ -32,7 +32,8 @@ class QuestionServiceTest {
                 Question.QuestionType.MULTIPLE_CHOICE,
                 Question.DifficultyLevel.EASY,
                 Question.RequiredUsage.FOR,
-                Question.Topics.LACOS
+                Question.Topics.LACOS,
+                "console.log('starter')"
         );
 
         Question savedQuestion = new Question();
@@ -50,10 +51,9 @@ class QuestionServiceTest {
         assertEquals(Question.DifficultyLevel.EASY, questionToSave.getDifficulty());
         assertEquals(Question.RequiredUsage.FOR, questionToSave.getRequiredUsage());
         assertEquals(Question.Topics.LACOS, questionToSave.getTopic());
+        assertEquals("console.log('starter')", questionToSave.getStarterCode());
 
         assertSame(savedQuestion, result);
         assertEquals(1L, result.getId());
     }
 }
-
-

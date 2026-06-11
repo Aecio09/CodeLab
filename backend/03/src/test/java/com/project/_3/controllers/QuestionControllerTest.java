@@ -4,6 +4,8 @@ import com.project._3.dto.QuestionCreateRequest;
 import com.project._3.entities.Question;
 import com.project._3.services.QuestionService;
 import com.project._3.services.QuestionSeedImportService;
+import com.project._3.services.TrailService;
+import com.project._3.repositories.UserRepository;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -22,7 +24,9 @@ class QuestionControllerTest {
 
     private final QuestionService questionService = mock(QuestionService.class);
     private final QuestionSeedImportService questionSeedImportService = mock(QuestionSeedImportService.class);
-    private final QuestionController questionController = new QuestionController(questionService, questionSeedImportService);
+    private final TrailService trailService = mock(TrailService.class);
+    private final UserRepository userRepository = mock(UserRepository.class);
+    private final QuestionController questionController = new QuestionController(questionService, questionSeedImportService, trailService, userRepository);
 
     @Test
     void createQuestionShouldReturnCreatedQuestion() {
@@ -31,7 +35,8 @@ class QuestionControllerTest {
                 Question.QuestionType.MULTIPLE_CHOICE,
                 Question.DifficultyLevel.EASY,
                 Question.RequiredUsage.FOR,
-                Question.Topics.LACOS
+                Question.Topics.LACOS,
+                null
         );
 
         Question savedQuestion = buildQuestion(1L, request);
@@ -51,7 +56,8 @@ class QuestionControllerTest {
                 Question.QuestionType.PRACTICAL,
                 Question.DifficultyLevel.MEDIUM,
                 Question.RequiredUsage.IF,
-                Question.Topics.OPERADORES_TIPOS_E_VARIAVEIS
+                Question.Topics.OPERADORES_TIPOS_E_VARIAVEIS,
+                null
         );
 
         Question updatedQuestion = buildQuestion(2L, request);
@@ -71,7 +77,8 @@ class QuestionControllerTest {
                 Question.QuestionType.MULTIPLE_CHOICE,
                 Question.DifficultyLevel.EASY,
                 Question.RequiredUsage.WHILE,
-                Question.Topics.LACOS
+                Question.Topics.LACOS,
+                null
         ));
         when(questionService.getAllQuestions()).thenReturn(List.of(question));
 
@@ -90,7 +97,8 @@ class QuestionControllerTest {
                 Question.QuestionType.PRACTICAL,
                 Question.DifficultyLevel.HARD,
                 Question.RequiredUsage.FOR,
-                Question.Topics.EXECUCAO_CONDICIONAL
+                Question.Topics.EXECUCAO_CONDICIONAL,
+                null
         ));
         when(questionService.getQuestionById(4L)).thenReturn(question);
 
@@ -120,6 +128,7 @@ class QuestionControllerTest {
         question.setDifficulty(request.difficulty());
         question.setRequiredUsage(request.requiredUsage());
         question.setTopic(request.topic());
+        question.setStarterCode(request.starterCode());
         return question;
     }
 }
