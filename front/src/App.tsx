@@ -6,6 +6,7 @@ import { ProfilePage } from './pages/ProfilePage'
 import { AdminQuestionsPage } from './pages/AdminQuestionsPage'
 import { AdminPlaygroundPage } from './pages/AdminPlaygroundPage'
 import { StudentPlaygroundPage } from './pages/StudentPlaygroundPage'
+import { GeneralPlaygroundPage } from './pages/GeneralPlaygroundPage'
 import { StudentPathPage } from './pages/StudentPathPage'
 
 export default function App() {
@@ -14,6 +15,7 @@ export default function App() {
   const isProfilePage = currentPath === '/perfil'
   const isAdminQuestionsPage = currentPath === '/admin/questions'
   const isStudentPathPage = currentPath === '/trilha'
+  const isGeneralPlaygroundPage = currentPath === '/playground'
 
   const adminPlaygroundMatch = currentPath.match(/^\/admin\/questions\/(\d+)\/playground$/)
   const playgroundQuestionId = adminPlaygroundMatch ? Number(adminPlaygroundMatch[1]) : null
@@ -30,6 +32,8 @@ export default function App() {
     <div className="bg-background font-body-md text-on-background min-h-screen flex flex-col antialiased">
       {isRegisterPage ? (
         <RegisterPage />
+      ) : isGeneralPlaygroundPage ? (
+        <GeneralPlaygroundPage />
       ) : studentQuestionId ? (
         <StudentPlaygroundPage questionId={studentQuestionId} />
       ) : playgroundQuestionId ? (

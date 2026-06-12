@@ -37,7 +37,17 @@ public class UserController {
     @PreAuthorize("hasAuthority('ADMIN') or #principal.name == authentication.name")
     public ResponseEntity<UserDto> getCurrentUser(Principal principal) {
         return repository.findByEmail(principal.getName())
-                .map(u -> new UserDto(u.getId(), u.getName(), u.getEmail(), u.getPhoto(), u.getRole().name(), u.getUserStreak(), u.getUserPoints()))
+                .map(u -> {
+                    int effectiveStreak = u.getUserStreak();
+                    if (u.getLastActivityDate() != null) {
+                        java.time.LocalDate last = u.getLastActivityDate().toLocalDate();
+                        java.time.LocalDate today = java.time.LocalDate.now();
+                        if (java.time.temporal.ChronoUnit.DAYS.between(last, today) > 1) {
+                            effectiveStreak = 0;
+                        }
+                    }
+                    return new UserDto(u.getId(), u.getName(), u.getEmail(), u.getPhoto(), u.getRole().name(), effectiveStreak, u.getUserPoints());
+                })
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }

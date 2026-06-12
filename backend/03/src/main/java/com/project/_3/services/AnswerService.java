@@ -14,6 +14,7 @@ import com.project._3.exceptions.AnswerRejectedByNodeException;
 import com.project._3.repositories.AnswerRepository;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -42,17 +43,56 @@ public class AnswerService {
         Question question = questionService.getQuestionById(request.questionId());
         answer.setQuestion(question);
         
+        com.project._3.entities.User user = null;
         if (principal != null) {
-            userRepository.findByEmail(principal.getName()).ifPresent(answer::setUser);
+            user = userRepository.findByEmail(principal.getName()).orElse(null);
+            answer.setUser(user);
         }
 
         Answer savedAnswer = answerRepository.save(answer);
         
-        // Verifica resposta no serviço de verificação de código
-        verifyAnswer(savedAnswer, question);
+        try {
+            verifyAnswer(savedAnswer, question);
+            if (user != null) {
+                applyPoints(user, question, true);
+                updateStreak(user);
+                userRepository.save(user);
+            }
+        } catch (Exception e) {
+            if (user != null) {
+                applyPoints(user, question, false);
+                userRepository.save(user);
+            }
+            throw e;
+        }
         
         return savedAnswer;
     }
+
+    private void applyPoints(com.project._3.entities.User user, Question question, boolean success) {
+        float basePoints = switch (question.getDifficulty()) {
+            case EASY -> 500f;
+            case MEDIUM -> 1000f;
+            case HARD -> 2000f;
+        };
+        
+        float change = success ? basePoints : -(basePoints / 2f);
+        user.setUserPoints(Math.max(0, user.getUserPoints() + change));
+    }
+private void updateStreak(com.project._3.entities.User user) {
+    java.time.LocalDate today = java.time.LocalDate.now();
+    if (user.getLastActivityDate() == null) {
+        user.setUserStreak(1);
+    } else {
+        java.time.LocalDate last = user.getLastActivityDate().toLocalDate();
+        if (today.isEqual(last.plusDays(1))) {
+            user.setUserStreak(user.getUserStreak() + 1);
+        } else if (today.isAfter(last.plusDays(1))) {
+            user.setUserStreak(1);
+        }
+    }
+    user.setLastActivityDate(java.time.LocalDateTime.now());
+}
 
     public Answer updateAnswer(long id, AnswerCreateRequest request, java.security.Principal principal) {
         Answer answer = answerRepository.findById(id)

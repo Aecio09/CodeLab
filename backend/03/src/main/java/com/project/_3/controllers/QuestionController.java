@@ -114,6 +114,7 @@ public class QuestionController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('USER')")
     public ResponseEntity<Question> getQuestionById(@PathVariable long id) {
         return ResponseEntity.ok(questionService.getQuestionById(id));
     }

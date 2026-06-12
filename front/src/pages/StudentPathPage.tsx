@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { API_BASE_URL } from '../constants'
 import type { TopicStatus, UserProfile } from '../types'
+import { EditProfileModal } from '../components/EditProfileModal'
 
 const TOPIC_METADATA: Record<string, { label: string; icon: string }> = {
   OPERADORES_TIPOS_E_VARIAVEIS: { label: 'Variáveis e Tipos', icon: 'variables' },
@@ -17,6 +18,7 @@ export function StudentPathPage() {
   const [user, setUser] = useState<UserProfile | null>(null)
   const [progress, setProgress] = useState<TopicStatus[]>([])
   const [loading, setLoading] = useState(true)
+  const [isProfileModalOpen, setIsProfileModalOpen] = useState(false)
 
   useEffect(() => {
     const fetchData = async () => {
@@ -73,49 +75,31 @@ export function StudentPathPage() {
       </div>
     )
 
-  const totalActivities = progress.reduce((acc, p) => acc + p.totalLessons * 2, 0)
-  const completedActivities = progress.reduce((acc, p) => acc + p.totalActivitiesCompleted, 0)
-  const overallProgress = totalActivities > 0 ? (completedActivities / totalActivities) * 100 : 0
+  // Pattern offset in pixels
+  const getXOffset = (index: number) => {
+    const pattern = [0, 80, 140, 80, 0, -80, -140, -80]
+    return pattern[index % pattern.length]
+  }
 
-  // Flatten lessons into a single list for the zigzag path
-  const allLessons = progress.flatMap((unit) => {
-    const lessons = []
-    for (let i = 1; i <= unit.totalLessons; i++) {
-      let lessonStatus: 'COMPLETED' | 'AVAILABLE' | 'LOCKED' = 'LOCKED'
-      
-      if (unit.status === 'COMPLETED') {
-        lessonStatus = 'COMPLETED'
-      } else if (unit.status === 'AVAILABLE') {
-        if (i < unit.currentLesson) lessonStatus = 'COMPLETED'
-        else if (i === unit.currentLesson) lessonStatus = 'AVAILABLE'
-        else lessonStatus = 'LOCKED'
-      }
-
-      lessons.push({
-        unitName: unit.topicName,
-        lessonNumber: i,
-        status: lessonStatus,
-        isFirstInUnit: i === 1,
-        totalInUnit: unit.totalLessons
-      })
-    }
-    return lessons
-  })
-
-  const photoUrl =
-    user.photo ||
-    'https://lh3.googleusercontent.com/aida-public/AB6AXuAp3BkeCN4Ob2TbvINS9OiWR-h28Mm_1YCP3t3UzUChVENbVCfx5_KWm83aoujbIXC1-OYEyUTosshLx8WAkP9Q6VEN7AWd7sbTdfwd3zIme-GjggGm3RtI44dLDX3ANMILnNss3fxV-bk_kG0k0ddfLaVcQOT9jOseqeFAprZNTHhtlVIYTFBvWEwPQR6UkiPWi1sikZ02EvmlmkwQPCVDOnUxVzHDvTluBL_ZzNKnpfMoUCObsMPlL8nS-aO0GGxEZdQTdxERfRM'
+  // Vertical math: py-32 (128px) + half bubble (48px) + index * (bubble 96px + gap 128px)
+  const getNodeY = (index: number) => 128 + 48 + index * 224
 
   return (
-    <div className="flex min-h-screen w-full bg-[#0e1512] text-[#dde4df] font-sans absolute top-0 left-0 z-50">
-      <aside className="fixed left-0 top-0 h-full flex flex-col py-6 px-4 border-r border-[#3e4941] bg-[#161d1a] w-64 z-50">
+    <div className="flex min-h-screen w-full bg-[#0e1512] text-[#dde4df] font-sans absolute top-0 left-0 z-50 overflow-x-hidden">
+      
+      {/* Neon Background Glows */}
+      <div className="fixed top-0 left-0 w-[600px] h-[600px] bg-primary/10 rounded-full blur-[140px] -translate-x-1/2 -translate-y-1/2 pointer-events-none z-0"></div>
+      <div className="fixed top-0 right-0 w-[600px] h-[600px] bg-primary/10 rounded-full blur-[140px] translate-x-1/2 -translate-y-1/2 pointer-events-none z-0"></div>
+
+      {/* Sidebar do Estudante */}
+      <aside className="fixed left-0 top-0 h-full flex flex-col py-6 px-4 border-r border-[#3e4941] bg-[#161d1a] w-64 z-[60]">
         <div className="flex items-center gap-3 mb-8 px-2">
-          <div className="w-10 h-10 rounded-lg bg-[#72db9f] flex items-center justify-center">
+          <div className="w-10 h-10 rounded-lg bg-[#72db9f] flex items-center justify-center shadow-[0_0_20px_rgba(114,219,159,0.2)]">
             <span className="material-symbols-outlined text-[#003920]">terminal</span>
           </div>
           <div>
             <h1 className="text-lg font-bold text-[#72db9f]">CodeLab</h1>
-            <p className="text-xs text-[#bdcabe]">Curso de Algoritmos</p>
+            <p className="text-[10px] text-[#bdcabe] uppercase tracking-widest font-bold">Plataforma</p>
           </div>
         </div>
         <nav className="flex-1 space-y-1">
@@ -124,23 +108,24 @@ export function StudentPathPage() {
             Minha Trilha
           </button>
           <button
-            onClick={() => (window.location.href = '/perfil')}
+            onClick={() => window.location.href = '/playground'}
+            className="w-full flex items-center gap-3 text-[#bdcabe] hover:text-[#dde4df] px-4 py-2 hover:bg-[#2f3633] rounded-lg text-left font-semibold text-sm transition-all"
+          >
+            <span className="material-symbols-outlined">terminal</span>
+            Playground
+          </button>
+          <button
+            onClick={() => setIsProfileModalOpen(true)}
             className="w-full flex items-center gap-3 text-[#bdcabe] hover:text-[#dde4df] px-4 py-2 hover:bg-[#2f3633] rounded-lg text-left font-semibold text-sm transition-all"
           >
             <span className="material-symbols-outlined">account_circle</span>
             Meu Perfil
           </button>
         </nav>
-        <div className="mt-auto pt-4 border-t border-[#3e4941]/30">
-          <div className="px-2 mb-4">
-             <p className="text-[10px] text-[#bdcabe] uppercase tracking-widest mb-1">Progresso Total</p>
-             <div className="w-full bg-[#2f3633] h-2 rounded-full overflow-hidden">
-                <div className="bg-[#72db9f] h-full transition-all duration-1000" style={{ width: `${overallProgress}%` }}></div>
-             </div>
-          </div>
+        <div className="mt-auto pt-4 border-t border-outline-variant/20">
           <button
             onClick={handleLogout}
-            className="w-full flex items-center justify-center gap-2 bg-[#93000a]/20 text-[#ffdad6] hover:bg-[#93000a]/40 border border-[#93000a]/30 px-4 py-2 rounded-lg text-sm font-bold transition-colors"
+            className="w-full flex items-center justify-center gap-2 bg-[#93000a]/10 text-[#ffdad6] hover:bg-[#93000a]/20 border border-[#93000a]/20 px-4 py-2 rounded-lg text-sm font-bold transition-colors"
           >
             <span className="material-symbols-outlined text-[18px]">logout</span>
             Sair
@@ -148,89 +133,154 @@ export function StudentPathPage() {
         </div>
       </aside>
 
-      <main className="flex-1 ml-64 flex flex-col relative min-h-screen">
-        <header className="sticky top-0 z-40 w-full flex justify-between items-center h-16 px-6 bg-[#0e1512]/80 backdrop-blur-md border-b border-[#3e4941]">
+      {/* Painel Central */}
+      <main className="flex-1 ml-64 flex flex-col relative min-h-screen z-10">
+        <header className="sticky top-0 z-[60] w-full flex justify-between items-center h-16 px-8 bg-[#0e1512]/80 backdrop-blur-md border-b border-[#3e4941]">
           <div className="flex items-center gap-6">
-            <div className="flex items-center gap-2 bg-[#1a211e] px-3 py-1 rounded-full border border-[#3e4941]">
-              <span className="material-symbols-outlined text-orange-500">local_fire_department</span>
-              <span className="text-md font-bold text-[#dde4df]">{user.userStreak}</span>
+            <div className="flex items-center gap-2 bg-[#1a211e] px-4 py-1.5 rounded-full border border-[#3e4941] shadow-inner">
+              <span className="material-symbols-outlined text-orange-500" style={{ fontVariationSettings: "'FILL' 1" }}>local_fire_department</span>
+              <span className="text-md font-black text-[#dde4df]">{user.userStreak}</span>
             </div>
-            <div className="flex items-center gap-2 bg-[#1a211e] px-3 py-1 rounded-full border border-[#3e4941]">
-              <span className="material-symbols-outlined text-yellow-500">stars</span>
-              <span className="text-md font-bold text-[#dde4df]">{Math.floor(user.userPoints)}</span>
+            <div className="flex items-center gap-2 bg-[#1a211e] px-4 py-1.5 rounded-full border border-[#3e4941] shadow-inner">
+              <span className="material-symbols-outlined text-yellow-500" style={{ fontVariationSettings: "'FILL' 1" }}>stars</span>
+              <span className="text-md font-black text-[#dde4df]">{Math.floor(user.userPoints)}</span>
             </div>
           </div>
           <div className="flex items-center gap-4">
-            <div className="text-right hidden sm:block">
-               <p className="text-sm font-bold text-[#dde4df]">{user.name}</p>
-               <p className="text-[10px] text-[#72db9f] uppercase tracking-tighter">Nível {Math.floor(user.userPoints / 100) + 1}</p>
-            </div>
             <button
-              onClick={() => (window.location.href = '/perfil')}
-              className="w-10 h-10 rounded-full border-2 border-[#72db9f] p-0.5 overflow-hidden transition-transform hover:scale-105"
+              onClick={() => setIsProfileModalOpen(true)}
+              className="w-10 h-10 rounded-full border-2 border-primary/50 p-0.5 overflow-hidden transition-all hover:border-primary hover:scale-105 active:scale-95"
             >
-              <img alt="Profile" className="w-full h-full rounded-full object-cover" src={photoUrl} />
+              <img alt="Profile" className="w-full h-full rounded-full object-cover" src={user.photo || 'https://via.placeholder.com/160x160?text=User'} />
             </button>
           </div>
         </header>
 
-        <div className="flex-1 max-w-4xl mx-auto w-full py-12 px-6">
-          <div className="relative flex flex-col items-center gap-12">
-            
-            <svg className="absolute top-0 left-1/2 -translate-x-1/2 w-48 h-full pointer-events-none opacity-20" preserveAspectRatio="none">
-               <path
-                  className="stroke-[#72db9f] stroke-[4] fill-none"
-                  style={{ strokeDasharray: '12 12' }}
-                  d={`M 96,0 ${allLessons.map((_, i) => `C ${i % 2 === 0 ? 180 : 20},${i * 100 + 50} ${i % 2 === 0 ? 20 : 180},${i * 100 + 50} 96,${(i + 1) * 100}`).join(' ')}`}
-                />
-            </svg>
+        <div className="flex-1 w-full">
+          {progress.map((unit, unitIndex) => {
+            const meta = TOPIC_METADATA[unit.topicName] || { label: unit.topicName, icon: 'help' }
+            const unitProgress = (unit.totalActivitiesCompleted / (unit.totalLessons * 2)) * 100
+            const isUnitLocked = unit.status === 'LOCKED'
 
-            {allLessons.map((lesson, index) => {
-              const meta = TOPIC_METADATA[lesson.unitName] || { label: lesson.unitName, icon: 'help' }
-              const isLocked = lesson.status === 'LOCKED'
-              const isCompleted = lesson.status === 'COMPLETED'
-
-              const xOffsets = ['translate-x-0', 'translate-x-16', 'translate-x-28', 'translate-x-16', 'translate-x-0', '-translate-x-16', '-translate-x-28', '-translate-x-16']
-              const xOffset = xOffsets[index % xOffsets.length]
-
-              return (
-                <div key={`${lesson.unitName}-${lesson.lessonNumber}`} className={`relative flex flex-col items-center ${xOffset}`}>
-                  
-                  {lesson.isFirstInUnit && (
-                    <div className="absolute -top-10 left-1/2 -translate-x-1/2 whitespace-nowrap">
-                       <span className="bg-[#1a211e] border border-[#72db9f]/30 text-[#72db9f] text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-widest shadow-lg">
-                         {meta.label}
-                       </span>
+            return (
+              <section key={unit.topicName} className={`relative ${isUnitLocked ? 'opacity-30 grayscale pointer-events-none' : ''}`}>
+                
+                {/* Full-width Unit Header */}
+                <div className="sticky top-16 z-50 w-full bg-[#161d1a]/95 backdrop-blur-md py-6 px-12 border-b border-[#3e4941] shadow-xl">
+                  <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+                    <div className="flex-1">
+                       <span className="text-[10px] text-[#72db9f] uppercase tracking-[0.4em] font-black block mb-1 opacity-70">Unidade {unitIndex + 1}</span>
+                       <h2 className="text-2xl font-black text-[#dde4df] uppercase tracking-tight italic">{meta.label}</h2>
                     </div>
+                    <div className="flex-1 max-w-sm">
+                       <div className="flex justify-between items-end mb-1.5">
+                          <span className="text-[10px] text-[#bdcabe] uppercase font-black tracking-widest">Maestria</span>
+                          <span className="text-[10px] text-[#72db9f] font-black tracking-tighter bg-primary/10 px-2 py-0.5 rounded">{Math.round(unitProgress)}%</span>
+                       </div>
+                       <div className="w-full bg-[#0e1512] h-2 rounded-full overflow-hidden border border-[#3e4941]">
+                         <div 
+                           className="bg-primary h-full transition-all duration-1000 shadow-[0_0_15px_rgba(114,219,159,0.4)]" 
+                           style={{ width: `${unitProgress}%` }}
+                         ></div>
+                       </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Path Area */}
+                <div className="relative py-32 flex flex-col items-center gap-32 min-h-[500px]">
+                  
+                  {/* SVG Path - Accurate Geometry */}
+                  {!isUnitLocked && (
+                    <svg className="absolute top-0 left-1/2 -translate-x-1/2 w-[400px] h-full pointer-events-none z-0" preserveAspectRatio="none">
+                      <path
+                        className="stroke-[#1a211e] stroke-[12] fill-none"
+                        d={`M ${200 + getXOffset(0)},176 ${Array.from({ length: unit.totalLessons - 1 }).map((_, i) => {
+                          const x1 = 200 + getXOffset(i)
+                          const y1 = getNodeY(i)
+                          const x2 = 200 + getXOffset(i + 1)
+                          const y2 = getNodeY(i + 1)
+                          return `C ${x1},${y1 + 112} ${x2},${y1 + 112} ${x2},${y2}`
+                        }).join(' ')}`}
+                      />
+                      <path
+                        className="stroke-primary stroke-[4] fill-none opacity-30"
+                        style={{ strokeDasharray: '12 12' }}
+                        d={`M ${200 + getXOffset(0)},176 ${Array.from({ length: unit.totalLessons - 1 }).map((_, i) => {
+                          const x1 = 200 + getXOffset(i)
+                          const y1 = getNodeY(i)
+                          const x2 = 200 + getXOffset(i + 1)
+                          const y2 = getNodeY(i + 1)
+                          return `C ${x1},${y1 + 112} ${x2},${y1 + 112} ${x2},${y2}`
+                        }).join(' ')}`}
+                      />
+                    </svg>
                   )}
 
-                  <button
-                    disabled={isLocked}
-                    onClick={() => handleNavigateToPlayground(lesson.unitName)}
-                    title={`Lição ${lesson.lessonNumber} de ${meta.label}`}
-                    className={`
-                      relative z-10 w-16 h-16 rounded-full flex items-center justify-center shadow-2xl transform transition-all focus:outline-none
-                      ${isLocked ? 'bg-[#161d1a] border-4 border-[#2f3633] text-[#4a5750] cursor-not-allowed' : 
-                        isCompleted ? 'bg-[#72db9f] text-[#003920] border-4 border-[#003920]/20 hover:scale-110' : 
-                        'bg-[#37a36c] text-[#dde4df] border-4 border-[#72db9f] hover:scale-110 shadow-[0_0_20px_rgba(114,219,159,0.4)] animate-[pulse_2s_infinite]'}
-                    `}
-                  >
-                    <span className="material-symbols-outlined text-[28px]">
-                      {isLocked ? 'lock' : (isCompleted ? 'check' : meta.icon)}
-                    </span>
+                  {Array.from({ length: unit.totalLessons }).map((_, lessonIdx) => {
+                    const lessonNum = lessonIdx + 1
+                    let lessonStatus: 'COMPLETED' | 'AVAILABLE' | 'LOCKED' = 'LOCKED'
+                    
+                    if (unit.status === 'COMPLETED') {
+                      lessonStatus = 'COMPLETED'
+                    } else if (unit.status === 'AVAILABLE') {
+                      if (lessonNum < unit.currentLesson) lessonStatus = 'COMPLETED'
+                      else if (lessonNum === unit.currentLesson) lessonStatus = 'AVAILABLE'
+                    }
 
-                    <div className={`absolute -bottom-2 -right-2 w-7 h-7 rounded-full border-2 flex items-center justify-center text-[10px] font-bold
-                      ${isLocked ? 'bg-[#1a211e] border-[#2f3633] text-[#4a5750]' : 'bg-[#0e1512] border-[#72db9f] text-[#72db9f]'}
-                    `}>
-                      {lesson.lessonNumber}
-                    </div>
-                  </button>
+                    const xOffsetPx = getXOffset(lessonIdx)
+                    const isCompleted = lessonStatus === 'COMPLETED'
+                    const isAvailable = lessonStatus === 'AVAILABLE'
+
+                    return (
+                      <div 
+                        key={`${unit.topicName}-${lessonNum}`} 
+                        className="relative z-10"
+                        style={{ transform: `translateX(${xOffsetPx}px)` }}
+                      >
+                        <button
+                          disabled={lessonStatus === 'LOCKED'}
+                          onClick={() => handleNavigateToPlayground(unit.topicName)}
+                          className={`
+                            relative w-24 h-24 rounded-full flex items-center justify-center shadow-2xl transition-all duration-500 focus:outline-none border-4
+                            ${lessonStatus === 'LOCKED' ? 'bg-[#161d1a] border-[#2f3633] text-[#4a5750] cursor-not-allowed scale-90' : 
+                              isCompleted ? 'bg-primary border-primary/20 text-[#003920] hover:scale-110 shadow-[0_0_20px_rgba(114,219,159,0.1)]' : 
+                              'bg-[#37a36c] border-primary text-[#dde4df] hover:scale-110 shadow-[0_0_50px_rgba(114,219,159,0.3)] animate-pulse'}
+                          `}
+                        >
+                          <span className="material-symbols-outlined text-[42px]">
+                            {lessonStatus === 'LOCKED' ? 'lock' : (isCompleted ? 'check' : meta.icon)}
+                          </span>
+
+                          <div className={`absolute -bottom-1 -right-1 w-10 h-10 rounded-full border-2 flex items-center justify-center text-[10px] font-black
+                            ${lessonStatus === 'LOCKED' ? 'bg-[#1a211e] border-[#2f3633] text-[#4a5750]' : 'bg-[#0e1512] border-primary text-primary shadow-lg'}
+                          `}>
+                            {lessonNum}
+                          </div>
+                        </button>
+                        
+                        {isAvailable && (
+                          <div className="absolute top-1/2 -translate-y-1/2 left-full ml-8 whitespace-nowrap bg-primary text-[#003920] px-4 py-2 rounded-xl text-[10px] font-black shadow-[0_10px_30px_rgba(114,219,159,0.3)] animate-bounce">
+                            LIÇÃO ATUAL
+                            <div className="absolute top-1/2 -left-2 -translate-y-1/2 w-4 h-4 bg-primary rotate-45"></div>
+                          </div>
+                        )}
+                      </div>
+                    )
+                  })}
                 </div>
-              )
-            })}
-          </div>
+              </section>
+            )
+          })}
         </div>
       </main>
+
+      <EditProfileModal 
+        isOpen={isProfileModalOpen} 
+        onClose={() => setIsProfileModalOpen(false)} 
+        user={user}
+        onUpdate={(updated) => setUser(updated)}
+      />
     </div>
   )
 }

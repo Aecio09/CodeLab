@@ -3,6 +3,7 @@ package com.project._3.controllers;
 import com.project._3.dto.AnswerCreateRequest;
 import com.project._3.entities.Answer;
 import com.project._3.services.AnswerService;
+import com.project._3.repositories.UserRepository;
 import org.junit.jupiter.api.Test;
 
 import java.security.Principal;
@@ -21,7 +22,8 @@ import static org.mockito.Mockito.when;
 class AnswerControllerTest {
 
     private final AnswerService answerService = mock(AnswerService.class);
-    private final AnswerController answerController = new AnswerController(answerService);
+    private final UserRepository userRepository = mock(UserRepository.class);
+    private final AnswerController answerController = new AnswerController(answerService, userRepository);
     private final Principal principal = mock(Principal.class);
 
     @Test
@@ -62,6 +64,8 @@ class AnswerControllerTest {
         answer.setId(12L);
         answer.setAnswerBody("Resposta 12");
 
+        // Mocking user for security check in controller might be needed if using @PreAuthorize in tests
+        // But for unit tests with mocked service, we usually mock the service response.
         when(answerService.getAnswerById(12L)).thenReturn(answer);
 
         var response = answerController.getAnswerById(12L);

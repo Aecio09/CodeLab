@@ -43,7 +43,7 @@
     top: 34px;
     height: 28px;
     transform: perspective(2000px) rotateZ(300deg) rotateX(44deg) rotateY(39deg)
-      scale(1.4);
+    scale(1.4);
   }
 
   .vite {
@@ -52,7 +52,7 @@
     height: 26px;
     width: auto;
     transform: perspective(2000px) rotateZ(300deg) rotateX(40deg) rotateY(39deg)
-      scale(0.8);
+    scale(0.8);
   }
 }
 
@@ -181,4 +181,35 @@
     right: 0;
     border-right-color: var(--border);
   }
+}
+
+/* ─── CodeMirror / Sandpack overrides ─── */
+.cm-editor,
+.cm-editor .cm-scroller,
+.cm-editor .cm-content {
+  background-color: #050a07 !important;
+}
+
+.cm-gutters {
+  background-color: #050a07 !important;
+  border-right-color: #1a211e !important;
+}
+
+.cm-activeLine,
+.cm-activeLineGutter {
+  background-color: #0e1512 !important;
+}
+
+.cm-selectionBackground,
+.cm-focused .cm-selectionBackground {
+  background-color: #1a211e !important;
+}
+
+.sp-wrapper,
+.sp-layout,
+.sp-stack,
+.sp-code-editor,
+.sp-preview-container,
+.sp-preview-iframe {
+  background-color: #050a07 !important;
 }

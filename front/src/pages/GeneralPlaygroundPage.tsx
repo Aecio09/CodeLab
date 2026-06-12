@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import {
     SandpackConsole,
     SandpackLayout,
@@ -6,7 +6,7 @@ import {
     SandpackPreview,
 } from '@codesandbox/sandpack-react'
 import { API_BASE_URL, DEFAULT_PLAYGROUND_CODE } from '../constants'
-import type { AnswerReviewResponse, QuestionItem, UserProfile } from '../types'
+import type { UserProfile } from '../types'
 import { PlaygroundCodeEditor } from '../components/PlaygroundCodeEditor'
 import { EditProfileModal } from '../components/EditProfileModal'
 
@@ -40,17 +40,12 @@ const mintDarkTheme = {
     },
 }
 
-export function StudentPlaygroundPage({ questionId }: { questionId: number }) {
+export function GeneralPlaygroundPage() {
     const [user, setUser] = useState<UserProfile | null>(null)
-    const [question, setQuestion] = useState<QuestionItem | null>(null)
     const [code, setCode] = useState(DEFAULT_PLAYGROUND_CODE)
     const [loading, setLoading] = useState(true)
-    const [submitting, setSubmitting] = useState(false)
-    const [reviewResult, setReviewResult] = useState<AnswerReviewResponse | null>(null)
-    const [isProfileModalOpen, setIsProfileModalOpen] = useState(false)
-
     const [seconds, setSeconds] = useState(0)
-    const initializedQuestionCodeRef = useRef<number | null>(null)
+    const [isProfileModalOpen, setIsProfileModalOpen] = useState(false)
 
     useEffect(() => {
         let cancelled = false
@@ -60,33 +55,15 @@ export function StudentPlaygroundPage({ questionId }: { questionId: number }) {
                 if (!meRes.ok) { window.location.href = '/'; return; }
                 const me = await meRes.json()
                 if (!cancelled) setUser(me)
-
-                const qRes = await fetch(`${API_BASE_URL}/questions/${questionId}`, { credentials: 'include' })
-                if (!qRes.ok) throw new Error('load-question')
-                const qData = await qRes.json()
-                if (!cancelled) setQuestion(qData)
             } catch {
-                if (!cancelled) alert('Falha ao carregar o sistema da Arena.')
+                console.error('Falha ao carregar perfil.')
             } finally {
                 if (!cancelled) setLoading(false)
             }
         }
         void load()
         return () => { cancelled = true }
-    }, [questionId])
-
-    useEffect(() => {
-        if (!question) return
-        if (initializedQuestionCodeRef.current === question.id) return
-
-        if (question.starterCode && question.starterCode.trim()) {
-            setCode(question.starterCode)
-        } else {
-            const prompt = question.questionBody.replaceAll('*/', '* /')
-            setCode(`/**\n * Desafio #${question.id}\n * ${prompt}\n */\n\n${DEFAULT_PLAYGROUND_CODE}`)
-        }
-        initializedQuestionCodeRef.current = question.id
-    }, [question])
+    }, [])
 
     useEffect(() => {
         const interval = setInterval(() => setSeconds(s => s + 1), 1000)
@@ -100,46 +77,6 @@ export function StudentPlaygroundPage({ questionId }: { questionId: number }) {
         return `${hrs}:${mins}:${secs}`
     }
 
-    const handleSubmit = async () => {
-        if (!question) return
-        setSubmitting(true)
-        setReviewResult(null)
-
-        try {
-            const response = await fetch(`${API_BASE_URL}/answers`, {
-                method: 'POST',
-                credentials: 'include',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ questionId: question.id, answerBody: code }),
-            })
-
-            if (response.ok) {
-                const result = await response.json()
-                setReviewResult(result)
-                return
-            }
-
-            const data = await response.json()
-            setReviewResult({
-                id: 0,
-                answerBody: code,
-                verificationStatus: 'REJECTED',
-                nodeVerificationResult: data.message || 'Falha na verificação.',
-                aiVerificationResult: data.message || 'Seu código não atende aos requisitos do desafio. Verifique a saída do sistema para mais detalhes.'
-            })
-        } catch {
-            setReviewResult({
-                id: 0,
-                answerBody: code,
-                verificationStatus: 'ERROR',
-                nodeVerificationResult: 'Erro de Conexão',
-                aiVerificationResult: 'Não foi possível conectar ao servidor de validação. Verifique sua internet.'
-            })
-        } finally {
-            setSubmitting(false)
-        }
-    }
-
     const handleLogout = async () => {
         try {
             await fetch(`${API_BASE_URL}/logout`, { method: 'POST', credentials: 'include' })
@@ -149,7 +86,7 @@ export function StudentPlaygroundPage({ questionId }: { questionId: number }) {
     }
 
     if (loading || !user) {
-        return <div className="h-screen bg-[#0e1512] flex items-center justify-center text-primary animate-pulse font-mono">INITIALIZING ARENA...</div>
+        return <div className="h-screen bg-[#0e1512] flex items-center justify-center text-primary animate-pulse font-mono">INITIALIZING PLAYGROUND...</div>
     }
 
     return (
@@ -206,9 +143,9 @@ export function StudentPlaygroundPage({ questionId }: { questionId: number }) {
                 <header className="shrink-0 w-full flex justify-between items-center h-16 px-8 bg-[#0e1512]/80 backdrop-blur-md border-b border-[#3e4941] z-[60]">
                     <div className="flex items-center gap-4">
                         <div className="hidden md:block">
-                            <p className="text-[10px] text-primary font-black uppercase tracking-widest opacity-70">Desafio em curso</p>
+                            <p className="text-[10px] text-primary font-black uppercase tracking-widest opacity-70">Sandbox Mode</p>
                             <h2 className="text-sm font-black text-[#dde4df] italic">
-                                {question?.topic?.replaceAll('_', ' ') ?? '...'}
+                                Treinamento Livre
                             </h2>
                         </div>
                     </div>
@@ -230,24 +167,15 @@ export function StudentPlaygroundPage({ questionId }: { questionId: number }) {
                                 <span className="material-symbols-outlined text-[20px]">schedule</span>
                                 <span className="font-mono text-sm">{formatTime(seconds)}</span>
                             </div>
-                            <div className="flex items-center gap-2">
-                                <button
-                                    onClick={() => {
-                                        const iframe = document.querySelector('iframe');
-                                        if (iframe) iframe.src = iframe.src;
-                                    }}
-                                    className="bg-[#1a211e] text-[#72db9f] border border-[#3e4941] font-black text-[11px] uppercase px-4 py-2.5 rounded-xl hover:bg-[#2f3633] transition-all"
-                                >
-                                    Executar
-                                </button>
-                                <button
-                                    onClick={handleSubmit}
-                                    disabled={submitting}
-                                    className="bg-gradient-to-r from-primary to-[#37a36c] text-[#003920] font-black text-[11px] uppercase px-8 py-2.5 rounded-xl hover:scale-105 active:scale-95 transition-all shadow-[0_0_25px_rgba(114,219,159,0.3)] disabled:opacity-50"
-                                >
-                                    {submitting ? 'Analisando...' : 'Enviar Resposta'}
-                                </button>
-                            </div>
+                            <button
+                                onClick={() => {
+                                    const iframe = document.querySelector('iframe');
+                                    if (iframe) iframe.src = iframe.src;
+                                }}
+                                className="bg-[#1a211e] text-[#72db9f] border border-[#3e4941] font-black text-[11px] uppercase px-6 py-2.5 rounded-xl hover:bg-[#2f3633] transition-all shadow-lg"
+                            >
+                                Executar
+                            </button>
                         </div>
                     </div>
                 </header>
@@ -272,19 +200,13 @@ export function StudentPlaygroundPage({ questionId }: { questionId: number }) {
                         backgroundColor: '#050a07',
                     }}
                 >
-                    {/* Challenge Briefing */}
+                    {/* Briefing */}
                     <div className="shrink-0 px-8 py-4 bg-[#1a211e] border-b border-[#3e4941] flex items-start justify-between gap-8">
                         <div className="flex-1">
-                            <p className="text-[10px] text-primary font-black uppercase tracking-[0.2em] mb-1">Objetivo</p>
+                            <p className="text-[10px] text-primary font-black uppercase tracking-[0.2em] mb-1">Laboratório</p>
                             <p className="text-sm text-[#dde4df] leading-relaxed font-medium">
-                                {question?.questionBody}
+                                Utilize este espaço para testar algoritmos, praticar sintaxe ou realizar experimentos em TypeScript.
                             </p>
-                        </div>
-                        <div className={`shrink-0 px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border
-                            ${question?.difficulty === 'HARD' ? 'text-error border-error/30 bg-error/10' :
-                            question?.difficulty === 'MEDIUM' ? 'text-orange-400 border-orange-500/30 bg-orange-500/10' :
-                                'text-primary border-primary/30 bg-primary/10'}`}>
-                            {question?.difficulty}
                         </div>
                     </div>
 
@@ -296,14 +218,8 @@ export function StudentPlaygroundPage({ questionId }: { questionId: number }) {
                             <div className="shrink-0 px-4 py-2 bg-[#161d1a] border-b border-[#3e4941] flex items-center justify-between">
                                 <div className="flex items-center gap-2">
                                     <span className="material-symbols-outlined text-primary text-sm">javascript</span>
-                                    <span className="text-[10px] font-bold text-[#bdcabe] uppercase tracking-widest">arena_solution.ts</span>
+                                    <span className="text-[10px] font-bold text-[#bdcabe] uppercase tracking-widest">scratchpad.ts</span>
                                 </div>
-                                {reviewResult && (
-                                    <div className={`flex items-center gap-2 px-3 py-1 rounded-full text-[9px] font-black uppercase
-                                        ${reviewResult.verificationStatus === 'APPROVED' ? 'bg-[#72db9f]/20 text-primary' : 'bg-error/20 text-error'}`}>
-                                        {reviewResult.verificationStatus === 'APPROVED' ? 'Código Validado' : 'Correção Necessária'}
-                                    </div>
-                                )}
                             </div>
                             <div className="flex-1 min-h-0 relative">
                                 <div className="absolute inset-0">
@@ -311,21 +227,19 @@ export function StudentPlaygroundPage({ questionId }: { questionId: number }) {
                                         style={{ height: '100%', background: '#050a07' }}
                                         className="!border-0 !h-full !max-h-full"
                                     >
-                                        <PlaygroundCodeEditor loading={submitting} onCodeChange={setCode} />
+                                        <PlaygroundCodeEditor loading={false} onCodeChange={setCode} />
                                     </SandpackLayout>
                                 </div>
                             </div>
                         </div>
 
-                        {/* Coluna direita: Terminal + AI Feedback */}
+                        {/* Coluna direita: Terminal */}
                         <div className="w-80 shrink-0 min-h-0 flex flex-col gap-4">
-
-                            {/* Terminal */}
                             <div className="flex-1 min-h-0 bg-[#050a07] rounded-2xl border border-[#3e4941] overflow-hidden flex flex-col shadow-xl">
                                 <div className="shrink-0 px-4 py-2 bg-[#161d1a] border-b border-[#3e4941] flex items-center justify-between">
                                     <div className="flex items-center gap-2">
                                         <span className="material-symbols-outlined text-[#bdcabe] text-sm">terminal</span>
-                                        <span className="text-[10px] font-bold text-[#bdcabe] uppercase tracking-widest">Saída do Sistema</span>
+                                        <span className="text-[10px] font-bold text-[#bdcabe] uppercase tracking-widest">Console</span>
                                     </div>
                                     <div className="hidden">
                                         <SandpackPreview />
@@ -335,36 +249,6 @@ export function StudentPlaygroundPage({ questionId }: { questionId: number }) {
                                     <SandpackConsole resetOnPreviewRestart />
                                 </div>
                             </div>
-
-                            {/* AI Feedback */}
-                            {reviewResult && (
-                                <div className={`shrink-0 rounded-2xl border p-6 flex flex-col animate-in slide-in-from-right-4 duration-300 shadow-xl
-                                    ${reviewResult.verificationStatus === 'APPROVED' ? 'bg-[#72db9f]/5 border-[#72db9f]/30' : 'bg-error/5 border-error/30'}`}>
-                                    <div className="flex items-center gap-2 mb-4">
-                                        <span className={`material-symbols-outlined ${reviewResult.verificationStatus === 'APPROVED' ? 'text-primary' : 'text-error'}`}>
-                                            {reviewResult.verificationStatus === 'APPROVED' ? 'verified' : 
-                                             reviewResult.verificationStatus === 'REJECTED' ? 'dangerous' : 'report'}
-                                        </span>
-                                        <h3 className="text-xs font-black uppercase tracking-widest">
-                                            {reviewResult.verificationStatus === 'APPROVED' ? 'Relatório de Verificação' : 
-                                             reviewResult.verificationStatus === 'REJECTED' ? 'Desafio Recusado' : 'Erro de Sistema'}
-                                        </h3>
-                                    </div>
-                                    <div className="overflow-auto max-h-48">
-                                        <p className={`text-sm italic leading-relaxed whitespace-pre-wrap ${reviewResult.verificationStatus === 'APPROVED' ? 'text-[#bdcabe]' : 'text-error/80'}`}>
-                                            "{reviewResult.aiVerificationResult}"
-                                        </p>
-                                    </div>
-                                    {reviewResult.verificationStatus === 'APPROVED' && (
-                                        <button
-                                            onClick={() => window.location.href = '/trilha'}
-                                            className="w-full mt-4 bg-primary text-[#003920] py-3 rounded-xl font-black uppercase text-xs hover:brightness-110 active:scale-95 transition-all shadow-lg"
-                                        >
-                                            Continuar Jornada
-                                        </button>
-                                    )}
-                                </div>
-                            )}
                         </div>
                     </div>
                 </SandpackProvider>
