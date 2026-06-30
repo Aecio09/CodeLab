@@ -247,12 +247,12 @@ export function AdminQuestionsPage() {
             <p className="font-label text-label text-on-surface-variant tracking-wider uppercase">Portal de Gerenciamento</p>
           </div>
         </div>
-        <nav className="flex-1 flex flex-col gap-xs">
-          <a className="flex items-center gap-md text-on-surface-variant hover:text-on-surface px-md py-sm hover:bg-surface-container-highest rounded-lg transition-all" href="#">
+        <nav className="flex-1 flex flex-col gap-xs" aria-label="Navegação administrativa">
+          <button type="button" disabled className="flex items-center gap-md text-outline/50 px-md py-sm rounded-lg cursor-not-allowed" aria-disabled="true">
             <span className="material-symbols-outlined">dashboard</span>
-            <span className="font-label text-label text-on-surface-variant uppercase tracking-wider">Dashboard</span>
-          </a>
-          <a className="flex items-center gap-md bg-secondary-container text-on-secondary-container rounded-lg px-md py-sm scale-[0.98] transition-all" href="/admin/questions">
+            <span className="font-label text-label uppercase tracking-wider">Dashboard</span>
+          </button>
+          <a className="flex items-center gap-md bg-secondary-container text-on-secondary-container rounded-lg px-md py-sm scale-[0.98] transition-all" href="/admin/questions" aria-current="page">
             <span className="material-symbols-outlined">terminal</span>
             <span className="font-label text-label text-on-surface-variant uppercase tracking-wider">Questões</span>
           </a>
@@ -407,6 +407,7 @@ export function AdminQuestionsPage() {
                             type="button"
                             className="p-xs text-on-surface-variant hover:text-primary transition-colors"
                             title="Abrir playground"
+                            aria-label="Abrir playground da questão"
                             onClick={() => {
                               window.location.href = `/admin/questions/${question.id}/playground`
                             }}
@@ -416,6 +417,7 @@ export function AdminQuestionsPage() {
                           <button
                             type="button"
                             className="p-xs text-on-surface-variant hover:text-primary transition-colors"
+                            aria-label="Editar questão"
                             onClick={() => handleEdit(question)}
                           >
                             <span className="material-symbols-outlined">edit</span>
@@ -438,8 +440,8 @@ export function AdminQuestionsPage() {
 
           <div ref={editFormRef} className="bg-surface-container border border-outline-variant rounded-xl p-lg">
             <h3 className="font-h3 text-h3 text-on-surface mb-md">{selectedQuestion ? `Editar Questão #${selectedQuestion.id}` : 'Nova Questão'}</h3>
-            {error ? <p className="text-error text-body-sm mb-sm">{error}</p> : null}
-            {success ? <p className="text-primary text-body-sm mb-sm">{success}</p> : null}
+            {error ? <p className="text-error text-body-sm mb-sm" role="alert">{error}</p> : null}
+            {success ? <p className="text-primary text-body-sm mb-sm" aria-live="polite">{success}</p> : null}
             <form className="grid grid-cols-1 md:grid-cols-2 gap-md" onSubmit={handleSaveQuestion}>
               <div className="md:col-span-2">
                 <label className="form-label" htmlFor="questionBody">

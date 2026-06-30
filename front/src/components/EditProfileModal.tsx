@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import type { ChangeEvent, FormEvent } from 'react'
 import { API_BASE_URL } from '../constants'
 import { resolvePhotoUrl } from '../utils'
@@ -19,6 +19,46 @@ export function EditProfileModal({ isOpen, onClose, user, onUpdate }: Props) {
   const [previewUrl, setPreviewUrl] = useState<string>(resolvePhotoUrl(user.photo))
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+
+  const modalRef = useRef<HTMLDivElement>(null)
+  const previousFocusRef = useRef<HTMLElement | null>(null)
+
+  useEffect(() => {
+    if (isOpen) {
+      previousFocusRef.current = document.activeElement as HTMLElement
+      setTimeout(() => {
+        const focusable = modalRef.current?.querySelector<HTMLElement>(
+          'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+        )
+        focusable?.focus()
+      }, 50)
+    } else {
+      previousFocusRef.current?.focus()
+    }
+  }, [isOpen])
+
+  const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
+    if (e.key !== 'Tab') return
+    const focusable = modalRef.current?.querySelectorAll<HTMLElement>(
+      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+    )
+    if (!focusable || focusable.length === 0) return
+
+    const first = focusable[0]
+    const last = focusable[focusable.length - 1]
+
+    if (e.shiftKey) {
+      if (document.activeElement === first) {
+        e.preventDefault()
+        last.focus()
+      }
+    } else {
+      if (document.activeElement === last) {
+        e.preventDefault()
+        first.focus()
+      }
+    }
+  }, [])
 
   if (!isOpen) return null
 
@@ -85,16 +125,22 @@ export function EditProfileModal({ isOpen, onClose, user, onUpdate }: Props) {
   }
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm">
-      <div className="bg-surface-container border border-outline-variant w-full max-w-2xl rounded-xl shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-200">
+    <div
+      className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="edit-profile-title"
+      onKeyDown={handleKeyDown}
+    >
+      <div ref={modalRef} className="bg-surface-container border border-outline-variant w-full max-w-2xl rounded-xl shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-200">
         
         {/* Modal Header */}
         <div className="p-lg border-b border-outline-variant flex justify-between items-center bg-surface-container-high">
           <div>
-            <h2 className="text-h3 font-h3 font-bold text-on-surface">Editar Perfil</h2>
+            <h2 id="edit-profile-title" className="text-h3 font-h3 font-bold text-on-surface">Editar Perfil</h2>
             <p className="text-label font-label text-on-surface-variant uppercase tracking-wider">Atualize suas informações</p>
           </div>
-          <button onClick={onClose} className="text-on-surface-variant hover:text-primary transition-colors p-xs rounded-lg">
+          <button onClick={onClose} aria-label="Fechar modal" className="text-on-surface-variant hover:text-primary transition-colors p-xs rounded-lg">
             <span className="material-symbols-outlined">close</span>
           </button>
         </div>
@@ -125,8 +171,9 @@ export function EditProfileModal({ isOpen, onClose, user, onUpdate }: Props) {
           {/* Form Fields */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-lg">
             <div>
-              <label className="form-label">Nome Completo</label>
+              <label className="form-label" htmlFor="edit-name">Nome Completo</label>
               <input
+                id="edit-name"
                 className="input-field"
                 type="text"
                 value={name}
@@ -135,8 +182,9 @@ export function EditProfileModal({ isOpen, onClose, user, onUpdate }: Props) {
               />
             </div>
             <div>
-              <label className="form-label">E-mail</label>
+              <label className="form-label" htmlFor="edit-email">E-mail</label>
               <input
+                id="edit-email"
                 className="input-field"
                 type="email"
                 value={email}
@@ -145,8 +193,9 @@ export function EditProfileModal({ isOpen, onClose, user, onUpdate }: Props) {
               />
             </div>
             <div className="md:col-span-2">
-              <label className="form-label">Nova Senha (opcional)</label>
+              <label className="form-label" htmlFor="edit-password">Nova Senha (opcional)</label>
               <input
+                id="edit-password"
                 className="input-field"
                 type="password"
                 placeholder="••••••••"
@@ -156,7 +205,7 @@ export function EditProfileModal({ isOpen, onClose, user, onUpdate }: Props) {
             </div>
           </div>
 
-          {error && <p className="text-body-sm font-body-sm text-error font-semibold">{error}</p>}
+          {error && <p className="text-body-sm font-body-sm text-error font-semibold" role="alert">{error}</p>}
 
           {/* Footer Actions */}
           <div className="pt-lg border-t border-outline-variant flex flex-col md:flex-row items-center justify-between gap-4">

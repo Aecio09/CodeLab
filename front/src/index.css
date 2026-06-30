@@ -53,3 +53,76 @@
   font-family: 'JetBrains Mono', 'Fira Code', ui-monospace, SFMono-Regular, Menlo, monospace;
 }
 
+/* Accessibility Toolbar Styles */
+
+html.access-high-contrast {
+  filter: none !important;
+}
+
+html.access-high-contrast body {
+  background-color: #000 !important;
+  color: #fff !important;
+}
+
+html.access-high-contrast .bg-background,
+html.access-high-contrast .bg-surface,
+html.access-high-contrast .bg-surface-container,
+html.access-high-contrast .bg-surface-container-low,
+html.access-high-contrast .bg-surface-container-high,
+html.access-high-contrast .bg-surface-container-highest,
+html.access-high-contrast .bg-surface-container-lowest,
+html.access-high-contrast .bg-surface-dim {
+  background-color: #000 !important;
+}
+
+html.access-high-contrast .text-on-surface,
+html.access-high-contrast .text-on-background,
+html.access-high-contrast .text-on-surface-variant {
+  color: #fff !important;
+}
+
+html.access-high-contrast .border-outline-variant,
+html.access-high-contrast .border-outline {
+  border-color: #fff !important;
+}
+
+html.access-high-contrast a {
+  color: #ff0 !important;
+  text-decoration: underline !important;
+}
+
+html.access-high-contrast .text-primary {
+  color: #0f0 !important;
+}
+
+html.access-high-contrast .btn-primary {
+  background-color: #fff !important;
+  color: #000 !important;
+}
+
+html.access-high-contrast .btn-secondary {
+  background-color: #333 !important;
+  color: #fff !important;
+  border-color: #fff !important;
+}
+
+html.access-high-contrast input,
+html.access-high-contrast select,
+html.access-high-contrast textarea {
+  background-color: #000 !important;
+  color: #fff !important;
+  border-color: #fff !important;
+}
+
+html.access-grayscale {
+  filter: grayscale(100%) !important;
+}
+
+html.access-highlight-links a,
+html.access-highlight-links button:not(.btn-primary):not(.btn-secondary):not(.btn-danger) {
+  background-color: rgba(255, 255, 0, 0.15) !important;
+  outline: 2px solid #ff0 !important;
+  outline-offset: 2px !important;
+  border-radius: 2px !important;
+}
+

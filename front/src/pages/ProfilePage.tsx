@@ -169,7 +169,7 @@ export function ProfilePage() {
   };
 
   if (redirecting) {
-    return <main className="flex-grow flex items-center justify-center text-on-surface-variant">Redirecionando para o painel admin...</main>
+    return <main className="flex-grow flex items-center justify-center text-on-surface-variant" role="status" aria-live="polite">Redirecionando para o painel admin...</main>
   }
 
   return (
@@ -203,9 +203,9 @@ export function ProfilePage() {
               <p className="text-body-sm font-body-sm text-on-surface-variant">Gerencie seus dados e mantenha sua conta atualizada.</p>
             </div>
 
-            {loading ? <p className="text-body-sm font-body-sm text-on-surface-variant">Carregando perfil...</p> : null}
-            {error ? <p className="text-error text-body-sm font-semibold">{error}</p> : null}
-            {success ? <p className="text-primary text-body-sm font-semibold">{success}</p> : null}
+            {loading ? <p className="text-body-sm font-body-sm text-on-surface-variant" role="status" aria-live="polite">Carregando perfil...</p> : null}
+            {error ? <p className="text-error text-body-sm font-semibold" role="alert">{error}</p> : null}
+            {success ? <p className="text-primary text-body-sm font-semibold" aria-live="polite">{success}</p> : null}
 
             <form className="space-y-md" onSubmit={handleUpdateProfile}>
               <div>

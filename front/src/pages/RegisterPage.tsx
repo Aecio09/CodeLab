@@ -146,11 +146,11 @@ export function RegisterPage() {
                   />
                 </div>
                 <label className="text-body-sm font-body-sm text-on-surface-variant" htmlFor="terms">
-                  Eu aceito os <a className="text-primary hover:underline font-semibold" href="#">termos de serviço</a> e a{' '}
-                  <a className="text-primary hover:underline font-semibold" href="#">política de privacidade</a> do CodeLab.
+                  Eu aceito os <span className="text-primary font-semibold">termos de serviço</span> e a{' '}
+                  <span className="text-primary font-semibold">política de privacidade</span> do CodeLab.
                 </label>
               </div>
-              {error ? <p className="text-error text-body-sm font-semibold">{error}</p> : null}
+              {error ? <p className="text-error text-body-sm font-semibold" role="alert">{error}</p> : null}
               <button className="btn-primary w-full mt-md" type="submit" disabled={submitting}>
                 {submitting ? 'Criando conta...' : 'Criar Conta'}
               </button>

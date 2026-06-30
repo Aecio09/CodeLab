@@ -201,11 +201,11 @@ export function AdminPlaygroundPage({ questionId }: { questionId: number }) {
               <span className="font-label text-label text-on-surface uppercase tracking-tight">Resultado da Revisão</span>
             </div>
             <div className="flex-1 p-gutter space-y-md overflow-auto">
-              {loading ? <p className="text-on-surface-variant">Carregando...</p> : null}
-              {error ? <p className="text-error">{error}</p> : null}
+              {loading ? <p className="text-on-surface-variant" role="status" aria-live="polite">Carregando...</p> : null}
+              {error ? <p className="text-error" role="alert">{error}</p> : null}
 
               {reviewResult ? (
-                <div className="bg-surface-container border border-outline-variant rounded-xl p-md space-y-sm">
+                <div className="bg-surface-container border border-outline-variant rounded-xl p-md space-y-sm" aria-live="polite">
                   <p className="text-label text-on-surface-variant uppercase">Status</p>
                   <p className={`text-h3 font-h3 font-bold ${reviewResult.verificationStatus === 'APPROVED' ? 'text-primary' : 'text-error'}`}>
                     {reviewResult.verificationStatus}
@@ -227,7 +227,7 @@ export function AdminPlaygroundPage({ questionId }: { questionId: number }) {
               ) : null}
 
               {reviewError ? (
-                <div className="bg-error-container border border-error rounded-xl p-md space-y-xs">
+                <div className="bg-error-container border border-error rounded-xl p-md space-y-xs" role="alert">
                   <p className="text-label text-on-error-container uppercase">{reviewError.code}</p>
                   <p className="text-body-sm text-on-error-container">{reviewError.message}</p>
                   <p className="text-label text-on-error-container">HTTP {reviewError.status}</p>

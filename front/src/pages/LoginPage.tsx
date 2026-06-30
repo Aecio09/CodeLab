@@ -66,7 +66,7 @@ export function LoginPage({ registered }: LoginPageProps) {
               <p className="font-body-sm text-body-sm text-on-surface-variant">Aprenda lógica de programação como em um jogo</p>
             </div>
 
-            {registered ? <p className="text-primary text-body-sm mb-md">Cadastro realizado. Faça login para continuar.</p> : null}
+            {registered ? <p className="text-primary text-body-sm mb-md" aria-live="polite">Cadastro realizado. Faça login para continuar.</p> : null}
 
             <form className="space-y-lg" onSubmit={handleSubmit}>
               <div>
@@ -89,9 +89,9 @@ export function LoginPage({ registered }: LoginPageProps) {
                   <label className="form-label !mb-0" htmlFor="password">
                     Senha
                   </label>
-                  <a className="font-label text-label text-primary hover:underline transition-all" href="#">
+                  <span className="font-label text-label text-primary opacity-60">
                     Esqueci minha senha
-                  </a>
+                  </span>
                 </div>
                 <input
                   className="input-field"

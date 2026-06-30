@@ -70,7 +70,7 @@ export function StudentPathPage() {
 
   if (loading || !user)
     return (
-      <div className="flex min-h-screen items-center justify-center bg-background text-primary animate-pulse font-mono">
+      <div className="flex min-h-screen items-center justify-center bg-background text-primary animate-pulse font-mono" role="status" aria-live="polite">
         Carregando Sua Jornada...
       </div>
     )
@@ -101,18 +101,18 @@ export function StudentPathPage() {
             <h1 className="text-lg font-h2 font-bold text-primary tracking-tight">CodeLab</h1>
           </div>
         </div>
-        <nav className="flex-1 space-y-1">
-          <button className="w-full flex items-center gap-3 bg-secondary-container text-on-secondary-container rounded-lg px-4 py-2 text-left font-semibold text-sm">
+        <nav className="flex-1 space-y-1" aria-label="Navegação principal">
+          <a className="w-full flex items-center gap-3 bg-secondary-container text-on-secondary-container rounded-lg px-4 py-2 text-left font-semibold text-sm" href="/trilha" aria-current="page">
             <span className="material-symbols-outlined">map</span>
             Minha Trilha
-          </button>
-          <button
-            onClick={() => window.location.href = '/playground'}
+          </a>
+          <a
+            href="/playground"
             className="w-full flex items-center gap-3 text-on-surface-variant hover:text-on-surface px-4 py-2 hover:bg-surface-container-highest rounded-lg text-left font-semibold text-sm transition-all"
           >
             <span className="material-symbols-outlined">terminal</span>
             Playground
-          </button>
+          </a>
           <button
             onClick={() => setIsProfileModalOpen(true)}
             className="w-full flex items-center gap-3 text-on-surface-variant hover:text-on-surface px-4 py-2 hover:bg-surface-container-highest rounded-lg text-left font-semibold text-sm transition-all"
@@ -241,7 +241,7 @@ export function StudentPathPage() {
                           disabled={lessonStatus === 'LOCKED'}
                           onClick={() => handleNavigateToPlayground(unit.topicName)}
                           className={`
-                            relative w-24 h-24 rounded-full flex items-center justify-center shadow-2xl transition-all duration-500 focus:outline-none border-4 cursor-pointer
+                            relative w-24 h-24 rounded-full flex items-center justify-center shadow-2xl transition-all duration-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-surface border-4 cursor-pointer
                             ${lessonStatus === 'LOCKED' ? 'bg-surface-container-low border-surface-container-highest text-outline cursor-not-allowed scale-90' : 
                               isCompleted ? 'bg-primary border-primary/20 text-on-primary hover:scale-110 shadow-md' : 
                               'bg-primary-container border-primary text-on-surface hover:scale-110 shadow-lg animate-pulse'}

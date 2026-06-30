@@ -149,7 +149,7 @@ export function StudentPlaygroundPage({ questionId }: { questionId: number }) {
     }
 
     if (loading || !user) {
-        return <div className="h-screen bg-background flex items-center justify-center text-primary animate-pulse font-mono">Inicializando Arena...</div>
+        return <div className="h-screen bg-background flex items-center justify-center text-primary animate-pulse font-mono" role="status" aria-live="polite">Inicializando Arena...</div>
     }
 
     return (
@@ -165,20 +165,22 @@ export function StudentPlaygroundPage({ questionId }: { questionId: number }) {
                         <h1 className="text-lg font-h2 font-bold text-primary tracking-tight">CodeLab</h1>
                     </div>
                 </div>
-                <nav className="flex-1 space-y-1">
-                    <button
-                        onClick={() => window.location.href = '/trilha'}
+                <nav className="flex-1 space-y-1" aria-label="Navegação principal">
+                    <a
+                        href="/trilha"
                         className="w-full flex items-center gap-3 text-on-surface-variant hover:text-on-surface px-4 py-2 hover:bg-surface-container-highest rounded-lg text-left font-semibold text-sm transition-all"
                     >
                         <span className="material-symbols-outlined">map</span>
                         Minha Trilha
-                    </button>
-                    <button
-                        className="w-full flex items-center gap-3 bg-secondary-container text-on-secondary-container rounded-lg px-4 py-2 text-left font-semibold text-sm cursor-default"
+                    </a>
+                    <a
+                        href="/playground"
+                        className="w-full flex items-center gap-3 bg-secondary-container text-on-secondary-container rounded-lg px-4 py-2 text-left font-semibold text-sm"
+                        aria-current="page"
                     >
                         <span className="material-symbols-outlined text-primary">terminal</span>
                         Playground
-                    </button>
+                    </a>
                     <button
                         onClick={() => setIsProfileModalOpen(true)}
                         className="w-full flex items-center gap-3 text-on-surface-variant hover:text-on-surface px-4 py-2 hover:bg-surface-container-highest rounded-lg text-left font-semibold text-sm transition-all"
@@ -337,7 +339,7 @@ export function StudentPlaygroundPage({ questionId }: { questionId: number }) {
 
                             {/* AI Feedback */}
                             {reviewResult && (
-                                <div className={`shrink-0 rounded-xl border p-6 flex flex-col animate-in slide-in-from-right-4 duration-300 shadow-xl
+                                <div aria-live="polite" className={`shrink-0 rounded-xl border p-6 flex flex-col animate-in slide-in-from-right-4 duration-300 shadow-xl
                                     ${reviewResult.verificationStatus === 'APPROVED' ? 'bg-primary/5 border-primary/30' : 'bg-error/5 border-error/30'}`}>
                                     <div className="flex items-center gap-2 mb-4">
                                         <span className={`material-symbols-outlined ${reviewResult.verificationStatus === 'APPROVED' ? 'text-primary' : 'text-error'}`}>
