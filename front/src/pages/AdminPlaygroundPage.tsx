@@ -122,14 +122,14 @@ export function AdminPlaygroundPage({ questionId }: { questionId: number }) {
     <>
       <header className="flex justify-between items-center h-16 px-gutter w-full sticky top-0 z-30 bg-surface border-b border-outline-variant">
         <div className="flex items-center gap-md">
-          <span className="font-h2 text-h2 font-extrabold text-primary">CodeLab</span>
+          <span className="text-lg font-h2 font-bold text-primary tracking-tight">CodeLab</span>
           <div className="h-6 w-[1px] bg-outline-variant mx-sm"></div>
-          <span className="font-label text-label text-on-surface-variant tracking-wider uppercase">Playground</span>
+          <span className="font-label text-label text-on-surface-variant tracking-wider">Playground</span>
         </div>
         <div className="flex items-center gap-md">
           <button
             type="button"
-            className="border border-outline-variant px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high"
+            className="btn-secondary !h-9 !px-md"
             onClick={() => {
               window.location.href = profile?.role === 'ADMIN' ? '/admin/questions' : '/trilha'
             }}
@@ -160,7 +160,7 @@ export function AdminPlaygroundPage({ questionId }: { questionId: number }) {
               </div>
               <button
                 type="button"
-                className="flex items-center gap-sm px-lg py-sm rounded-lg bg-primary text-on-primary font-label font-bold hover:brightness-110 transition-all disabled:opacity-70"
+                className="btn-primary !h-9 !px-md"
                 onClick={handleSubmitForReview}
                 disabled={submitting || loading || !question}
               >
@@ -207,7 +207,7 @@ export function AdminPlaygroundPage({ questionId }: { questionId: number }) {
               {reviewResult ? (
                 <div className="bg-surface-container border border-outline-variant rounded-xl p-md space-y-sm">
                   <p className="text-label text-on-surface-variant uppercase">Status</p>
-                  <p className={`text-h3 ${reviewResult.verificationStatus === 'APPROVED' ? 'text-[#72db9f]' : 'text-primary'}`}>
+                  <p className={`text-h3 font-h3 font-bold ${reviewResult.verificationStatus === 'APPROVED' ? 'text-primary' : 'text-error'}`}>
                     {reviewResult.verificationStatus}
                   </p>
                   <p className="text-label text-on-surface-variant uppercase">Node</p>
@@ -218,7 +218,7 @@ export function AdminPlaygroundPage({ questionId }: { questionId: number }) {
                   {reviewResult.verificationStatus === 'APPROVED' && (
                     <button
                       onClick={() => (window.location.href = '/trilha')}
-                      className="w-full mt-4 bg-[#72db9f] text-[#003920] py-2 rounded-lg font-bold hover:brightness-110 transition-all"
+                      className="btn-primary w-full mt-4 !h-10"
                     >
                       Voltar para a Trilha
                     </button>

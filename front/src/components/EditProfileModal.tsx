@@ -86,15 +86,15 @@ export function EditProfileModal({ isOpen, onClose, user, onUpdate }: Props) {
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm">
-      <div className="bg-[#161f1b] border border-[#2d3a34] w-full max-w-2xl rounded-2xl shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-200">
+      <div className="bg-surface-container border border-outline-variant w-full max-w-2xl rounded-xl shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-200">
         
         {/* Modal Header */}
-        <div className="p-lg border-b border-[#2d3a34] flex justify-between items-center bg-[#1a211e]">
+        <div className="p-lg border-b border-outline-variant flex justify-between items-center bg-surface-container-high">
           <div>
-            <h2 className="text-xl font-black text-[#dde4df] uppercase tracking-tight">Editar Perfil</h2>
-            <p className="text-[10px] text-[#bdcabe] uppercase tracking-widest font-bold">Atualize suas informações</p>
+            <h2 className="text-h3 font-h3 font-bold text-on-surface">Editar Perfil</h2>
+            <p className="text-label font-label text-on-surface-variant uppercase tracking-wider">Atualize suas informações</p>
           </div>
-          <button onClick={onClose} className="text-[#bdcabe] hover:text-primary transition-colors">
+          <button onClick={onClose} className="text-on-surface-variant hover:text-primary transition-colors p-xs rounded-lg">
             <span className="material-symbols-outlined">close</span>
           </button>
         </div>
@@ -104,50 +104,50 @@ export function EditProfileModal({ isOpen, onClose, user, onUpdate }: Props) {
           {/* Avatar Section */}
           <div className="flex flex-col md:flex-row items-center gap-lg border-b border-outline-variant pb-lg">
             <div className="relative group">
-              <div className="w-28 h-28 rounded-full border-4 border-primary/20 p-1 overflow-hidden shadow-[0_0_30px_rgba(114,219,159,0.1)]">
+              <div className="w-28 h-28 rounded-full border-4 border-primary/20 p-1 overflow-hidden shadow-md">
                 <img alt="User Avatar" className="w-full h-full rounded-full object-cover" src={previewUrl} />
               </div>
-              <label className="absolute bottom-1 right-1 bg-primary text-[#003920] p-1.5 rounded-full cursor-pointer hover:scale-110 transition-transform shadow-lg border-2 border-[#161f1b]" htmlFor="avatar-upload">
+              <label className="absolute bottom-1 right-1 bg-primary text-on-primary p-1.5 rounded-full cursor-pointer hover:scale-110 transition-transform shadow-lg border-2 border-surface-container" htmlFor="avatar-upload">
                 <span className="material-symbols-outlined text-[20px]">photo_camera</span>
               </label>
               <input className="hidden" id="avatar-upload" type="file" accept="image/*" onChange={handlePhotoChange} />
             </div>
             <div className="text-center md:text-left flex-1">
-              <h3 className="text-lg font-bold text-[#dde4df]">Sua Foto</h3>
-              <p className="text-[10px] text-[#bdcabe] uppercase tracking-wider mb-2">JPG ou PNG • Máx 2MB</p>
+              <h3 className="text-h3 font-h3 font-semibold text-on-surface">Sua Foto</h3>
+              <p className="text-body-sm font-body-sm text-on-surface-variant mb-2">JPG ou PNG • Máx 2MB</p>
               <div className="flex gap-2 justify-center md:justify-start">
-                <label htmlFor="avatar-upload" className="text-[10px] font-black text-primary border border-primary/30 px-3 py-1.5 rounded-lg hover:bg-primary/10 transition-all uppercase cursor-pointer">Trocar Foto</label>
-                {user.photo && <button type="button" className="text-[10px] font-black text-error border border-error/30 px-3 py-1.5 rounded-lg hover:bg-error/10 transition-all uppercase">Remover</button>}
+                <label htmlFor="avatar-upload" className="btn-secondary !h-9 !px-md !text-[12px] cursor-pointer">Trocar Foto</label>
+                {user.photo && <button type="button" className="btn-danger !h-9 !px-md !text-[12px]">Remover</button>}
               </div>
             </div>
           </div>
 
           {/* Form Fields */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-lg">
-            <div className="space-y-xs">
-              <label className="text-[10px] font-black text-[#bdcabe] uppercase tracking-widest">Nome Completo</label>
+            <div>
+              <label className="form-label">Nome Completo</label>
               <input
-                className="w-full bg-[#0e1512] border border-[#3e4941] rounded-xl px-4 py-3 text-[#dde4df] font-bold focus:border-primary focus:ring-1 focus:ring-primary/30 transition-all outline-none"
+                className="input-field"
                 type="text"
                 value={name}
                 onChange={e => setName(e.target.value)}
                 required
               />
             </div>
-            <div className="space-y-xs">
-              <label className="text-[10px] font-black text-[#bdcabe] uppercase tracking-widest">E-mail</label>
+            <div>
+              <label className="form-label">E-mail</label>
               <input
-                className="w-full bg-[#0e1512] border border-[#3e4941] rounded-xl px-4 py-3 text-[#dde4df] font-bold focus:border-primary focus:ring-1 focus:ring-primary/30 transition-all outline-none"
+                className="input-field"
                 type="email"
                 value={email}
                 onChange={e => setEmail(e.target.value)}
                 required
               />
             </div>
-            <div className="md:col-span-2 space-y-xs">
-              <label className="text-[10px] font-black text-[#bdcabe] uppercase tracking-widest">Nova Senha (opcional)</label>
+            <div className="md:col-span-2">
+              <label className="form-label">Nova Senha (opcional)</label>
               <input
-                className="w-full bg-[#0e1512] border border-[#3e4941] rounded-xl px-4 py-3 text-[#dde4df] font-bold focus:border-primary focus:ring-1 focus:ring-primary/30 transition-all outline-none"
+                className="input-field"
                 type="password"
                 placeholder="••••••••"
                 value={password}
@@ -156,26 +156,26 @@ export function EditProfileModal({ isOpen, onClose, user, onUpdate }: Props) {
             </div>
           </div>
 
-          {error && <p className="text-xs text-error font-bold uppercase tracking-tight">{error}</p>}
+          {error && <p className="text-body-sm font-body-sm text-error font-semibold">{error}</p>}
 
           {/* Footer Actions */}
-          <div className="pt-lg border-t border-[#2d3a34] flex flex-col md:flex-row items-center justify-between gap-4">
-            <div className="flex gap-4 w-full md:w-auto">
+          <div className="pt-lg border-t border-outline-variant flex flex-col md:flex-row items-center justify-between gap-4">
+            <div className="flex gap-md w-full md:w-auto">
               <button
                 type="submit"
                 disabled={loading}
-                className="flex-1 md:flex-none bg-gradient-to-br from-[#1b8f5a] to-[#37a36c] text-[#003920] font-black px-8 py-3 rounded-xl hover:brightness-110 active:scale-95 transition-all shadow-xl shadow-primary/10 uppercase text-xs"
+                className="btn-primary flex-1 md:flex-none"
               >
                 {loading ? 'Salvando...' : 'Salvar Alterações'}
               </button>
-              <button type="button" onClick={onClose} className="hidden md:block text-[10px] font-black text-[#bdcabe] hover:text-[#dde4df] px-4 py-3 transition-colors uppercase">Cancelar</button>
+              <button type="button" onClick={onClose} className="btn-secondary hidden md:inline-flex">Cancelar</button>
             </div>
             <button
               type="button"
               onClick={handleDeleteAccount}
-              className="flex items-center gap-1 text-[10px] font-black text-error hover:bg-error/10 px-4 py-2 rounded-lg transition-all uppercase"
+              className="btn-danger"
             >
-              <span className="material-symbols-outlined text-sm">delete</span>
+              <span className="material-symbols-outlined text-[18px]">delete</span>
               Deletar Conta
             </button>
           </div>

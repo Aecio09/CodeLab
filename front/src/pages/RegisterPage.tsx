@@ -58,12 +58,12 @@ export function RegisterPage() {
     <>
       <header className="bg-surface border-b border-outline-variant z-50 sticky top-0">
         <div className="flex justify-between items-center px-lg md:px-margin-desktop h-16 max-w-max-width mx-auto">
-          <div className="text-h2 font-bold text-primary">CodeLab</div>
+          <div className="text-lg font-h2 font-bold text-primary tracking-tight">CodeLab</div>
           <div className="flex items-center gap-md">
-            <a className="text-body-md text-on-surface-variant hover:text-primary transition-colors cursor-pointer" href="/">
+            <a className="text-body-md font-body-md text-on-surface-variant hover:text-primary transition-colors cursor-pointer" href="/">
               Entrar
             </a>
-            <a className="bg-primary-container text-on-primary-container px-md py-sm rounded-lg font-label hover:brightness-110 transition-all cursor-pointer" href="mailto:suporte@codelab.com">
+            <a className="btn-secondary !h-9 !px-md" href="mailto:suporte@codelab.com">
               Contate-nos
             </a>
           </div>
@@ -73,16 +73,16 @@ export function RegisterPage() {
         <div className="w-full max-w-[480px] bg-surface-container rounded-xl border border-outline-variant tinted-shadow overflow-hidden">
           <div className="p-lg md:p-xl space-y-lg">
             <div className="text-center space-y-xs">
-              <h1 className="text-h1 text-on-surface">Começar agora</h1>
-              <p className="text-body-md text-on-surface-variant">Crie sua conta no CodeLab e domine a lógica</p>
+              <h1 className="text-h1 font-h1 font-bold text-on-surface">Começar agora</h1>
+              <p className="text-body-md font-body-md text-on-surface-variant">Crie sua conta no CodeLab e domine a lógica</p>
             </div>
             <form className="space-y-md" onSubmit={handleSubmit}>
-              <div className="space-y-xs">
-                <label className="text-label text-on-surface-variant block uppercase tracking-wider" htmlFor="name">
+              <div>
+                <label className="form-label" htmlFor="name">
                   Nome Completo
                 </label>
                 <input
-                  className="w-full h-12 px-md bg-surface-container-highest border border-outline-variant rounded-lg text-on-surface placeholder:text-outline"
+                  className="input-field"
                   id="name"
                   placeholder="Ex: João Silva"
                   type="text"
@@ -91,12 +91,12 @@ export function RegisterPage() {
                   onChange={(event) => setName(event.target.value)}
                 />
               </div>
-              <div className="space-y-xs">
-                <label className="text-label text-on-surface-variant block uppercase tracking-wider" htmlFor="register-email">
+              <div>
+                <label className="form-label" htmlFor="register-email">
                   E-mail
                 </label>
                 <input
-                  className="w-full h-12 px-md bg-surface-container-highest border border-outline-variant rounded-lg text-on-surface placeholder:text-outline"
+                  className="input-field"
                   id="register-email"
                   placeholder="nome@email.com"
                   type="email"
@@ -106,12 +106,12 @@ export function RegisterPage() {
                 />
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-md">
-                <div className="space-y-xs">
-                  <label className="text-label text-on-surface-variant block uppercase tracking-wider" htmlFor="register-password">
+                <div>
+                  <label className="form-label" htmlFor="register-password">
                     Senha
                   </label>
                   <input
-                    className="w-full h-12 px-md bg-surface-container-highest border border-outline-variant rounded-lg text-on-surface placeholder:text-outline"
+                    className="input-field"
                     id="register-password"
                     placeholder="••••••••"
                     type="password"
@@ -120,12 +120,12 @@ export function RegisterPage() {
                     onChange={(event) => setPassword(event.target.value)}
                   />
                 </div>
-                <div className="space-y-xs">
-                  <label className="text-label text-on-surface-variant block uppercase tracking-wider" htmlFor="confirm-password">
+                <div>
+                  <label className="form-label" htmlFor="confirm-password">
                     Confirmar Senha
                   </label>
                   <input
-                    className="w-full h-12 px-md bg-surface-container-highest border border-outline-variant rounded-lg text-on-surface placeholder:text-outline"
+                    className="input-field"
                     id="confirm-password"
                     placeholder="••••••••"
                     type="password"
@@ -138,20 +138,20 @@ export function RegisterPage() {
               <div className="flex items-start gap-sm pt-xs">
                 <div className="flex items-center h-5">
                   <input
-                    className="w-4 h-4 text-primary bg-surface-container-highest border-outline-variant rounded focus:ring-primary focus:ring-offset-surface-container"
+                    className="w-4 h-4 text-primary bg-surface-container-highest border-outline-variant rounded focus:ring-primary focus:ring-offset-surface-container accent-primary"
                     id="terms"
                     type="checkbox"
                     checked={acceptTerms}
                     onChange={(event) => setAcceptTerms(event.target.checked)}
                   />
                 </div>
-                <label className="text-body-sm text-on-surface-variant" htmlFor="terms">
+                <label className="text-body-sm font-body-sm text-on-surface-variant" htmlFor="terms">
                   Eu aceito os <a className="text-primary hover:underline font-semibold" href="#">termos de serviço</a> e a{' '}
                   <a className="text-primary hover:underline font-semibold" href="#">política de privacidade</a> do CodeLab.
                 </label>
               </div>
-              {error ? <p className="text-error text-body-sm">{error}</p> : null}
-              <button className="w-full h-12 bg-primary text-on-primary font-h3 text-center rounded-lg hover:brightness-110 transition-all active:scale-[0.98] mt-md disabled:opacity-70" type="submit" disabled={submitting}>
+              {error ? <p className="text-error text-body-sm font-semibold">{error}</p> : null}
+              <button className="btn-primary w-full mt-md" type="submit" disabled={submitting}>
                 {submitting ? 'Criando conta...' : 'Criar Conta'}
               </button>
             </form>
@@ -159,13 +159,13 @@ export function RegisterPage() {
               <div className="absolute inset-0 flex items-center">
                 <div className="w-full border-t border-outline-variant"></div>
               </div>
-              <div className="relative flex justify-center text-label uppercase">
+              <div className="relative flex justify-center text-label">
                 <span className="bg-surface-container px-md text-on-surface-variant font-medium">Ou registre-se com</span>
               </div>
             </div>
             <div className="grid grid-cols-1">
               <a
-                className="flex items-center justify-center gap-sm h-11 border border-outline-variant rounded-lg hover:bg-surface-container-high transition-colors text-label text-on-surface uppercase tracking-widest"
+                className="btn-secondary w-full"
                 href={`${API_BASE_URL}/oauth2/authorization/google`}
               >
                 <svg viewBox="0 0 48 48" className="w-5 h-5" aria-hidden="true">

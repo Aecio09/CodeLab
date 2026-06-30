@@ -149,49 +149,48 @@ export function StudentPlaygroundPage({ questionId }: { questionId: number }) {
     }
 
     if (loading || !user) {
-        return <div className="h-screen bg-[#0e1512] flex items-center justify-center text-primary animate-pulse font-mono">INITIALIZING ARENA...</div>
+        return <div className="h-screen bg-background flex items-center justify-center text-primary animate-pulse font-mono">Inicializando Arena...</div>
     }
 
     return (
-        <div className="flex h-screen w-full bg-[#0e1512] text-[#dde4df] font-sans overflow-hidden">
+        <div className="flex h-screen w-full bg-background text-on-surface font-sans overflow-hidden">
 
             {/* Sidebar */}
-            <aside className="fixed left-0 top-0 h-full flex flex-col py-6 px-4 border-r border-[#3e4941] bg-[#161d1a] w-64 z-50 shrink-0">
+            <aside className="fixed left-0 top-0 h-full flex flex-col py-6 px-4 border-r border-outline-variant bg-surface-container-low w-64 z-50 shrink-0">
                 <div className="flex items-center gap-3 mb-8 px-2">
-                    <div className="w-10 h-10 rounded-lg bg-[#72db9f] flex items-center justify-center shadow-[0_0_20px_rgba(114,219,159,0.2)]">
-                        <span className="material-symbols-outlined text-[#003920]">terminal</span>
+                    <div className="w-10 h-10 rounded-lg bg-primary flex items-center justify-center shadow-md">
+                        <span className="material-symbols-outlined text-on-primary">terminal</span>
                     </div>
                     <div>
-                        <h1 className="text-lg font-bold text-[#72db9f]">CodeLab</h1>
-                        <p className="text-[10px] text-[#bdcabe] uppercase tracking-widest font-bold">Plataforma</p>
+                        <h1 className="text-lg font-h2 font-bold text-primary tracking-tight">CodeLab</h1>
                     </div>
                 </div>
                 <nav className="flex-1 space-y-1">
                     <button
                         onClick={() => window.location.href = '/trilha'}
-                        className="w-full flex items-center gap-3 text-[#bdcabe] hover:text-[#dde4df] px-4 py-2 hover:bg-[#2f3633] rounded-lg text-left font-semibold text-sm transition-all"
+                        className="w-full flex items-center gap-3 text-on-surface-variant hover:text-on-surface px-4 py-2 hover:bg-surface-container-highest rounded-lg text-left font-semibold text-sm transition-all"
                     >
                         <span className="material-symbols-outlined">map</span>
                         Minha Trilha
                     </button>
                     <button
-                        className="w-full flex items-center gap-3 bg-[#3c4a43] text-[#aab9b0] rounded-lg px-4 py-2 text-left font-semibold text-sm cursor-default"
+                        className="w-full flex items-center gap-3 bg-secondary-container text-on-secondary-container rounded-lg px-4 py-2 text-left font-semibold text-sm cursor-default"
                     >
                         <span className="material-symbols-outlined text-primary">terminal</span>
                         Playground
                     </button>
                     <button
                         onClick={() => setIsProfileModalOpen(true)}
-                        className="w-full flex items-center gap-3 text-[#bdcabe] hover:text-[#dde4df] px-4 py-2 hover:bg-[#2f3633] rounded-lg text-left font-semibold text-sm transition-all"
+                        className="w-full flex items-center gap-3 text-on-surface-variant hover:text-on-surface px-4 py-2 hover:bg-surface-container-highest rounded-lg text-left font-semibold text-sm transition-all"
                     >
                         <span className="material-symbols-outlined">account_circle</span>
                         Meu Perfil
                     </button>
                 </nav>
-                <div className="mt-auto pt-4 border-t border-[#3e4941]">
+                <div className="mt-auto pt-4 border-t border-outline-variant">
                     <button
                         onClick={handleLogout}
-                        className="w-full flex items-center justify-center gap-2 bg-[#93000a]/10 text-[#ffdad6] hover:bg-[#93000a]/20 border border-[#93000a]/20 px-4 py-2 rounded-lg text-sm font-bold transition-colors"
+                        className="btn-danger w-full !h-10"
                     >
                         <span className="material-symbols-outlined text-[18px]">logout</span>
                         Sair
@@ -203,11 +202,11 @@ export function StudentPlaygroundPage({ questionId }: { questionId: number }) {
             <main className="flex-1 ml-64 min-w-0 min-h-0 flex flex-col h-screen overflow-hidden">
 
                 {/* Header */}
-                <header className="shrink-0 w-full flex justify-between items-center h-16 px-8 bg-[#0e1512]/80 backdrop-blur-md border-b border-[#3e4941] z-[60]">
+                <header className="shrink-0 w-full flex justify-between items-center h-16 px-8 bg-background/80 backdrop-blur-md border-b border-outline-variant z-[60]">
                     <div className="flex items-center gap-4">
                         <div className="hidden md:block">
-                            <p className="text-[10px] text-primary font-black uppercase tracking-widest opacity-70">Desafio em curso</p>
-                            <h2 className="text-sm font-black text-[#dde4df] italic">
+                            <p className="text-[10px] text-primary font-black uppercase tracking-widest opacity-80">Desafio em curso</p>
+                            <h2 className="text-sm font-black text-on-surface italic">
                                 {question?.topic?.replaceAll('_', ' ') ?? '...'}
                             </h2>
                         </div>
@@ -215,18 +214,18 @@ export function StudentPlaygroundPage({ questionId }: { questionId: number }) {
 
                     <div className="flex items-center gap-8">
                         <div className="flex items-center gap-4">
-                            <div className="flex items-center gap-2 bg-[#1a211e] px-4 py-1.5 rounded-full border border-[#3e4941] shadow-inner">
+                            <div className="flex items-center gap-2 bg-surface-container px-4 py-1.5 rounded-full border border-outline-variant shadow-inner">
                                 <span className="material-symbols-outlined text-orange-500" style={{ fontVariationSettings: "'FILL' 1" }}>local_fire_department</span>
-                                <span className="text-md font-black text-[#dde4df]">{user.userStreak}</span>
+                                <span className="text-md font-black text-on-surface">{user.userStreak}</span>
                             </div>
-                            <div className="flex items-center gap-2 bg-[#1a211e] px-4 py-1.5 rounded-full border border-[#3e4941] shadow-inner">
+                            <div className="flex items-center gap-2 bg-surface-container px-4 py-1.5 rounded-full border border-outline-variant shadow-inner">
                                 <span className="material-symbols-outlined text-yellow-500" style={{ fontVariationSettings: "'FILL' 1" }}>stars</span>
-                                <span className="text-md font-black text-[#dde4df]">{Math.floor(user.userPoints)}</span>
+                                <span className="text-md font-black text-on-surface">{Math.floor(user.userPoints)}</span>
                             </div>
                         </div>
 
                         <div className="flex items-center gap-6">
-                            <div className="flex items-center gap-2 text-[#bdcabe]">
+                            <div className="flex items-center gap-2 text-on-surface-variant">
                                 <span className="material-symbols-outlined text-[20px]">schedule</span>
                                 <span className="font-mono text-sm">{formatTime(seconds)}</span>
                             </div>
@@ -236,14 +235,14 @@ export function StudentPlaygroundPage({ questionId }: { questionId: number }) {
                                         const iframe = document.querySelector('iframe');
                                         if (iframe) iframe.src = iframe.src;
                                     }}
-                                    className="bg-[#1a211e] text-[#72db9f] border border-[#3e4941] font-black text-[11px] uppercase px-4 py-2.5 rounded-xl hover:bg-[#2f3633] transition-all"
+                                    className="btn-secondary !h-9 !px-md !text-[11px]"
                                 >
                                     Executar
                                 </button>
                                 <button
                                     onClick={handleSubmit}
                                     disabled={submitting}
-                                    className="bg-gradient-to-r from-primary to-[#37a36c] text-[#003920] font-black text-[11px] uppercase px-8 py-2.5 rounded-xl hover:scale-105 active:scale-95 transition-all shadow-[0_0_25px_rgba(114,219,159,0.3)] disabled:opacity-50"
+                                    className="btn-primary !h-9 !px-lg !text-[11px]"
                                 >
                                     {submitting ? 'Analisando...' : 'Enviar Resposta'}
                                 </button>
@@ -273,10 +272,10 @@ export function StudentPlaygroundPage({ questionId }: { questionId: number }) {
                     }}
                 >
                     {/* Challenge Briefing */}
-                    <div className="shrink-0 px-8 py-4 bg-[#1a211e] border-b border-[#3e4941] flex items-start justify-between gap-8">
+                    <div className="shrink-0 px-8 py-4 bg-surface-container-high border-b border-outline-variant flex items-start justify-between gap-8">
                         <div className="flex-1">
                             <p className="text-[10px] text-primary font-black uppercase tracking-[0.2em] mb-1">Objetivo</p>
-                            <p className="text-sm text-[#dde4df] leading-relaxed font-medium">
+                            <p className="text-sm text-on-surface leading-relaxed font-medium">
                                 {question?.questionBody}
                             </p>
                         </div>
@@ -292,15 +291,15 @@ export function StudentPlaygroundPage({ questionId }: { questionId: number }) {
                     <div className="flex-1 min-h-0 flex overflow-hidden p-6 gap-6">
 
                         {/* Editor */}
-                        <div className="flex-1 min-w-0 min-h-0 bg-[#050a07] rounded-2xl border border-[#3e4941] overflow-hidden flex flex-col shadow-2xl">
-                            <div className="shrink-0 px-4 py-2 bg-[#161d1a] border-b border-[#3e4941] flex items-center justify-between">
+                        <div className="flex-1 min-w-0 min-h-0 bg-[#050a07] rounded-xl border border-outline-variant overflow-hidden flex flex-col shadow-2xl">
+                            <div className="shrink-0 px-4 py-2 bg-surface-container-low border-b border-outline-variant flex items-center justify-between">
                                 <div className="flex items-center gap-2">
                                     <span className="material-symbols-outlined text-primary text-sm">javascript</span>
-                                    <span className="text-[10px] font-bold text-[#bdcabe] uppercase tracking-widest">arena_solution.ts</span>
+                                    <span className="text-[10px] font-bold text-on-surface-variant">Solução</span>
                                 </div>
                                 {reviewResult && (
                                     <div className={`flex items-center gap-2 px-3 py-1 rounded-full text-[9px] font-black uppercase
-                                        ${reviewResult.verificationStatus === 'APPROVED' ? 'bg-[#72db9f]/20 text-primary' : 'bg-error/20 text-error'}`}>
+                                        ${reviewResult.verificationStatus === 'APPROVED' ? 'bg-primary/20 text-primary' : 'bg-error/20 text-error'}`}>
                                         {reviewResult.verificationStatus === 'APPROVED' ? 'Código Validado' : 'Correção Necessária'}
                                     </div>
                                 )}
@@ -321,11 +320,11 @@ export function StudentPlaygroundPage({ questionId }: { questionId: number }) {
                         <div className="w-80 shrink-0 min-h-0 flex flex-col gap-4">
 
                             {/* Terminal */}
-                            <div className="flex-1 min-h-0 bg-[#050a07] rounded-2xl border border-[#3e4941] overflow-hidden flex flex-col shadow-xl">
-                                <div className="shrink-0 px-4 py-2 bg-[#161d1a] border-b border-[#3e4941] flex items-center justify-between">
+                            <div className="flex-1 min-h-0 bg-[#050a07] rounded-xl border border-outline-variant overflow-hidden flex flex-col shadow-xl">
+                                <div className="shrink-0 px-4 py-2 bg-surface-container-low border-b border-outline-variant flex items-center justify-between">
                                     <div className="flex items-center gap-2">
-                                        <span className="material-symbols-outlined text-[#bdcabe] text-sm">terminal</span>
-                                        <span className="text-[10px] font-bold text-[#bdcabe] uppercase tracking-widest">Saída do Sistema</span>
+                                        <span className="material-symbols-outlined text-on-surface-variant text-sm">terminal</span>
+                                        <span className="text-[10px] font-bold text-on-surface-variant">Saída do Sistema</span>
                                     </div>
                                     <div className="hidden">
                                         <SandpackPreview />
@@ -338,27 +337,27 @@ export function StudentPlaygroundPage({ questionId }: { questionId: number }) {
 
                             {/* AI Feedback */}
                             {reviewResult && (
-                                <div className={`shrink-0 rounded-2xl border p-6 flex flex-col animate-in slide-in-from-right-4 duration-300 shadow-xl
-                                    ${reviewResult.verificationStatus === 'APPROVED' ? 'bg-[#72db9f]/5 border-[#72db9f]/30' : 'bg-error/5 border-error/30'}`}>
+                                <div className={`shrink-0 rounded-xl border p-6 flex flex-col animate-in slide-in-from-right-4 duration-300 shadow-xl
+                                    ${reviewResult.verificationStatus === 'APPROVED' ? 'bg-primary/5 border-primary/30' : 'bg-error/5 border-error/30'}`}>
                                     <div className="flex items-center gap-2 mb-4">
                                         <span className={`material-symbols-outlined ${reviewResult.verificationStatus === 'APPROVED' ? 'text-primary' : 'text-error'}`}>
                                             {reviewResult.verificationStatus === 'APPROVED' ? 'verified' : 
                                              reviewResult.verificationStatus === 'REJECTED' ? 'dangerous' : 'report'}
                                         </span>
-                                        <h3 className="text-xs font-black uppercase tracking-widest">
+                                        <h3 className={`text-xs font-black uppercase tracking-widest ${reviewResult.verificationStatus === 'APPROVED' ? 'text-on-surface' : 'text-white'}`}>
                                             {reviewResult.verificationStatus === 'APPROVED' ? 'Relatório de Verificação' : 
                                              reviewResult.verificationStatus === 'REJECTED' ? 'Desafio Recusado' : 'Erro de Sistema'}
                                         </h3>
                                     </div>
                                     <div className="overflow-auto max-h-48">
-                                        <p className={`text-sm italic leading-relaxed whitespace-pre-wrap ${reviewResult.verificationStatus === 'APPROVED' ? 'text-[#bdcabe]' : 'text-error/80'}`}>
+                                        <p className={`text-sm italic leading-relaxed whitespace-pre-wrap ${reviewResult.verificationStatus === 'APPROVED' ? 'text-on-surface-variant' : 'text-white/90'}`}>
                                             "{reviewResult.aiVerificationResult}"
                                         </p>
                                     </div>
                                     {reviewResult.verificationStatus === 'APPROVED' && (
                                         <button
                                             onClick={() => window.location.href = '/trilha'}
-                                            className="w-full mt-4 bg-primary text-[#003920] py-3 rounded-xl font-black uppercase text-xs hover:brightness-110 active:scale-95 transition-all shadow-lg"
+                                            className="btn-primary w-full mt-4 !h-10"
                                         >
                                             Continuar Jornada
                                         </button>

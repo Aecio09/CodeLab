@@ -176,12 +176,12 @@ export function ProfilePage() {
     <>
       <header className="bg-surface border-b border-outline-variant z-50 sticky top-0">
         <div className="flex justify-between items-center px-lg md:px-margin-desktop h-16 max-w-max-width mx-auto">
-          <div className="text-h2 font-bold text-primary">CodeLab</div>
+          <div className="text-lg font-h2 font-bold text-primary tracking-tight">CodeLab</div>
           <div className="flex items-center gap-md">
-            <span className="text-body-sm text-on-surface-variant uppercase">{profile?.role ?? 'USER'}</span>
+            <span className="text-body-sm font-body-sm text-on-surface-variant uppercase font-semibold">{profile?.role ?? 'USER'}</span>
             <button
               type="button"
-              className="bg-primary-container text-on-primary-container px-md py-sm rounded-lg font-label hover:brightness-110 transition-all"
+              className="btn-secondary !h-9 !px-md"
               onClick={handleLogout}
             >
               Sair
@@ -197,53 +197,53 @@ export function ProfilePage() {
               <img
                 src={resolvePhotoUrl(profile?.photo ?? null)}
                 alt="Foto de perfil"
-                className="w-28 h-28 rounded-full mx-auto object-cover border-4 border-surface-container-highest"
+                className="w-28 h-28 rounded-full mx-auto object-cover border-4 border-surface-container-highest shadow-md"
               />
-              <h1 className="text-h1 text-on-surface">Meu perfil</h1>
-              <p className="text-body-sm text-on-surface-variant">Gerencie seus dados e mantenha sua conta atualizada.</p>
+              <h1 className="text-h1 font-h1 font-bold text-on-surface">Meu perfil</h1>
+              <p className="text-body-sm font-body-sm text-on-surface-variant">Gerencie seus dados e mantenha sua conta atualizada.</p>
             </div>
 
-            {loading ? <p className="text-body-sm text-on-surface-variant">Carregando perfil...</p> : null}
-            {error ? <p className="text-error text-body-sm">{error}</p> : null}
-            {success ? <p className="text-primary text-body-sm">{success}</p> : null}
+            {loading ? <p className="text-body-sm font-body-sm text-on-surface-variant">Carregando perfil...</p> : null}
+            {error ? <p className="text-error text-body-sm font-semibold">{error}</p> : null}
+            {success ? <p className="text-primary text-body-sm font-semibold">{success}</p> : null}
 
             <form className="space-y-md" onSubmit={handleUpdateProfile}>
-              <div className="space-y-xs">
-                <label className="text-label text-on-surface-variant block uppercase tracking-wider" htmlFor="profile-name">
+              <div>
+                <label className="form-label" htmlFor="profile-name">
                   Nome
                 </label>
                 <input
                   id="profile-name"
                   type="text"
-                  className="w-full h-12 px-md bg-surface-container-highest border border-outline-variant rounded-lg text-on-surface placeholder:text-outline"
+                  className="input-field"
                   value={name}
                   onChange={(event) => setName(event.target.value)}
                   required
                   disabled={loading}
                 />
               </div>
-              <div className="space-y-xs">
-                <label className="text-label text-on-surface-variant block uppercase tracking-wider" htmlFor="profile-email">
+              <div>
+                <label className="form-label" htmlFor="profile-email">
                   E-mail
                 </label>
                 <input
                   id="profile-email"
                   type="email"
-                  className="w-full h-12 px-md bg-surface-container-highest border border-outline-variant rounded-lg text-on-surface placeholder:text-outline"
+                  className="input-field"
                   value={email}
                   onChange={(event) => setEmail(event.target.value)}
                   required
                   disabled={loading}
                 />
               </div>
-              <div className="space-y-xs">
-                <label className="text-label text-on-surface-variant block uppercase tracking-wider" htmlFor="profile-password">
+              <div>
+                <label className="form-label" htmlFor="profile-password">
                   Nova senha
                 </label>
                 <input
                   id="profile-password"
                   type="password"
-                  className="w-full h-12 px-md bg-surface-container-highest border border-outline-variant rounded-lg text-on-surface placeholder:text-outline"
+                  className="input-field"
                   value={password}
                   placeholder="Opcional"
                   onChange={(event) => setPassword(event.target.value)}
@@ -251,7 +251,7 @@ export function ProfilePage() {
                 />
               </div>
               <button
-                className="w-full h-12 bg-primary text-on-primary font-label text-label uppercase rounded-lg hover:bg-primary/90 active:scale-[0.98] transition-all disabled:opacity-70"
+                className="btn-primary w-full"
                 type="submit"
                 disabled={loading}
               >
@@ -260,21 +260,21 @@ export function ProfilePage() {
             </form>
 
             <form className="space-y-md" onSubmit={handleUploadPhoto}>
-              <div className="space-y-xs">
-                <label className="text-label text-on-surface-variant block uppercase tracking-wider" htmlFor="profile-photo">
+              <div>
+                <label className="form-label" htmlFor="profile-photo">
                   Foto de perfil
                 </label>
                 <input
                   id="profile-photo"
                   type="file"
                   accept="image/*"
-                  className="w-full text-body-sm text-on-surface file:mr-sm file:py-sm file:px-md file:rounded-lg file:border-0 file:bg-surface-container-highest file:text-on-surface file:cursor-pointer"
+                  className="w-full text-body-sm text-on-surface file:mr-sm file:py-xs file:px-md file:rounded-lg file:border file:border-outline-variant file:bg-surface-container-high file:text-on-surface file:font-semibold file:cursor-pointer hover:file:bg-surface-container-highest transition-all"
                   onChange={handlePhotoChange}
                   disabled={loading}
                 />
               </div>
               <button
-                className="w-full h-12 bg-secondary-container text-on-secondary-container font-label text-label uppercase rounded-lg hover:brightness-110 active:scale-[0.98] transition-all disabled:opacity-70"
+                className="btn-secondary w-full"
                 type="submit"
                 disabled={loading}
               >
@@ -282,13 +282,13 @@ export function ProfilePage() {
               </button>
             </form>
 
-            <div className="pt-md border-t border-outline-variant space-y-sm">
+            <div className="pt-md border-t border-outline-variant">
               <button
                 type="button"
-                className="w-full h-12 bg-error-container text-on-error-container font-label text-label uppercase rounded-lg hover:brightness-110 transition-all"
+                className="btn-danger w-full"
                 onClick={handleDeleteAccount}
               >
-                Deletar conta
+                Deletar Conta
               </button>
             </div>
           </div>

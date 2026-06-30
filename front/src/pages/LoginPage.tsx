@@ -60,7 +60,7 @@ export function LoginPage({ registered }: LoginPageProps) {
                 <span className="material-symbols-outlined text-primary text-[40px]" style={{ fontVariationSettings: "'FILL' 1" }}>
                   terminal
                 </span>
-                <span className="font-h1 text-h1 text-primary tracking-tight">CodeLab</span>
+                <span className="text-lg font-h2 font-bold text-primary tracking-tight">CodeLab</span>
               </div>
               <h1 className="font-h2 text-h2 text-on-surface mb-xs">Bem-vindo de volta</h1>
               <p className="font-body-sm text-body-sm text-on-surface-variant">Aprenda lógica de programação como em um jogo</p>
@@ -69,12 +69,12 @@ export function LoginPage({ registered }: LoginPageProps) {
             {registered ? <p className="text-primary text-body-sm mb-md">Cadastro realizado. Faça login para continuar.</p> : null}
 
             <form className="space-y-lg" onSubmit={handleSubmit}>
-              <div className="space-y-xs">
-                <label className="block font-label text-label text-on-surface-variant px-xs uppercase" htmlFor="email">
-                  E-mail
+              <div>
+<label className="form-label" htmlFor="email">
+                   Email
                 </label>
                 <input
-                  className="w-full h-12 px-md bg-surface-container-highest border border-outline-variant rounded-lg font-body-md text-on-surface placeholder:text-outline"
+                  className="input-field"
                   id="email"
                   placeholder="seu@email.com"
                   type="email"
@@ -84,9 +84,9 @@ export function LoginPage({ registered }: LoginPageProps) {
                 />
               </div>
 
-              <div className="space-y-xs">
-                <div className="flex justify-between items-center px-xs">
-                  <label className="font-label text-label text-on-surface-variant uppercase" htmlFor="password">
+              <div>
+                <div className="flex justify-between items-center mb-xs">
+                  <label className="form-label !mb-0" htmlFor="password">
                     Senha
                   </label>
                   <a className="font-label text-label text-primary hover:underline transition-all" href="#">
@@ -94,7 +94,7 @@ export function LoginPage({ registered }: LoginPageProps) {
                   </a>
                 </div>
                 <input
-                  className="w-full h-12 px-md bg-surface-container-highest border border-outline-variant rounded-lg font-body-md text-on-surface placeholder:text-outline"
+                  className="input-field"
                   id="password"
                   placeholder="••••••••"
                   type="password"
@@ -105,7 +105,7 @@ export function LoginPage({ registered }: LoginPageProps) {
               </div>
 
               <button
-                className="w-full h-12 bg-primary text-on-primary font-label text-label uppercase rounded-lg hover:bg-primary/90 active:scale-[0.98] transition-all shadow-sm disabled:opacity-70"
+                className="btn-primary w-full"
                 type="submit"
                 disabled={submitting}
               >
@@ -115,13 +115,13 @@ export function LoginPage({ registered }: LoginPageProps) {
 
             <div className="relative my-xl flex items-center">
               <div className="flex-grow border-t border-outline-variant"></div>
-              <span className="flex-shrink mx-md font-label text-label text-on-surface-variant uppercase tracking-widest">ou entre com</span>
+              <span className="flex-shrink mx-md font-label text-label text-on-surface-variant tracking-widest">ou entre com</span>
               <div className="flex-grow border-t border-outline-variant"></div>
             </div>
 
             <div className="grid grid-cols-1">
               <a
-                className="flex items-center justify-center gap-sm h-12 bg-surface-container-high border border-outline-variant rounded-lg font-label text-label text-on-surface-variant hover:bg-surface-container-highest transition-all uppercase"
+                className="btn-secondary w-full"
                 href={`${API_BASE_URL}/oauth2/authorization/google`}
               >
                 <svg viewBox="0 0 48 48" className="w-5 h-5" aria-hidden="true">

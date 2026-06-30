@@ -70,7 +70,7 @@ export function StudentPathPage() {
 
   if (loading || !user)
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[#0e1512] text-[#72db9f] animate-pulse">
+      <div className="flex min-h-screen items-center justify-center bg-background text-primary animate-pulse font-mono">
         Carregando Sua Jornada...
       </div>
     )
@@ -85,47 +85,46 @@ export function StudentPathPage() {
   const getNodeY = (index: number) => 128 + 48 + index * 224
 
   return (
-    <div className="flex min-h-screen w-full bg-[#0e1512] text-[#dde4df] font-sans absolute top-0 left-0 z-50 overflow-x-hidden">
+    <div className="flex min-h-screen w-full bg-background text-on-surface font-sans absolute top-0 left-0 z-50 overflow-x-hidden">
       
       {/* Neon Background Glows */}
       <div className="fixed top-0 left-0 w-[600px] h-[600px] bg-primary/10 rounded-full blur-[140px] -translate-x-1/2 -translate-y-1/2 pointer-events-none z-0"></div>
       <div className="fixed top-0 right-0 w-[600px] h-[600px] bg-primary/10 rounded-full blur-[140px] translate-x-1/2 -translate-y-1/2 pointer-events-none z-0"></div>
 
       {/* Sidebar do Estudante */}
-      <aside className="fixed left-0 top-0 h-full flex flex-col py-6 px-4 border-r border-[#3e4941] bg-[#161d1a] w-64 z-[60]">
+      <aside className="fixed left-0 top-0 h-full flex flex-col py-6 px-4 border-r border-outline-variant bg-surface-container-low w-64 z-[60]">
         <div className="flex items-center gap-3 mb-8 px-2">
-          <div className="w-10 h-10 rounded-lg bg-[#72db9f] flex items-center justify-center shadow-[0_0_20px_rgba(114,219,159,0.2)]">
-            <span className="material-symbols-outlined text-[#003920]">terminal</span>
+          <div className="w-10 h-10 rounded-lg bg-primary flex items-center justify-center shadow-md">
+            <span className="material-symbols-outlined text-on-primary">terminal</span>
           </div>
           <div>
-            <h1 className="text-lg font-bold text-[#72db9f]">CodeLab</h1>
-            <p className="text-[10px] text-[#bdcabe] uppercase tracking-widest font-bold">Plataforma</p>
+            <h1 className="text-lg font-h2 font-bold text-primary tracking-tight">CodeLab</h1>
           </div>
         </div>
         <nav className="flex-1 space-y-1">
-          <button className="w-full flex items-center gap-3 bg-[#3c4a43] text-[#aab9b0] rounded-lg px-4 py-2 text-left font-semibold text-sm">
+          <button className="w-full flex items-center gap-3 bg-secondary-container text-on-secondary-container rounded-lg px-4 py-2 text-left font-semibold text-sm">
             <span className="material-symbols-outlined">map</span>
             Minha Trilha
           </button>
           <button
             onClick={() => window.location.href = '/playground'}
-            className="w-full flex items-center gap-3 text-[#bdcabe] hover:text-[#dde4df] px-4 py-2 hover:bg-[#2f3633] rounded-lg text-left font-semibold text-sm transition-all"
+            className="w-full flex items-center gap-3 text-on-surface-variant hover:text-on-surface px-4 py-2 hover:bg-surface-container-highest rounded-lg text-left font-semibold text-sm transition-all"
           >
             <span className="material-symbols-outlined">terminal</span>
             Playground
           </button>
           <button
             onClick={() => setIsProfileModalOpen(true)}
-            className="w-full flex items-center gap-3 text-[#bdcabe] hover:text-[#dde4df] px-4 py-2 hover:bg-[#2f3633] rounded-lg text-left font-semibold text-sm transition-all"
+            className="w-full flex items-center gap-3 text-on-surface-variant hover:text-on-surface px-4 py-2 hover:bg-surface-container-highest rounded-lg text-left font-semibold text-sm transition-all"
           >
             <span className="material-symbols-outlined">account_circle</span>
             Meu Perfil
           </button>
         </nav>
-        <div className="mt-auto pt-4 border-t border-outline-variant/20">
+        <div className="mt-auto pt-4 border-t border-outline-variant">
           <button
             onClick={handleLogout}
-            className="w-full flex items-center justify-center gap-2 bg-[#93000a]/10 text-[#ffdad6] hover:bg-[#93000a]/20 border border-[#93000a]/20 px-4 py-2 rounded-lg text-sm font-bold transition-colors"
+            className="btn-danger w-full !h-10"
           >
             <span className="material-symbols-outlined text-[18px]">logout</span>
             Sair
@@ -135,15 +134,15 @@ export function StudentPathPage() {
 
       {/* Painel Central */}
       <main className="flex-1 ml-64 flex flex-col relative min-h-screen z-10">
-        <header className="sticky top-0 z-[60] w-full flex justify-between items-center h-16 px-8 bg-[#0e1512]/80 backdrop-blur-md border-b border-[#3e4941]">
+        <header className="sticky top-0 z-[60] w-full flex justify-between items-center h-16 px-8 bg-background/80 backdrop-blur-md border-b border-outline-variant">
           <div className="flex items-center gap-6">
-            <div className="flex items-center gap-2 bg-[#1a211e] px-4 py-1.5 rounded-full border border-[#3e4941] shadow-inner">
+            <div className="flex items-center gap-2 bg-surface-container px-4 py-1.5 rounded-full border border-outline-variant shadow-inner">
               <span className="material-symbols-outlined text-orange-500" style={{ fontVariationSettings: "'FILL' 1" }}>local_fire_department</span>
-              <span className="text-md font-black text-[#dde4df]">{user.userStreak}</span>
+              <span className="text-md font-black text-on-surface">{user.userStreak}</span>
             </div>
-            <div className="flex items-center gap-2 bg-[#1a211e] px-4 py-1.5 rounded-full border border-[#3e4941] shadow-inner">
+            <div className="flex items-center gap-2 bg-surface-container px-4 py-1.5 rounded-full border border-outline-variant shadow-inner">
               <span className="material-symbols-outlined text-yellow-500" style={{ fontVariationSettings: "'FILL' 1" }}>stars</span>
-              <span className="text-md font-black text-[#dde4df]">{Math.floor(user.userPoints)}</span>
+              <span className="text-md font-black text-on-surface">{Math.floor(user.userPoints)}</span>
             </div>
           </div>
           <div className="flex items-center gap-4">
@@ -166,20 +165,20 @@ export function StudentPathPage() {
               <section key={unit.topicName} className={`relative ${isUnitLocked ? 'opacity-30 grayscale pointer-events-none' : ''}`}>
                 
                 {/* Full-width Unit Header */}
-                <div className="sticky top-16 z-50 w-full bg-[#161d1a]/95 backdrop-blur-md py-6 px-12 border-b border-[#3e4941] shadow-xl">
+                <div className="sticky top-16 z-50 w-full bg-surface-container-low/95 backdrop-blur-md py-6 px-12 border-b border-outline-variant shadow-xl">
                   <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
                     <div className="flex-1">
-                       <span className="text-[10px] text-[#72db9f] uppercase tracking-[0.4em] font-black block mb-1 opacity-70">Unidade {unitIndex + 1}</span>
-                       <h2 className="text-2xl font-black text-[#dde4df] uppercase tracking-tight italic">{meta.label}</h2>
+                       <span className="text-[10px] text-primary uppercase tracking-[0.4em] font-black block mb-1 opacity-80">Unidade {unitIndex + 1}</span>
+                       <h2 className="text-2xl font-black text-on-surface uppercase tracking-tight italic">{meta.label}</h2>
                     </div>
                     <div className="flex-1 max-w-sm">
                        <div className="flex justify-between items-end mb-1.5">
-                          <span className="text-[10px] text-[#bdcabe] uppercase font-black tracking-widest">Maestria</span>
-                          <span className="text-[10px] text-[#72db9f] font-black tracking-tighter bg-primary/10 px-2 py-0.5 rounded">{Math.round(unitProgress)}%</span>
+                          <span className="text-[10px] text-on-surface-variant uppercase font-black tracking-widest">Maestria</span>
+                          <span className="text-[10px] text-primary font-black tracking-tighter bg-primary/10 px-2 py-0.5 rounded">{Math.round(unitProgress)}%</span>
                        </div>
-                       <div className="w-full bg-[#0e1512] h-2 rounded-full overflow-hidden border border-[#3e4941]">
+                       <div className="w-full bg-background h-2 rounded-full overflow-hidden border border-outline-variant">
                          <div 
-                           className="bg-primary h-full transition-all duration-1000 shadow-[0_0_15px_rgba(114,219,159,0.4)]" 
+                           className="bg-primary h-full transition-all duration-1000 shadow-sm" 
                            style={{ width: `${unitProgress}%` }}
                          ></div>
                        </div>
@@ -194,7 +193,7 @@ export function StudentPathPage() {
                   {!isUnitLocked && (
                     <svg className="absolute top-0 left-1/2 -translate-x-1/2 w-[400px] h-full pointer-events-none z-0" preserveAspectRatio="none">
                       <path
-                        className="stroke-[#1a211e] stroke-[12] fill-none"
+                        className="stroke-surface-container-high stroke-[12] fill-none"
                         d={`M ${200 + getXOffset(0)},176 ${Array.from({ length: unit.totalLessons - 1 }).map((_, i) => {
                           const x1 = 200 + getXOffset(i)
                           const y1 = getNodeY(i)
@@ -242,10 +241,10 @@ export function StudentPathPage() {
                           disabled={lessonStatus === 'LOCKED'}
                           onClick={() => handleNavigateToPlayground(unit.topicName)}
                           className={`
-                            relative w-24 h-24 rounded-full flex items-center justify-center shadow-2xl transition-all duration-500 focus:outline-none border-4
-                            ${lessonStatus === 'LOCKED' ? 'bg-[#161d1a] border-[#2f3633] text-[#4a5750] cursor-not-allowed scale-90' : 
-                              isCompleted ? 'bg-primary border-primary/20 text-[#003920] hover:scale-110 shadow-[0_0_20px_rgba(114,219,159,0.1)]' : 
-                              'bg-[#37a36c] border-primary text-[#dde4df] hover:scale-110 shadow-[0_0_50px_rgba(114,219,159,0.3)] animate-pulse'}
+                            relative w-24 h-24 rounded-full flex items-center justify-center shadow-2xl transition-all duration-500 focus:outline-none border-4 cursor-pointer
+                            ${lessonStatus === 'LOCKED' ? 'bg-surface-container-low border-surface-container-highest text-outline cursor-not-allowed scale-90' : 
+                              isCompleted ? 'bg-primary border-primary/20 text-on-primary hover:scale-110 shadow-md' : 
+                              'bg-primary-container border-primary text-on-surface hover:scale-110 shadow-lg animate-pulse'}
                           `}
                         >
                           <span className="material-symbols-outlined text-[42px]">
@@ -253,14 +252,14 @@ export function StudentPathPage() {
                           </span>
 
                           <div className={`absolute -bottom-1 -right-1 w-10 h-10 rounded-full border-2 flex items-center justify-center text-[10px] font-black
-                            ${lessonStatus === 'LOCKED' ? 'bg-[#1a211e] border-[#2f3633] text-[#4a5750]' : 'bg-[#0e1512] border-primary text-primary shadow-lg'}
+                            ${lessonStatus === 'LOCKED' ? 'bg-surface-container border-surface-container-highest text-outline' : 'bg-background border-primary text-primary shadow-lg'}
                           `}>
                             {lessonNum}
                           </div>
                         </button>
                         
                         {isAvailable && (
-                          <div className="absolute top-1/2 -translate-y-1/2 left-full ml-8 whitespace-nowrap bg-primary text-[#003920] px-4 py-2 rounded-xl text-[10px] font-black shadow-[0_10px_30px_rgba(114,219,159,0.3)] animate-bounce">
+                          <div className="absolute top-1/2 -translate-y-1/2 left-full ml-8 whitespace-nowrap bg-primary text-on-primary px-4 py-2 rounded-xl text-[10px] font-black shadow-lg animate-bounce">
                             LIÇÃO ATUAL
                             <div className="absolute top-1/2 -left-2 -translate-y-1/2 w-4 h-4 bg-primary rotate-45"></div>
                           </div>

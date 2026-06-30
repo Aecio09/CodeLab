@@ -242,19 +242,19 @@ export function AdminQuestionsPage() {
           <div className="w-10 h-10 bg-primary-container rounded-lg flex items-center justify-center text-on-primary-container">
             <span className="material-symbols-outlined">terminal</span>
           </div>
-          <div>
-            <h1 className="font-h3 text-h3 font-bold text-primary">CodeLab</h1>
-            <p className="font-label text-label text-on-surface-variant">Management Portal</p>
+<div>
+            <h1 className="text-lg font-h2 font-bold text-primary tracking-tight">CodeLab</h1>
+            <p className="font-label text-label text-on-surface-variant tracking-wider uppercase">Portal de Gerenciamento</p>
           </div>
         </div>
         <nav className="flex-1 flex flex-col gap-xs">
           <a className="flex items-center gap-md text-on-surface-variant hover:text-on-surface px-md py-sm hover:bg-surface-container-highest rounded-lg transition-all" href="#">
             <span className="material-symbols-outlined">dashboard</span>
-            <span className="font-label text-label">Dashboard</span>
+            <span className="font-label text-label text-on-surface-variant uppercase tracking-wider">Dashboard</span>
           </a>
           <a className="flex items-center gap-md bg-secondary-container text-on-secondary-container rounded-lg px-md py-sm scale-[0.98] transition-all" href="/admin/questions">
             <span className="material-symbols-outlined">terminal</span>
-            <span className="font-label text-label">Questions</span>
+            <span className="font-label text-label text-on-surface-variant uppercase tracking-wider">Questões</span>
           </a>
         </nav>
         <div className="mt-auto px-md space-y-sm">
@@ -267,16 +267,16 @@ export function AdminQuestionsPage() {
           />
           <button
             type="button"
-            className="w-full bg-primary hover:bg-primary-container text-on-primary font-label text-label px-md py-sm rounded-lg flex items-center justify-center gap-sm transition-colors duration-200"
+            className="btn-primary w-full !h-10"
             onClick={handleUploadQuestionsClick}
             disabled={uploading || loading}
           >
             <span className="material-symbols-outlined text-[20px]">add</span>
-            {uploading ? 'Uploading...' : 'Upload Questions'}
+            <span>Importar Questões</span>
           </button>
           <button
             type="button"
-            className="w-full border border-outline-variant hover:bg-surface-container-highest text-on-surface font-label text-label px-md py-sm rounded-lg transition-colors duration-200"
+            className="btn-secondary w-full !h-10"
             onClick={handleLogout}
           >
             Sair
@@ -286,7 +286,7 @@ export function AdminQuestionsPage() {
 
       <main className="ml-64 flex flex-col min-h-screen">
         <header className="flex justify-between items-center h-16 px-gutter w-full sticky top-0 z-30 bg-surface border-b border-outline-variant">
-          <h2 className="font-h2 text-h2 font-bold text-primary">Questions Manager</h2>
+          <h2 className="font-h2 text-h2 font-bold text-primary">Gerenciador de Questões</h2>
           <div className="flex items-center gap-md">
             <div className="text-right">
               <p className="text-body-sm text-on-surface">{profile?.name ?? 'Administrador'}</p>
@@ -323,13 +323,13 @@ export function AdminQuestionsPage() {
               <h3 className="font-h3 text-h3 text-on-surface">Question Bank</h3>
               <div className="grid grid-cols-1 md:grid-cols-4 gap-sm w-full lg:w-auto">
                 <input
-                  className="bg-background border border-outline-variant rounded-lg px-md py-sm text-body-sm focus:border-primary focus:ring-1 focus:ring-primary outline-none"
+                  className="input-field !h-10"
                   placeholder="Buscar..."
                   value={search}
                   onChange={(event) => setSearch(event.target.value)}
                 />
                 <select
-                  className="bg-background border border-outline-variant rounded-lg px-md py-sm text-body-sm focus:border-primary focus:ring-1 focus:ring-primary outline-none"
+                  className="select-field !h-10"
                   value={topicFilter}
                   onChange={(event) => setTopicFilter(event.target.value as 'ALL' | QuestionItem['topic'])}
                 >
@@ -341,7 +341,7 @@ export function AdminQuestionsPage() {
                   ))}
                 </select>
                 <select
-                  className="bg-background border border-outline-variant rounded-lg px-md py-sm text-body-sm focus:border-primary focus:ring-1 focus:ring-primary outline-none"
+                  className="select-field !h-10"
                   value={difficultyFilter}
                   onChange={(event) => setDifficultyFilter(event.target.value as 'ALL' | QuestionItem['difficulty'])}
                 >
@@ -353,7 +353,7 @@ export function AdminQuestionsPage() {
                   ))}
                 </select>
                 <select
-                  className="bg-background border border-outline-variant rounded-lg px-md py-sm text-body-sm focus:border-primary focus:ring-1 focus:ring-primary outline-none"
+                  className="select-field !h-10"
                   value={typeFilter}
                   onChange={(event) => setTypeFilter(event.target.value as 'ALL' | QuestionItem['type'])}
                 >
@@ -442,12 +442,12 @@ export function AdminQuestionsPage() {
             {success ? <p className="text-primary text-body-sm mb-sm">{success}</p> : null}
             <form className="grid grid-cols-1 md:grid-cols-2 gap-md" onSubmit={handleSaveQuestion}>
               <div className="md:col-span-2">
-                <label className="text-label text-on-surface-variant block uppercase tracking-wider mb-xs" htmlFor="questionBody">
+                <label className="form-label" htmlFor="questionBody">
                   Enunciado
                 </label>
                 <textarea
                   id="questionBody"
-                  className="w-full min-h-28 px-md py-sm bg-surface-container-highest border border-outline-variant rounded-lg text-on-surface placeholder:text-outline"
+                  className="textarea-field min-h-28"
                   value={form.questionBody}
                   onChange={(event) => setForm((prev) => ({ ...prev, questionBody: event.target.value }))}
                   required
@@ -456,12 +456,12 @@ export function AdminQuestionsPage() {
               </div>
 
               <div>
-                <label className="text-label text-on-surface-variant block uppercase tracking-wider mb-xs" htmlFor="type">
+                <label className="form-label" htmlFor="type">
                   Tipo
                 </label>
                 <select
                   id="type"
-                  className="w-full h-12 px-md bg-surface-container-highest border border-outline-variant rounded-lg"
+                  className="select-field"
                   value={form.type}
                   onChange={(event) => setForm((prev) => ({ ...prev, type: event.target.value as QuestionItem['type'] }))}
                 >
@@ -474,12 +474,12 @@ export function AdminQuestionsPage() {
               </div>
 
               <div>
-                <label className="text-label text-on-surface-variant block uppercase tracking-wider mb-xs" htmlFor="difficulty">
+                <label className="form-label" htmlFor="difficulty">
                   Dificuldade
                 </label>
                 <select
                   id="difficulty"
-                  className="w-full h-12 px-md bg-surface-container-highest border border-outline-variant rounded-lg"
+                  className="select-field"
                   value={form.difficulty}
                   onChange={(event) => setForm((prev) => ({ ...prev, difficulty: event.target.value as QuestionItem['difficulty'] }))}
                 >
@@ -492,12 +492,12 @@ export function AdminQuestionsPage() {
               </div>
 
               <div>
-                <label className="text-label text-on-surface-variant block uppercase tracking-wider mb-xs" htmlFor="topic">
+                <label className="form-label" htmlFor="topic">
                   Tópico
                 </label>
                 <select
                   id="topic"
-                  className="w-full h-12 px-md bg-surface-container-highest border border-outline-variant rounded-lg"
+                  className="select-field"
                   value={form.topic}
                   onChange={(event) => setForm((prev) => ({ ...prev, topic: event.target.value as QuestionItem['topic'] }))}
                 >
@@ -510,12 +510,12 @@ export function AdminQuestionsPage() {
               </div>
 
               <div>
-                <label className="text-label text-on-surface-variant block uppercase tracking-wider mb-xs" htmlFor="requiredUsage">
-                  Required Usage (opcional)
+<label className="form-label" htmlFor="requiredUsage">
+                   Uso Obrigatório (opcional)
                 </label>
                 <input
                   id="requiredUsage"
-                  className="w-full h-12 px-md bg-surface-container-highest border border-outline-variant rounded-lg text-on-surface placeholder:text-outline"
+                  className="input-field"
                   placeholder="ex: FOR, IF, ARRAY_MAP"
                   value={form.requiredUsage ?? ''}
                   onChange={(event) =>
@@ -529,14 +529,14 @@ export function AdminQuestionsPage() {
 
               <div className="md:col-span-2 flex gap-sm">
                 <button
-                  className="bg-primary text-on-primary font-label text-label px-md py-sm rounded-lg hover:bg-primary-container transition-colors disabled:opacity-70"
+                  className="btn-primary"
                   type="submit"
                   disabled={saving || loading}
                 >
                   {saving ? 'Salvando...' : selectedQuestion ? 'Salvar alteração' : 'Criar questão'}
                 </button>
                 <button
-                  className="bg-surface border border-outline-variant text-on-surface font-label text-label px-md py-sm rounded-lg hover:bg-surface-container-highest transition-colors"
+                  className="btn-secondary"
                   type="button"
                   onClick={handleNewQuestion}
                 >
