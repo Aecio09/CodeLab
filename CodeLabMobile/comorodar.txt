@@ -1,0 +1,61 @@
+# Expo Go — Comandos PowerShell
+
+## 1. Abrir a porta 8080 no Firewall
+
+Abra o PowerShell como **Administrador**:
+
+```powershell
+New-NetFirewallRule -DisplayName "Expo 8080 TCP" -Direction Inbound -Protocol TCP -LocalPort 8080 -Action Allow
+```
+
+Isso cria uma regra permitindo conexões TCP de entrada na porta 8080.
+
+## 2. Verificar a regra
+
+```powershell
+Get-NetFirewallRule -DisplayName "*Expo*"
+```
+
+Isso mostra se a regra do Expo está ativa.
+
+## 3. Caso o passo de cima nao funcione, vai ter que desativar o firewall
+
+```powershell
+Set-NetFirewallProfile -Profile Domain,Public,Private -Enabled False
+```
+
+Isso desativa temporariamente o Firewall do Windows.
+
+## 4. Reativar o Firewall
+
+```powershell
+Set-NetFirewallProfile -Profile Domain,Public,Private -Enabled True
+```
+
+Isso reativa o Firewall do Windows.
+
+## 5. Verificar se a porta 8080 está sendo utilizada
+
+```powershell
+netstat -ano | findstr :8080
+```
+
+Isso mostra se existe algum programa escutando na porta 8080.
+
+## 6. Descobrir qual programa está usando a porta
+
+```powershell
+Get-Process -Id NUMERO_DO_PID
+```
+
+Substitua `NUMERO_DO_PID` pelo PID mostrado pelo `netstat`.
+
+## 7. Iniciar o Expo
+
+No WSL:
+
+```bash
+npx expo start --lan
+```
+
+Isso inicia o Expo em modo LAN para permitir a conexão pelo Expo Go.
