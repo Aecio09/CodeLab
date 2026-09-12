@@ -1,62 +1,98 @@
+name: codelab
+
 services:
+  # ===== Infra =====
   mysql:
-    image: mysql:latest
-    container_name: project-mysql
+    image: mysql:8.4
+    container_name: codelab-mysql
     environment:
-      MYSQL_ROOT_PASSWORD: rootpassword
-      MYSQL_DATABASE: projectdb
-    ports:
-      - "3308:3306"
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root}
+    networks: [codelab]
     volumes:
-      - mysql_data:/var/lib/mysql
-      - ./backend/03/docker-init:/docker-entrypoint-initdb.d
-    networks:
-      - project-network
+      - mysql-data:/var/lib/mysql
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-prootpassword"]
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-p${MYSQL_ROOT_PASSWORD:-root}"]
       interval: 10s
       timeout: 5s
       retries: 10
-      start_period: 40s
+    ports:
+      - "3308:3306"
 
-  backend:
-    build:
-      context: ./backend/03
-      dockerfile: Dockerfile
-    container_name: project-backend
-    env_file:
-      - .env
+  kafka:
+    image: apache/kafka:3.9.0
+    container_name: codelab-kafka
     environment:
-      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/projectdb
-      SPRING_DATASOURCE_USERNAME: projectuser
-      SPRING_DATASOURCE_PASSWORD: projectpass
-      SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
-      SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
-      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:29092
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092,CONTROLLER://0.0.0.0:29092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+    networks: [codelab]
+    ports:
+      - "9092:9092"
+
+  # ===== Servicos =====
+  auth-service:
+    build: ./backend/auth-service
+    container_name: codelab-auth
+    depends_on:
+      mysql: { condition: service_healthy }
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/auth_db?createDatabaseIfNotExist=true
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root}
+      SPRING_JWT_SECRET: ${JWT_SECRET}
     ports:
       - "8080:8080"
-    volumes:
-      - ./backend/03/uploads:/app/uploads
+    networks: [codelab]
+
+  core-service:
+    build: ./backend/core-service
+    container_name: codelab-core
     depends_on:
-      mysql:
-        condition: service_healthy
-    networks:
-      - project-network
-    restart: on-failure
-
-  code-executor:
-    build:
-      context: ./code-executor
-      dockerfile: Dockerfile
-    container_name: project-code-executor
+      kafka: { condition: service_started }
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/core_db?createDatabaseIfNotExist=true
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root}
+      SPRING_JWT_SECRET: ${JWT_SECRET}
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
     ports:
-      - "3000:3000"
-    networks:
-      - project-network
+      - "8081:8081"
+    networks: [codelab]
 
-networks:
-  project-network:
-    driver: bridge
+  verification-service:
+    build: ./backend/verification-service
+    container_name: codelab-verification
+    depends_on:
+      kafka: { condition: service_started }
+    environment:
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      SPRING_JWT_SECRET: ${JWT_SECRET}
+      GROQ_API_KEY: ${GROQ_API_KEY}
+    ports:
+      - "8082:8082"
+    networks: [codelab]
+
+  etl-service:
+    build: ./backend/etl-service
+    container_name: codelab-etl
+    depends_on:
+      kafka: { condition: service_started }
+    environment:
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      GROQ_API_KEY: ${GROQ_API_KEY}
+    ports:
+      - "8083:8083"
+    networks: [codelab]
 
 volumes:
-  mysql_data:
+  mysql-data:
+
+networks:
+  codelab:
+    driver: bridge

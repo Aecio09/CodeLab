@@ -1,6 +1,0 @@
-target/
-.mvn/
-*.log
-.git
-.gitignore
-*.md
