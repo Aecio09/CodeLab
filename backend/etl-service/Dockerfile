@@ -15,7 +15,7 @@ COPY data ./data
 ENV PYTHONUNBUFFERED=1
 ENV KAFKA_BOOTSTRAP_SERVERS=kafka:9092
 ENV GROQ_API_URL=https://api.groq.com/openai/v1/chat/completions
-ENV GROQ_MODEL=llama-3.3-70b-versatile
+ENV GROQ_MODEL=qwen/qwen3.8-27b
 
 EXPOSE 8083
 CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8083"]

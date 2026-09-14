@@ -6,6 +6,7 @@ import {
     SandpackPreview,
 } from '@codesandbox/sandpack-react'
 import { API_BASE_URL, DEFAULT_PLAYGROUND_CODE } from '../constants'
+import { authFetch, apiLogout } from '../lib/api'
 import type { UserProfile } from '../types'
 import { PlaygroundCodeEditor } from '../components/PlaygroundCodeEditor'
 import { EditProfileModal } from '../components/EditProfileModal'
@@ -51,7 +52,7 @@ export function GeneralPlaygroundPage() {
         let cancelled = false
         const load = async () => {
             try {
-                const meRes = await fetch(`${API_BASE_URL}/api/users/me`, { credentials: 'include' })
+                const meRes = await authFetch(`${API_BASE_URL}/api/users/me`)
                 if (!meRes.ok) { window.location.href = '/'; return; }
                 const me = await meRes.json()
                 if (!cancelled) setUser(me)
@@ -77,13 +78,7 @@ export function GeneralPlaygroundPage() {
         return `${hrs}:${mins}:${secs}`
     }
 
-    const handleLogout = async () => {
-        try {
-            await fetch(`${API_BASE_URL}/logout`, { method: 'POST', credentials: 'include' })
-        } finally {
-            window.location.href = '/'
-        }
-    }
+    const handleLogout = () => { apiLogout() }
 
     if (loading || !user) {
         return <div className="h-screen bg-background flex items-center justify-center text-primary animate-pulse font-mono" role="status" aria-live="polite">Inicializando Playground...</div>

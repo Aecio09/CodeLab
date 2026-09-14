@@ -6,6 +6,7 @@ import {
   SandpackProvider,
 } from '@codesandbox/sandpack-react'
 import { API_BASE_URL, DEFAULT_PLAYGROUND_CODE } from '../constants'
+import { authFetch } from '../lib/api'
 import type { AnswerReviewResponse, QuestionItem, ReviewApiError, UserProfile } from '../types'
 import { PlaygroundCodeEditor } from '../components/PlaygroundCodeEditor'
 
@@ -25,9 +26,7 @@ export function AdminPlaygroundPage({ questionId }: { questionId: number }) {
 
     const load = async () => {
       try {
-        const meResponse = await fetch(`${API_BASE_URL}/api/users/me`, {
-          credentials: 'include',
-        })
+        const meResponse = await authFetch(`${API_BASE_URL}/api/users/me`)
         if (!meResponse.ok) {
           window.location.href = '/'
           return
@@ -37,9 +36,7 @@ export function AdminPlaygroundPage({ questionId }: { questionId: number }) {
         if (cancelled) return
         setProfile(me)
 
-        const questionResponse = await fetch(`${API_BASE_URL}/questions/${questionId}`, {
-          credentials: 'include',
-        })
+        const questionResponse = await authFetch(`${API_BASE_URL}/questions/${questionId}`)
         if (!questionResponse.ok) {
           throw new Error('load-question')
         }
@@ -87,9 +84,8 @@ export function AdminPlaygroundPage({ questionId }: { questionId: number }) {
     setReviewError(null)
 
     try {
-      const response = await fetch(`${API_BASE_URL}/answers`, {
+      const response = await authFetch(`${API_BASE_URL}/answers`, {
         method: 'POST',
-        credentials: 'include',
         headers: {
           'Content-Type': 'application/json',
         },

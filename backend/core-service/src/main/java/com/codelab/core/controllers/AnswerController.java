@@ -28,7 +28,7 @@ public class AnswerController {
     @PostMapping
     @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('USER')")
     public ResponseEntity<Answer> createAnswer(@Valid @RequestBody AnswerCreateRequest request, Principal principal) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(answerService.createAnswer(request, principal));
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(answerService.createAnswer(request, principal));
     }
 
     @PutMapping("/{id}")

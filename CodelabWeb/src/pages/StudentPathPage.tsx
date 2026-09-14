@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { API_BASE_URL } from '../constants'
+import { authFetch, apiLogout } from '../lib/api'
 import type { TopicStatus, UserProfile } from '../types'
 import { EditProfileModal } from '../components/EditProfileModal'
 
@@ -23,12 +24,12 @@ export function StudentPathPage() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const userRes = await fetch(`${API_BASE_URL}/api/users/me`, { credentials: 'include' })
+        const userRes = await authFetch(`${API_BASE_URL}/api/users/me`)
         if (!userRes.ok) throw new Error('Não autenticado')
         const userData = (await userRes.json()) as UserProfile
         setUser(userData)
 
-        const progressRes = await fetch(`${API_BASE_URL}/api/trail/progress`, { credentials: 'include' })
+        const progressRes = await authFetch(`${API_BASE_URL}/api/trail/progress`)
         if (progressRes.ok) {
           const progressData = await progressRes.json()
           setProgress(progressData)
@@ -44,17 +45,11 @@ export function StudentPathPage() {
     fetchData()
   }, [])
 
-  const handleLogout = async () => {
-    try {
-      await fetch(`${API_BASE_URL}/logout`, { method: 'POST', credentials: 'include' })
-    } finally {
-      window.location.href = '/'
-    }
-  }
+  const handleLogout = () => { apiLogout() }
 
   const handleNavigateToPlayground = async (topicKey: string) => {
     try {
-      const res = await fetch(`${API_BASE_URL}/questions/next?topic=${topicKey}`, { credentials: 'include' })
+      const res = await authFetch(`${API_BASE_URL}/questions/next?topic=${topicKey}`)
       if (res.ok) {
         const nextQuestion = await res.json()
         window.location.href = `/playground/${nextQuestion.id}`

@@ -1,5 +1,7 @@
 package com.codelab.core.security;
 
+import com.codelab.core.entities.User;
+import com.codelab.core.repositories.UserRepository;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -18,9 +20,11 @@ import java.util.List;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtValidator jwtValidator;
+    private final UserRepository userRepository;
 
-    public JwtAuthenticationFilter(JwtValidator jwtValidator) {
+    public JwtAuthenticationFilter(JwtValidator jwtValidator, UserRepository userRepository) {
         this.jwtValidator = jwtValidator;
+        this.userRepository = userRepository;
     }
 
     @Override
@@ -40,9 +44,32 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 var authentication = new UsernamePasswordAuthenticationToken(email, null, authorities);
 
                 SecurityContextHolder.getContext().setAuthentication(authentication);
+
+                syncUser(claims);
             }
         }
 
         filterChain.doFilter(request, response);
+    }
+
+    private void syncUser(Claims claims) {
+        String email = claims.getSubject();
+        if (email == null || email.isBlank()) return;
+
+        if (userRepository.findByEmail(email).isPresent()) return;
+
+        User user = new User();
+        Number userId = claims.get("user_id", Number.class);
+        if (userId != null) {
+            user.setId(userId.longValue());
+        }
+        user.setEmail(email);
+        user.setName(email);
+        user.setRole(claims.get("role", String.class) != null ? claims.get("role", String.class) : "USER");
+        user.setUserStreak(0);
+        user.setUserPoints(0f);
+
+        userRepository.save(user);
+        System.out.println("[JwtAuthenticationFilter] Usuário sincronizado no core_db: " + email);
     }
 }

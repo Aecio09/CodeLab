@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import type { ChangeEvent, FormEvent } from 'react'
 import { API_BASE_URL } from '../constants'
+import { authFetch, apiLogout } from '../lib/api'
 import { resolvePhotoUrl } from '../utils'
 import type { UserProfile } from '../types'
 import { SharedFooter } from '../components/SharedFooter'
@@ -19,10 +20,7 @@ export function ProfilePage() {
   useEffect(() => {
     let cancelled = false
 
-    fetch(`${API_BASE_URL}/api/users/me`, {
-      method: 'GET',
-      credentials: 'include',
-    })
+    authFetch(`${API_BASE_URL}/api/users/me`)
       .then(async (response) => {
         if (!response.ok) {
           throw new Error('invalid-session')
@@ -66,9 +64,8 @@ export function ProfilePage() {
     setSuccess('')
 
     try {
-      const response = await fetch(`${API_BASE_URL}/api/users/perfil`, {
+      const response = await authFetch(`${API_BASE_URL}/api/users/perfil`, {
         method: 'PUT',
-        credentials: 'include',
         headers: {
           'Content-Type': 'application/json',
         },
@@ -113,9 +110,8 @@ export function ProfilePage() {
     formData.append('photo', photoFile)
 
     try {
-      const response = await fetch(`${API_BASE_URL}/api/users/upload-photo`, {
+      const response = await authFetch(`${API_BASE_URL}/api/users/upload-photo`, {
         method: 'POST',
-        credentials: 'include',
         body: formData,
       })
 
@@ -139,9 +135,8 @@ export function ProfilePage() {
     setError('')
     setSuccess('')
     try {
-      const response = await fetch(`${API_BASE_URL}/api/users/perfil`, {
+      const response = await authFetch(`${API_BASE_URL}/api/users/perfil`, {
         method: 'DELETE',
-        credentials: 'include',
       })
 
       if (!response.ok) {
@@ -155,18 +150,7 @@ export function ProfilePage() {
     }
   }
 
-  const handleLogout = async () => {
-    try {
-      await fetch(`${API_BASE_URL}/logout`, {
-        method: 'POST',
-        credentials: 'include',
-      });
-    } catch (err) {
-      console.error("Erro ao deslogar no servidor:", err);
-    } finally {
-      window.location.href = '/';
-    }
-  };
+  const handleLogout = () => { apiLogout() }
 
   if (redirecting) {
     return <main className="flex-grow flex items-center justify-center text-on-surface-variant" role="status" aria-live="polite">Redirecionando para o painel admin...</main>

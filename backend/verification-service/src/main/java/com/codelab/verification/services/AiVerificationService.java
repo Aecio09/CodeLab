@@ -2,6 +2,7 @@ package com.codelab.verification.services;
 
 import com.codelab.verification.dto.AiVerificationRequestDto;
 import com.codelab.verification.dto.AiVerificationResponseDto;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -18,18 +19,21 @@ import java.util.Map;
 public class AiVerificationService {
 
     private static final String URL = "https://api.groq.com/openai/v1/chat/completions";
-    private static final String MODEL = "llama-3.1-8b-instant";
+    private final String model;
     private final RestTemplate restTemplate;
     private final String apiKey;
 
-    public AiVerificationService(RestTemplate restTemplate) {
+    public AiVerificationService(RestTemplate restTemplate,
+                                  @Value("${codelab.groq.model:qwen/qwen3.8-27b}") String model) {
         this.restTemplate = restTemplate;
+        this.model = model;
         this.apiKey = loadApiKey();
     }
 
     public AiVerificationResponseDto verify(AiVerificationRequestDto request) {
         Map<String, Object> payload = Map.of(
-                "model", MODEL,
+                "model", model,
+                "max_tokens", 356,
                 "messages", List.of(
                         Map.of("role", "system", "content", "Você é um avaliador final de respostas. Analise com rigor, sem inventar requisitos, e decida apenas se a resposta atende ou nao a questao. Se estiver correta, retorne approved=true. Se estiver incorreta, retorne approved=false e use feedback apenas se for realmente necessario para orientar o usuario. Responda somente no formato approved=true;feedback=texto ou approved=false;feedback=texto."),
                         Map.of("role", "user", "content", buildPrompt(request))

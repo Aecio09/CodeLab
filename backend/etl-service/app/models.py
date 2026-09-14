@@ -10,10 +10,13 @@ class QuestionDto:
     correct_index: int = 0
     difficulty: str = "unknown"
     topic: str = "java"
+    question_type: str = "PRACTICAL"
+    required_usage: str | list[str] | None = None
+    starter_code: str | None = None
 
-    def regex_requirements(self) -> list[str]:
-        """Uso exigido (for/while/if/switch) — o verification-service (Java)
-        também aplica essas regras nos nódulos `node` da resposta."""
+    def regex_requirements(self) -> list[str] | str | None:
+        if self.required_usage is not None:
+            return self.required_usage
         found = []
         for kw in ("for", "while", "do", "if", "switch"):
             if kw in self.title.lower():
@@ -21,15 +24,21 @@ class QuestionDto:
         return found
 
     def to_payload(self) -> dict:
-        return {
+        payload = {
             "id": self._stable_id(),
             "title": self.title,
+            "questionBody": self.title,
             "options": self.options,
             "correctIndex": self.correct_index,
             "difficulty": self.difficulty,
             "topic": self.topic,
+            "questionType": self.question_type,
+            "type": self.question_type,
             "requiredUsage": self.regex_requirements(),
         }
+        if self.starter_code is not None:
+            payload["starterCode"] = self.starter_code
+        return payload
 
     def _stable_id(self) -> str:
         import hashlib
