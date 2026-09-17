@@ -1,35 +1,55 @@
-# Compiled class file
-*.class
-
-# Log file
-*.log
-
-# BlueJ files
-*.ctxt
-
-# Mobile Tools for Java (J2ME)
-.mtj.tmp/
-
-# Package Files #
-*.jar
-*.war
-*.nar
-*.ear
-*.zip
-*.tar.gz
-*.rar
-
-# virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
-hs_err_pid*
-replay_pid*
+# Environment & Secrets
 .env
 .env.*
 !.env.example
+**/APIKEY
+APIKEY
+SPLIT.md
 
+# Maven / Java (Spring Boot) Build Outputs
+target/
+**/target/
+*.class
+*.jar
+*.war
+*.ear
+*.nar
+
+# IDE & Editor files
 .idea/
-backend/03/src/main/resources/APIKEY
-backend/03/src/main/resources/questionsSeedAndETL/*
-/code-executor/node_modules/
-/code-executor/node_modules
-/code-executor/node_modules/.bin
-CodeLabMobile/CLAUDE.md
+.vscode/
+*.swp
+*.swo
+.DS_Store
+
+# Node / Frontend / Mobile
+node_modules/
+**/node_modules/
+dist/
+**/dist/
+.expo/
+.metro-health-check*
+
+# Python (ETL Service)
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+.venv/
+venv/
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Documents & Media
+*.docx
+*.pdf
+
+# Crash logs
+hs_err_pid*
+replay_pid*
+

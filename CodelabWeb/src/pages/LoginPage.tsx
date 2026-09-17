@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import type { FormEvent } from 'react'
 import { API_BASE_URL } from '../constants'
+import { apiLogin, authFetch, getToken } from '../lib/api'
 import { SharedFooter } from '../components/SharedFooter'
 
 type LoginPageProps = {
@@ -11,9 +12,11 @@ export function LoginPage({ registered }: LoginPageProps) {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [submitting, setSubmitting] = useState(false)
+  const [loginError, setLoginError] = useState('')
 
   useEffect(() => {
-    fetch(`${API_BASE_URL}/api/users/me`, { credentials: 'include' })
+    if (!getToken()) return
+    authFetch(`${API_BASE_URL}/api/users/me`)
       .then(async (response) => {
         if (response.ok) {
           const data = await response.json()
@@ -27,27 +30,28 @@ export function LoginPage({ registered }: LoginPageProps) {
       .catch(() => {})
   }, [])
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     setSubmitting(true)
+    setLoginError('')
 
-    const form = document.createElement('form')
-    form.method = 'POST'
-    form.action = `${API_BASE_URL}/login`
-    form.style.display = 'none'
-
-    const usernameInput = document.createElement('input')
-    usernameInput.name = 'username'
-    usernameInput.value = email
-    form.appendChild(usernameInput)
-
-    const passwordInput = document.createElement('input')
-    passwordInput.name = 'password'
-    passwordInput.value = password
-    form.appendChild(passwordInput)
-
-    document.body.appendChild(form)
-    form.submit()
+    try {
+      await apiLogin(email, password)
+      const meRes = await authFetch(`${API_BASE_URL}/api/users/me`)
+      if (meRes.ok) {
+        const me = await meRes.json()
+        if (me.role === 'ADMIN') {
+          window.location.href = '/admin/questions'
+        } else {
+          window.location.href = '/trilha'
+        }
+      } else {
+        window.location.href = '/trilha'
+      }
+    } catch {
+      setLoginError('Email ou senha inválidos.')
+      setSubmitting(false)
+    }
   }
 
   return (
@@ -68,6 +72,7 @@ export function LoginPage({ registered }: LoginPageProps) {
 
             {registered ? <p className="text-primary text-body-sm mb-md" aria-live="polite">Cadastro realizado. Faça login para continuar.</p> : null}
 
+            {loginError && <p className="text-error text-body-sm font-semibold text-center" role="alert">{loginError}</p>}
             <form className="space-y-lg" onSubmit={handleSubmit}>
               <div>
 <label className="form-label" htmlFor="email">

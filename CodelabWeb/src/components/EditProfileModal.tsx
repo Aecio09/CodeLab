@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import type { ChangeEvent, FormEvent } from 'react'
 import { API_BASE_URL } from '../constants'
+import { authFetch } from '../lib/api'
 import { resolvePhotoUrl } from '../utils'
 import type { UserProfile } from '../types'
 
@@ -77,9 +78,8 @@ export function EditProfileModal({ isOpen, onClose, user, onUpdate }: Props) {
 
     try {
       // 1. Update basic info
-      const res = await fetch(`${API_BASE_URL}/api/users/perfil`, {
+      const res = await authFetch(`${API_BASE_URL}/api/users/perfil`, {
         method: 'PUT',
-        credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name, email, password }),
       })
@@ -91,9 +91,8 @@ export function EditProfileModal({ isOpen, onClose, user, onUpdate }: Props) {
       if (photoFile) {
         const formData = new FormData()
         formData.append('photo', photoFile)
-        const photoRes = await fetch(`${API_BASE_URL}/api/users/upload-photo`, {
+        const photoRes = await authFetch(`${API_BASE_URL}/api/users/upload-photo`, {
           method: 'POST',
-          credentials: 'include',
           body: formData,
         })
         if (photoRes.ok) {
@@ -114,9 +113,8 @@ export function EditProfileModal({ isOpen, onClose, user, onUpdate }: Props) {
   const handleDeleteAccount = async () => {
     if (!window.confirm('TEM CERTEZA? Esta ação é irreversível.')) return
     try {
-      const res = await fetch(`${API_BASE_URL}/api/users/perfil`, {
+      const res = await authFetch(`${API_BASE_URL}/api/users/perfil`, {
         method: 'DELETE',
-        credentials: 'include',
       })
       if (res.ok) window.location.href = '/'
     } catch (err) {

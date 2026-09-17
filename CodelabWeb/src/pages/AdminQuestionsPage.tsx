@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import type { ChangeEvent, FormEvent } from 'react'
 import { API_BASE_URL, DIFFICULTY_OPTIONS, TOPIC_OPTIONS, TYPE_OPTIONS } from '../constants'
+import { authFetch, apiLogout } from '../lib/api'
 import { difficultyLabel, resolvePhotoUrl, topicLabel, typeLabel } from '../utils'
 import type { QuestionItem, QuestionPayload, QuestionSeedImportResponse, UserProfile } from '../types'
 
@@ -28,9 +29,7 @@ export function AdminQuestionsPage() {
   const editFormRef = useRef<HTMLDivElement | null>(null)
 
   const loadQuestions = async () => {
-    const questionsResponse = await fetch(`${API_BASE_URL}/questions`, {
-      credentials: 'include',
-    })
+    const questionsResponse = await authFetch(`${API_BASE_URL}/questions`)
 
     if (!questionsResponse.ok) {
       throw new Error('load-questions')
@@ -45,9 +44,7 @@ export function AdminQuestionsPage() {
 
     const load = async () => {
       try {
-        const meResponse = await fetch(`${API_BASE_URL}/api/users/me`, {
-          credentials: 'include',
-        })
+        const meResponse = await authFetch(`${API_BASE_URL}/api/users/me`)
 
         if (!meResponse.ok) {
           window.location.href = '/'
@@ -105,18 +102,7 @@ export function AdminQuestionsPage() {
     return 'Difícil'
   }, [questions])
 
-  const handleLogout = async () => {
-    try {
-      await fetch(`${API_BASE_URL}/logout`, {
-        method: 'POST',
-        credentials: 'include',
-      });
-    } catch (err) {
-      console.error("Erro ao deslogar no servidor:", err);
-    } finally {
-      window.location.href = '/';
-    }
-  };
+  const handleLogout = () => { apiLogout() }
 
   const handleEdit = (question: QuestionItem) => {
     setSelectedQuestion(question)
@@ -163,9 +149,8 @@ export function AdminQuestionsPage() {
     formData.append('file', file)
 
     try {
-      const response = await fetch(`${API_BASE_URL}/questions/import-upload`, {
+      const response = await authFetch(`${API_BASE_URL}/api/etl/import-upload`, {
         method: 'POST',
-        credentials: 'include',
         body: formData,
       })
 
@@ -204,9 +189,8 @@ export function AdminQuestionsPage() {
     try {
       const url = selectedQuestion ? `${API_BASE_URL}/questions/${selectedQuestion.id}` : `${API_BASE_URL}/questions`
       const method = selectedQuestion ? 'PUT' : 'POST'
-      const response = await fetch(url, {
+      const response = await authFetch(url, {
         method,
-        credentials: 'include',
         headers: {
           'Content-Type': 'application/json',
         },

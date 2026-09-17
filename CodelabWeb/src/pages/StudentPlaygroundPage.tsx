@@ -6,6 +6,7 @@ import {
     SandpackPreview,
 } from '@codesandbox/sandpack-react'
 import { API_BASE_URL, DEFAULT_PLAYGROUND_CODE } from '../constants'
+import { authFetch, apiLogout } from '../lib/api'
 import type { AnswerReviewResponse, QuestionItem, UserProfile } from '../types'
 import { PlaygroundCodeEditor } from '../components/PlaygroundCodeEditor'
 import { EditProfileModal } from '../components/EditProfileModal'
@@ -40,6 +41,16 @@ const mintDarkTheme = {
     },
 }
 
+const FINAL_STATUSES = ['APPROVED', 'AI_REJECTED', 'NODE_REJECTED'] as const
+
+function isFinalStatus(status: string) {
+    return FINAL_STATUSES.includes(status as (typeof FINAL_STATUSES)[number])
+}
+
+function isRejectedStatus(status: string) {
+    return status === 'AI_REJECTED' || status === 'NODE_REJECTED'
+}
+
 export function StudentPlaygroundPage({ questionId }: { questionId: number }) {
     const [user, setUser] = useState<UserProfile | null>(null)
     const [question, setQuestion] = useState<QuestionItem | null>(null)
@@ -56,12 +67,12 @@ export function StudentPlaygroundPage({ questionId }: { questionId: number }) {
         let cancelled = false
         const load = async () => {
             try {
-                const meRes = await fetch(`${API_BASE_URL}/api/users/me`, { credentials: 'include' })
+                const meRes = await authFetch(`${API_BASE_URL}/api/users/me`)
                 if (!meRes.ok) { window.location.href = '/'; return; }
                 const me = await meRes.json()
                 if (!cancelled) setUser(me)
 
-                const qRes = await fetch(`${API_BASE_URL}/questions/${questionId}`, { credentials: 'include' })
+                const qRes = await authFetch(`${API_BASE_URL}/questions/${questionId}`)
                 if (!qRes.ok) throw new Error('load-question')
                 const qData = await qRes.json()
                 if (!cancelled) setQuestion(qData)
@@ -106,27 +117,54 @@ export function StudentPlaygroundPage({ questionId }: { questionId: number }) {
         setReviewResult(null)
 
         try {
-            const response = await fetch(`${API_BASE_URL}/answers`, {
+            const response = await authFetch(`${API_BASE_URL}/answers`, {
                 method: 'POST',
-                credentials: 'include',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ questionId: question.id, answerBody: code }),
             })
 
-            if (response.ok) {
-                const result = await response.json()
-                setReviewResult(result)
+            if (!response.ok) {
+                const data = await response.json().catch(() => ({}))
+                setReviewResult({
+                    id: 0,
+                    answerBody: code,
+                    verificationStatus: 'NODE_REJECTED',
+                    nodeVerificationResult: data.message || 'Falha na verificação.',
+                    aiVerificationResult: data.message || 'Seu código não atende aos requisitos do desafio. Verifique a saída do sistema para mais detalhes.'
+                })
+                setSubmitting(false)
                 return
             }
 
-            const data = await response.json()
-            setReviewResult({
-                id: 0,
-                answerBody: code,
-                verificationStatus: 'REJECTED',
-                nodeVerificationResult: data.message || 'Falha na verificação.',
-                aiVerificationResult: data.message || 'Seu código não atende aos requisitos do desafio. Verifique a saída do sistema para mais detalhes.'
-            })
+            const result = await response.json()
+            if (isFinalStatus(result.verificationStatus)) {
+                setReviewResult(result)
+                setSubmitting(false)
+                return
+            }
+
+            let attempts = 0
+            const maxAttempts = 30
+            const poll = async () => {
+                if (attempts >= maxAttempts) {
+                    setSubmitting(false)
+                    return
+                }
+                attempts += 1
+                try {
+                    const pollRes = await authFetch(`${API_BASE_URL}/answers/${result.id}`)
+                    if (pollRes.ok) {
+                        const data = await pollRes.json()
+                        if (isFinalStatus(data.verificationStatus)) {
+                            setReviewResult(data)
+                            setSubmitting(false)
+                            return
+                        }
+                    }
+                } catch {}
+                setTimeout(poll, 2000)
+            }
+            setTimeout(poll, 2000)
         } catch {
             setReviewResult({
                 id: 0,
@@ -135,18 +173,11 @@ export function StudentPlaygroundPage({ questionId }: { questionId: number }) {
                 nodeVerificationResult: 'Erro de Conexão',
                 aiVerificationResult: 'Não foi possível conectar ao servidor de validação. Verifique sua internet.'
             })
-        } finally {
             setSubmitting(false)
         }
     }
 
-    const handleLogout = async () => {
-        try {
-            await fetch(`${API_BASE_URL}/logout`, { method: 'POST', credentials: 'include' })
-        } finally {
-            window.location.href = '/'
-        }
-    }
+    const handleLogout = () => { apiLogout() }
 
     if (loading || !user) {
         return <div className="h-screen bg-background flex items-center justify-center text-primary animate-pulse font-mono" role="status" aria-live="polite">Inicializando Arena...</div>
@@ -302,7 +333,8 @@ export function StudentPlaygroundPage({ questionId }: { questionId: number }) {
                                 {reviewResult && (
                                     <div className={`flex items-center gap-2 px-3 py-1 rounded-full text-[9px] font-black uppercase
                                         ${reviewResult.verificationStatus === 'APPROVED' ? 'bg-primary/20 text-primary' : 'bg-error/20 text-error'}`}>
-                                        {reviewResult.verificationStatus === 'APPROVED' ? 'Código Validado' : 'Correção Necessária'}
+                                        {reviewResult.verificationStatus === 'APPROVED' ? 'Código Validado' :
+                                         reviewResult.verificationStatus === 'PENDING' ? 'Analisando...' : 'Correção Necessária'}
                                     </div>
                                 )}
                             </div>
@@ -344,11 +376,11 @@ export function StudentPlaygroundPage({ questionId }: { questionId: number }) {
                                     <div className="flex items-center gap-2 mb-4">
                                         <span className={`material-symbols-outlined ${reviewResult.verificationStatus === 'APPROVED' ? 'text-primary' : 'text-error'}`}>
                                             {reviewResult.verificationStatus === 'APPROVED' ? 'verified' : 
-                                             reviewResult.verificationStatus === 'REJECTED' ? 'dangerous' : 'report'}
+                                             isRejectedStatus(reviewResult.verificationStatus) ? 'dangerous' : 'report'}
                                         </span>
                                         <h3 className={`text-xs font-black uppercase tracking-widest ${reviewResult.verificationStatus === 'APPROVED' ? 'text-on-surface' : 'text-white'}`}>
                                             {reviewResult.verificationStatus === 'APPROVED' ? 'Relatório de Verificação' : 
-                                             reviewResult.verificationStatus === 'REJECTED' ? 'Desafio Recusado' : 'Erro de Sistema'}
+                                             isRejectedStatus(reviewResult.verificationStatus) ? 'Desafio Recusado' : 'Erro de Sistema'}
                                         </h3>
                                     </div>
                                     <div className="overflow-auto max-h-48">

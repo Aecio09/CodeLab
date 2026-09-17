@@ -1,0 +1,372 @@
+{
+  "questions": [
+    {
+      "questionBody": "Imprimir o perímetro de um triângulo equilátero",
+      "type": "PRACTICAL",
+      "difficulty": "EASY",
+      "requiredUsage": null,
+      "topic": "OPERADORES_TIPOS_E_VARIAVEIS"
+    },
+    {
+      "questionBody": "Imprimir o perímetro de um quadrado",
+      "type": "PRACTICAL",
+      "difficulty": "EASY",
+      "requiredUsage": null,
+      "topic": "OPERADORES_TIPOS_E_VARIAVEIS"
+    },
+    {
+      "questionBody": "Imprimir o perímetro de um retângulo",
+      "type": "PRACTICAL",
+      "difficulty": "EASY",
+      "requiredUsage": null,
+      "topic": "OPERADORES_TIPOS_E_VARIAVEIS"
+    },
+    {
+      "questionBody": "Imprimir o perímetro de um pentágono",
+      "type": "PRACTICAL",
+      "difficulty": "EASY",
+      "requiredUsage": null,
+      "topic": "OPERADORES_TIPOS_E_VARIAVEIS"
+    },
+    {
+      "questionBody": "Imprimir o perímetro de um hexágono",
+      "type": "PRACTICAL",
+      "difficulty": "EASY",
+      "requiredUsage": null,
+      "topic": "OPERADORES_TIPOS_E_VARIAVEIS"
+    },
+    {
+      "questionBody": "Converter segundos em horas",
+      "type": "PRACTICAL",
+      "difficulty": "EASY",
+      "requiredUsage": null,
+      "topic": "OPERADORES_TIPOS_E_VARIAVEIS"
+    },
+    {
+      "questionBody": "Solucionar a equação: f(x) = x² + 2x – 3",
+      "type": "PRACTICAL",
+      "difficulty": "EASY",
+      "requiredUsage": null,
+      "topic": "OPERADORES_TIPOS_E_VARIAVEIS"
+    },
+    {
+      "questionBody": "Solucionar a equação: f(x) = x³ + x² + 3x - 25",
+      "type": "PRACTICAL",
+      "difficulty": "EASY",
+      "requiredUsage": null,
+      "topic": "OPERADORES_TIPOS_E_VARIAVEIS"
+    },
+    {
+      "questionBody": "Imprimir a média de seis números",
+      "type": "PRACTICAL",
+      "difficulty": "EASY",
+      "requiredUsage": null,
+      "topic": "OPERADORES_TIPOS_E_VARIAVEIS"
+    },
+    {
+      "questionBody": "Imprimir a média ponderada de quatro números",
+      "type": "PRACTICAL",
+      "difficulty": "EASY",
+      "requiredUsage": null,
+      "topic": "OPERADORES_TIPOS_E_VARIAVEIS"
+    },
+    {
+      "questionBody": "Imprimir o índice de Massa Corporal (peso dividido pelo quadrado da altura)",
+      "type": "PRACTICAL",
+      "difficulty": "EASY",
+      "requiredUsage": null,
+      "topic": "OPERADORES_TIPOS_E_VARIAVEIS"
+    },
+    {
+      "questionBody": "Imprimir o perímetro de um círculo (2 vezes PI vezes raio)",
+      "type": "PRACTICAL",
+      "difficulty": "EASY",
+      "requiredUsage": null,
+      "topic": "OPERADORES_TIPOS_E_VARIAVEIS"
+    },
+    {
+      "questionBody": "Solucionar a equação: f(x, z) = x³ + z² + 3xz - 25",
+      "type": "PRACTICAL",
+      "difficulty": "EASY",
+      "requiredUsage": null,
+      "topic": "OPERADORES_TIPOS_E_VARIAVEIS"
+    },
+    {
+      "questionBody": "Imprimir o volume de um cilindro (área da base vezes a altura)",
+      "type": "PRACTICAL",
+      "difficulty": "EASY",
+      "requiredUsage": null,
+      "topic": "OPERADORES_TIPOS_E_VARIAVEIS"
+    },
+    {
+      "questionBody": "Imprimir o volume de uma caixa (base vezes altura vezes profundidade)",
+      "type": "PRACTICAL",
+      "difficulty": "EASY",
+      "requiredUsage": null,
+      "topic": "OPERADORES_TIPOS_E_VARIAVEIS"
+    },
+    {
+      "questionBody": "Imprimir área de um triângulo isósceles (base vezes altura dividido por dois)",
+      "type": "PRACTICAL",
+      "difficulty": "EASY",
+      "requiredUsage": null,
+      "topic": "OPERADORES_TIPOS_E_VARIAVEIS"
+    },
+    {
+      "questionBody": "Escolher o maior entre dois números",
+      "type": "PRACTICAL",
+      "difficulty": "MEDIUM",
+      "requiredUsage": null,
+      "topic": "OPERADORES_TIPOS_E_VARIAVEIS"
+    },
+    {
+      "questionBody": "Computar as raízes de uma equação do segundo grau",
+      "type": "PRACTICAL",
+      "difficulty": "MEDIUM",
+      "requiredUsage": null,
+      "topic": "OPERADORES_TIPOS_E_VARIAVEIS"
+    },
+    {
+      "questionBody": "Computar a distância entre dois pontos tridimensionais",
+      "type": "PRACTICAL",
+      "difficulty": "HARD",
+      "requiredUsage": null,
+      "topic": "OPERADORES_TIPOS_E_VARIAVEIS"
+    },
+    {
+      "questionBody": "Computar o valor da hipotenusa em um triângulo retângulo ",
+      "type": "PRACTICAL",
+      "difficulty": "MEDIUM",
+      "requiredUsage": null,
+      "topic": "OPERADORES_TIPOS_E_VARIAVEIS"
+    },
+    {
+      "questionBody": "Trocar o valor de duas variáveis",
+      "type": "PRACTICAL",
+      "difficulty": "MEDIUM",
+      "requiredUsage": null,
+      "topic": "OPERADORES_TIPOS_E_VARIAVEIS"
+    },
+    {
+      "questionBody": "Corrigir o programa que computar a média de 4 números",
+      "type": "PRACTICAL",
+      "difficulty": "EASY",
+      "requiredUsage": null,
+      "topic": "OPERADORES_TIPOS_E_VARIAVEIS"
+    },
+    {
+      "questionBody": "Dado um array de uma dimensão como parâmetro, retornar a multiplicação de seus elementos",
+      "type": "PRACTICAL",
+      "difficulty": "MEDIUM",
+      "requiredUsage": null,
+      "topic": "ARRAYS"
+    },
+    {
+      "questionBody": "Dados dois arrays de uma dimensão como parâmetro, retornar a multiplicação de todos os elementos de ambos.",
+      "type": "PRACTICAL",
+      "difficulty": "MEDIUM",
+      "requiredUsage": null,
+      "topic": "ARRAYS"
+    },
+    {
+      "questionBody": "Dado um array de duas dimensões como parâmetro, retornar a multiplicação de seus elementos",
+      "type": "PRACTICAL",
+      "difficulty": "MEDIUM",
+      "requiredUsage": null,
+      "topic": "ARRAYS"
+    },
+    {
+      "questionBody": "Dados dois arrays de duas dimensões como parâmetro, retornar a multiplicação dos elementos de ambos.",
+      "type": "PRACTICAL",
+      "difficulty": "MEDIUM",
+      "requiredUsage": null,
+      "topic": "ARRAYS"
+    },
+    {
+      "questionBody": "Criar o tipo AssentoOnibus com ao menos 4 atributos",
+      "type": "PRACTICAL",
+      "difficulty": "MEDIUM",
+      "requiredUsage": null,
+      "topic": "TIPOS_CRIADOS_PELO_PROGRAMADOR"
+    },
+    {
+      "questionBody": "Criar um subprograma que, dado um AssentoOnibus, marca o mesmo como reservado",
+      "type": "PRACTICAL",
+      "difficulty": "MEDIUM",
+      "requiredUsage": null,
+      "topic": "TIPOS_CRIADOS_PELO_PROGRAMADOR"
+    },
+    {
+      "questionBody": "Criar o tipo Onibus com ao menos 3 atributos",
+      "type": "PRACTICAL",
+      "difficulty": "MEDIUM",
+      "requiredUsage": null,
+      "topic": "TIPOS_CRIADOS_PELO_PROGRAMADOR"
+    },
+    {
+      "questionBody": "Criar um subprograma que, dado um Onibus como parâmetro, retorna a quantidade de assentos reservados no mesmo.",
+      "type": "PRACTICAL",
+      "difficulty": "MEDIUM",
+      "requiredUsage": null,
+      "topic": "TIPOS_CRIADOS_PELO_PROGRAMADOR"
+    },
+    {
+      "questionBody": "O programa abaixo deveria implementar o tipo Blog com os atributos textos,  títulos e autores, além do subprograma titulosPorAutor que, dado um Blog e um autor, retorna um array contendo todos os títulos de seus textos. Corrija todos os erros do programa e comente cada uma das correções.",
+      "type": "PRACTICAL",
+      "difficulty": "MEDIUM",
+      "requiredUsage": null,
+      "topic": "LACOS",
+      "starterCode": "class Blog {\n}\nfunction titulosPorAutor(blog: Blog, autor : string) : string[] {\n    let resultado : string[] = []\n    for (let i : number = 0; i < blog.autores; i++) {\n        if (blog.autores[i] == autor) {\n            resultado.push(blog.textos[i]) // push adiciona um item no fim do array\n        }\n    }\n}"
+    },
+    {
+      "questionBody": "Qual o retorno do subprograma abaixo para a chamada title(\"okui.dje\")?",
+      "type": "PRACTICAL",
+      "difficulty": "MEDIUM",
+      "requiredUsage": null,
+      "topic": "EXECUCAO_CONDICIONAL",
+      "starterCode": "class IE {\n    i : string = \"\"\n    e : string = \"\"\n}\nfunction title(s : string) : string {\n    let t : IE = {i : \"\", e : \"\"}\n    for (let i = 0; i < s.length; i = i + 2) {\n        t.i = t.i + s[(i + 4) % s.length]\n        t.e = t.e + s[(i + 5) % s.length]\n    }\n}"
+    },
+    {
+      "questionBody": "Implemente as classes de um jogo da velha, além das funções jogadaPC (que efetua uma jogada automaticamente pelo computador) e a função vencedor (identifica quando um jogador venceu).",
+      "type": "PRACTICAL",
+      "difficulty": "MEDIUM",
+      "requiredUsage": null,
+      "topic": "EXECUCAO_CONDICIONAL"
+    },
+    {
+      "questionBody": "Imprimir os números negativos de 1 em 1, de -1 até -20",
+      "type": "PRACTICAL",
+      "difficulty": "EASY",
+      "requiredUsage": null,
+      "topic": "OPERADORES_TIPOS_E_VARIAVEIS"
+    },
+    {
+      "questionBody": "Imprimir os números de 3 em 3, de 0 até 30",
+      "type": "PRACTICAL",
+      "difficulty": "EASY",
+      "requiredUsage": null,
+      "topic": "OPERADORES_TIPOS_E_VARIAVEIS"
+    },
+    {
+      "questionBody": "Imprimir os número de 3 em 3, de 0 até -30",
+      "type": "PRACTICAL",
+      "difficulty": "EASY",
+      "requiredUsage": null,
+      "topic": "OPERADORES_TIPOS_E_VARIAVEIS"
+    },
+    {
+      "questionBody": "Imprimir os 10 primeiros números ímpares",
+      "type": "PRACTICAL",
+      "difficulty": "EASY",
+      "requiredUsage": null,
+      "topic": "OPERADORES_TIPOS_E_VARIAVEIS"
+    },
+    {
+      "questionBody": "Imprimir os 20 primeiros números divisíveis por 3",
+      "type": "PRACTICAL",
+      "difficulty": "EASY",
+      "requiredUsage": null,
+      "topic": "OPERADORES_TIPOS_E_VARIAVEIS"
+    },
+    {
+      "questionBody": "Imprimir os 10 primeiros números divisíveis por 10",
+      "type": "PRACTICAL",
+      "difficulty": "EASY",
+      "requiredUsage": null,
+      "topic": "OPERADORES_TIPOS_E_VARIAVEIS"
+    },
+    {
+      "questionBody": "Imprimir os quadrados dos 10 primeiros números inteiros",
+      "type": "PRACTICAL",
+      "difficulty": "EASY",
+      "requiredUsage": null,
+      "topic": "OPERADORES_TIPOS_E_VARIAVEIS"
+    },
+    {
+      "questionBody": "Imprimir os números entre 0 e 25 em ordem decrescente.",
+      "type": "PRACTICAL",
+      "difficulty": "EASY",
+      "requiredUsage": null,
+      "topic": "OPERADORES_TIPOS_E_VARIAVEIS"
+    },
+    {
+      "questionBody": "Multiplicar dois números sem usar o operador da multiplicação (Dica: 5x3 = 5 + 5 + 5)",
+      "type": "PRACTICAL",
+      "difficulty": "MEDIUM",
+      "requiredUsage": null,
+      "topic": "OPERADORES_TIPOS_E_VARIAVEIS"
+    },
+    {
+      "questionBody": "Dividir dois números sem usar o operador da divisão (Dica: 9/3 = 9 - 3 - 3 - 3)",
+      "type": "PRACTICAL",
+      "difficulty": "MEDIUM",
+      "requiredUsage": null,
+      "topic": "OPERADORES_TIPOS_E_VARIAVEIS"
+    },
+    {
+      "questionBody": "Computar o resto da divisão de dois números sem utilizar o operador %",
+      "type": "PRACTICAL",
+      "difficulty": "MEDIUM",
+      "requiredUsage": null,
+      "topic": "OPERADORES_TIPOS_E_VARIAVEIS"
+    },
+    {
+      "questionBody": "Computar o fatorial de um número",
+      "type": "PRACTICAL",
+      "difficulty": "MEDIUM",
+      "requiredUsage": null,
+      "topic": "OPERADORES_TIPOS_E_VARIAVEIS"
+    },
+    {
+      "questionBody": "Testar se um número é primo",
+      "type": "PRACTICAL",
+      "difficulty": "MEDIUM",
+      "requiredUsage": null,
+      "topic": "OPERADORES_TIPOS_E_VARIAVEIS"
+    },
+    {
+      "questionBody": "Testar se um número não é primo",
+      "type": "PRACTICAL",
+      "difficulty": "MEDIUM",
+      "requiredUsage": null,
+      "topic": "OPERADORES_TIPOS_E_VARIAVEIS"
+    },
+    {
+      "questionBody": "Imprimir os números negativos múltiplos de 5 até -100",
+      "type": "PRACTICAL",
+      "difficulty": "MEDIUM",
+      "requiredUsage": null,
+      "topic": "OPERADORES_TIPOS_E_VARIAVEIS"
+    },
+    {
+      "questionBody": "Imprimir os números inteiros pares entre -10 e 10.",
+      "type": "PRACTICAL",
+      "difficulty": "MEDIUM",
+      "requiredUsage": null,
+      "topic": "OPERADORES_TIPOS_E_VARIAVEIS"
+    },
+    {
+      "questionBody": "Testar se o fatorial de um número é primo.",
+      "type": "PRACTICAL",
+      "difficulty": "HARD",
+      "requiredUsage": null,
+      "topic": "OPERADORES_TIPOS_E_VARIAVEIS"
+    },
+    {
+      "questionBody": "O programa abaixo deveria ser capaz de multiplicar dois números sem utilizar o operador da multiplicação *, corrija todos os erros do mesmo e para cada erro encontrado faça um comentário explicando qual o erro e qual foi a solução encontrada.",
+      "type": "PRACTICAL",
+      "difficulty": "HARD",
+      "requiredUsage": null,
+      "topic": "OPERADORES_TIPOS_E_VARIAVEIS",
+      "starterCode": "r = r + 10\n}"
+    },
+    {
+      "questionBody": "Corrija todos os erros do mesmo e para cada erro encontrado faça um comentário explicando qual o erro e qual foi a solução encontrada (observação: sua resposta deve adicionar um caractere por vez à string a ser impressa ao fim do programa).",
+      "type": "PRACTICAL",
+      "difficulty": "HARD",
+      "requiredUsage": null,
+      "topic": "OPERADORES_TIPOS_E_VARIAVEIS",
+      "starterCode": "for (let j : number = 0; j < 6; j++) {\n\tif (i == j) {\n\t} else {\n\t}\n  }\n  s = s + \"\\n\"\n}"
+    }
+  ]
+}
