@@ -4,12 +4,13 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.Map;
 
 @Getter
 @Setter
 public class MacAddressTable {
-    private Map<String, MacAddress> macAddresses;
+    private Map<String, MacAddress> macAddresses = new HashMap<>();
 
     @Getter
     @Setter

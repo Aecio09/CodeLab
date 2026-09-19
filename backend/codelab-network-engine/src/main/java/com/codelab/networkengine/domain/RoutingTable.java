@@ -3,12 +3,13 @@ package com.codelab.networkengine.domain;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.HashMap;
 import java.util.Map;
 
 @Getter
 @Setter
 public class RoutingTable {
-    private Map<String, RouteEntry> routes;
+    private Map<String, RouteEntry> routes = new HashMap<>();
 
     @Getter
     @Setter

@@ -4,12 +4,13 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.Map;
 
 @Getter
 @Setter
 public class ArpTable {
-    private Map<String, ArpEntry> entries;
+    private Map<String, ArpEntry> entries = new HashMap<>();
 
     @Getter
     @Setter

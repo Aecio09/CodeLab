@@ -208,9 +208,68 @@ Tabela de roteamento. A **chave é a rede destino** (ex.: `192.168.1.0`).
 
 Métodos auxiliares: `isDirectlyConnected()` — verdadeiro quando `type == CONNECTED`.
 
+## Camada CLI (`com.codelab.networkengine.cli`)
+
+CLI estilo Cisco que opera diretamente sobre o domain: os comandos **mutam as mesmas referências** que o `NetworkEngine` lê, sem estado duplicado.
+
+### Modos
+
+| Modo | Prompt | Entrada |
+|---|---|---|
+| `USER` | `hostname>` | inicial |
+| `PRIVILEGED` | `hostname#` | `enable` |
+| `CONFIG` | `hostname(config)#` | `configure terminal` |
+| `CONFIG_INTERFACE` | `hostname(config-if)#` | `interface <nome>` |
+| `CONFIG_VLAN` | `hostname(config-vlan)#` | `vlan <id>` |
+
+`exit` sobe um nível; `disable` volta para `USER`. Comandos `USER` também valem em `PRIVILEGED`.
+
+### Parser e resolução
+
+- Abreviação única estilo Cisco (`conf t`, `sh ip a`, `no shut`).
+- Prefixo `no` suportado por comandos de remoção (`no shutdown`, `no ip address`, …).
+- Comando incompleto (`show`) e ambíguo (`sh ip`) são reportados com mensagens distintas.
+- Ajuda por `?` no modo atual ou com prefixo (`sh ?`).
+
+### Comandos
+
+| Comando | Modo | Aplicação |
+|---|---|---|
+| `enable` / `disable` / `exit` / `end` | `USER`/`PRIVILEGED`/`ANY` | navegação |
+| `do <comando exec>` | config | executa comando exec sem sair do modo de config |
+| `configure terminal` | `PRIVILEGED` | entra em `CONFIG` |
+| `hostname <nome>` | `CONFIG` | `Device` |
+| `interface <nome>` | `CONFIG` | cria/reutiliza porta |
+| `vlan <id>` / `name <nome>` | `CONFIG`/`CONFIG_VLAN` | `Switch` |
+| `ip address <ip> <mascara>` | `CONFIG_INTERFACE` | L3 |
+| `shutdown` / `no shutdown` | `CONFIG_INTERFACE` | `AdminState` |
+| `description <texto>` | `CONFIG_INTERFACE` | L3 |
+| `switchport mode access\|trunk` | `CONFIG_INTERFACE` | `Switch` |
+| `switchport access vlan <id>` | `CONFIG_INTERFACE` | `Switch` |
+| `ip route <rede> <mascara> <nexthop>` | `CONFIG` | `Router` |
+| `ip default-gateway <ip>` | `CONFIG` | `Computer` |
+| `ping <ip>` | `USER` | executa `NetworkEngine.ping` |
+| `show ip arp` / `show ip route` / `show interfaces` | `USER` | L3/geral |
+| `show ip interface brief` / `show running-config` | `USER` | geral |
+| `show mac address-table` | `USER` | `Switch` |
+| `show vlan [brief]` | `USER` | `Switch` |
+
+### Encaminhamento L2 e VLANs
+
+`SwitchingProtocol` respeita a VLAN ao encaminhar: um quadro de uma porta de acesso só sai por portas de acesso da **mesma VLAN** ou por portas em **trunk** (que carregam todas). Portas com VLAN nula pertencem à VLAN 1. Limitação conhecida: não há modelagem de tag 802.1Q, então uma porta trunk é tratada como pertencente à VLAN nativa (1) na entrada.
+
+### Classes
+
+- `CliMode` — enum dos modos (com sufixo de prompt).
+- `Command` — interface: `name()`, `mode()`, `usage()`, `appliesTo()`, `supportsNo()`, `execute(...)`/`executeNo(...)`.
+- `CommandParser` — tokenização, detecção de `?` e do prefixo `no`.
+- `CommandRegistry` — comandos elegíveis por modo/dispositivo e resolução por prefixo.
+- `CommandResolution` — resultado (`command` + `args` ou `error`).
+- `DeviceCli` — sessão por dispositivo: pilha de modos, contexto de interface/VLAN e dispatch.
+
 ## Próximos passos (fora do domain)
 
-- `protocols/{arp,icmp,switching,routing}` — comportamento: aprender MAC, resolver ARP, longest-prefix-match, encaminhamento.
-- `simulation/` — orquestrar sessões de topologia e o loop de pacotes.
-- `cli/` — parser/registro de comandos estilo Cisco sobre o domain.
+- `protocols/{arp,icmp,switching,routing}` — comportamento: aprender MAC, resolver ARP, longest-prefix-match, encaminhamento. *(implementado)*
+- `simulation/` — orquestrar sessões de topologia e o loop de pacotes. *(implementado)*
+- `cli/` — parser/registro de comandos estilo Cisco sobre o domain. *(implementado)*
 - `persistence/` — gravar exercícios e topologias.
