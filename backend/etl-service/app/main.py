@@ -34,7 +34,7 @@ def _require_admin(credentials: HTTPAuthorizationCredentials | None) -> None:
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Auto-importar seeds do JSON na inicialização (docx só via upload)
+    # Auto-importar seeds do JSON na inicialização (docx/pdf só via upload)
     try:
         print("[etl-service] Carregando seeds do JSON no startup...")
         result, questions = load_json_seed()
