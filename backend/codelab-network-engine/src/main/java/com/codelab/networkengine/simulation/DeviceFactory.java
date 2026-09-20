@@ -16,6 +16,17 @@ import java.util.HashMap;
 public class DeviceFactory {
     private int idCounter = 1;
 
+    public Computer computerWithoutInterface(String hostname) {
+        Computer computer = new Computer();
+        computer.setId(idCounter++);
+        computer.setHostname(hostname);
+        computer.setModel(DeviceModel.HOST);
+        computer.setInterfaces(new java.util.ArrayList<>());
+        computer.setArpTable(new ArpTable());
+        computer.setRoutingTable(new RoutingTable());
+        return computer;
+    }
+
     public Computer computer(String hostname, String ip, String mask) {
         Computer computer = new Computer();
         computer.setId(idCounter++);

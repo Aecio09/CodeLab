@@ -1,4 +1,4 @@
-# Multi-stage build do serviço Spring codelab-network-engine
+# Multi-stage build do serviço Spring network-engine
 FROM maven:3.9-eclipse-temurin-21 AS build
 WORKDIR /workspace
 COPY pom.xml .
