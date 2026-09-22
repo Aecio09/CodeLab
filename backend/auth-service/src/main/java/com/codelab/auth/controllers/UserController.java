@@ -60,6 +60,12 @@ public class UserController {
         return ResponseEntity.ok(userService.uploadPhoto(file, principal.getName()));
     }
 
+    @DeleteMapping("/photo")
+    @PreAuthorize("hasAuthority('ADMIN') or #principal.name == authentication.name")
+    public ResponseEntity<UserDto> deletePhoto(Principal principal) {
+        return ResponseEntity.ok(userService.removePhoto(principal.getName()));
+    }
+
     @GetMapping
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<java.util.List<UserDto>> getAllUsers() {

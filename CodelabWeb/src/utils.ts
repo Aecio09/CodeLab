@@ -15,9 +15,23 @@ export function typeLabel(type: QuestionItem['type']) {
   return type === 'PRACTICAL' ? 'Prática' : 'Múltipla escolha'
 }
 
-export function resolvePhotoUrl(photo: string | null) {
-  if (!photo) return 'https://via.placeholder.com/160x160?text=User'
-  if (photo.startsWith('http://') || photo.startsWith('https://')) return photo
-  if (photo.startsWith('/')) return `${API_BASE_URL}${photo}`
-  return `${API_BASE_URL}/${photo}`
+export function resolvePhotoUrl(photo: string | null | undefined, name?: string) {
+
+  if (!photo || photo === 'null' || photo.trim() === '') {
+    const fallbackName = name ? encodeURIComponent(name) : 'User'
+    return `https://ui-avatars.com/api/?name=${fallbackName}&background=2f3633&color=72db9f&size=160`
+  }
+
+
+  if (photo.startsWith('http://') || photo.startsWith('https://')) {
+    return photo
+  }
+
+
+  let finalPath = photo;
+  if (!finalPath.startsWith('/')) {
+    finalPath = `/uploads/${finalPath}`;
+  }
+
+  return `${API_BASE_URL}${finalPath}`
 }

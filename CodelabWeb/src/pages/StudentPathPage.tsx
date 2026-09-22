@@ -3,6 +3,7 @@ import { API_BASE_URL } from '../constants'
 import { authFetch, apiLogout } from '../lib/api'
 import type { TopicStatus, UserProfile } from '../types'
 import { EditProfileModal } from '../components/EditProfileModal'
+import {resolvePhotoUrl} from "../utils.ts";
 
 const TOPIC_METADATA: Record<string, { label: string; icon: string }> = {
   OPERADORES_TIPOS_E_VARIAVEIS: { label: 'Variáveis e Tipos', icon: 'variables' },
@@ -145,7 +146,7 @@ export function StudentPathPage() {
               onClick={() => setIsProfileModalOpen(true)}
               className="w-10 h-10 rounded-full border-2 border-primary/50 p-0.5 overflow-hidden transition-all hover:border-primary hover:scale-105 active:scale-95"
             >
-              <img alt="Profile" className="w-full h-full rounded-full object-cover" src={user.photo || 'https://via.placeholder.com/160x160?text=User'} />
+              <img alt="Profile" className="w-full h-full rounded-full object-cover" src={resolvePhotoUrl(user?.photo, user?.name)} />
             </button>
           </div>
         </header>

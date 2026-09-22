@@ -85,6 +85,12 @@ public class UserService {
         return user.getPhoto();
     }
 
+    public UserDto removePhoto(String email) {
+        User user = findByEmail(email);
+        user.setPhoto(null);
+        return toDto(repository.save(user));
+    }
+
     public List<UserDto> getAllUsers() {
         return repository.findAll().stream().map(this::toDto).toList();
     }
