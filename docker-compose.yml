@@ -53,6 +53,8 @@ services:
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
     ports:
       - "8080:8080"
+    volumes:
+      - uploads-data:/app/uploads
     networks: [codelab]
 
   core-service:
@@ -130,6 +132,7 @@ services:
 volumes:
   mysql-data:
   playground-data:
+  uploads-data:
 
 networks:
   codelab:

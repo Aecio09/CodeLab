@@ -13,12 +13,25 @@ type Props = {
 }
 
 export function EditProfileModal({ isOpen, onClose, user, onUpdate }: Props) {
+  if (!isOpen) return null
+  return (
+    <ProfileForm
+      key={`${user.id}:${user.photo ?? 'none'}`}
+      onClose={onClose}
+      user={user}
+      onUpdate={onUpdate}
+    />
+  )
+}
+
+function ProfileForm({ onClose, user, onUpdate }: Omit<Props, 'isOpen'>) {
   const [name, setName] = useState(user.name)
   const [email, setEmail] = useState(user.email)
   const [password, setPassword] = useState('')
   const [photoFile, setPhotoFile] = useState<File | null>(null)
   const [previewUrl, setPreviewUrl] = useState<string>(resolvePhotoUrl(user.photo, user.name))
   const [removePhoto, setRemovePhoto] = useState(false)
+  const [photoFailed, setPhotoFailed] = useState(false)
 
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
@@ -27,18 +40,19 @@ export function EditProfileModal({ isOpen, onClose, user, onUpdate }: Props) {
   const previousFocusRef = useRef<HTMLElement | null>(null)
 
   useEffect(() => {
-    if (isOpen) {
-      previousFocusRef.current = document.activeElement as HTMLElement
-      setTimeout(() => {
-        const focusable = modalRef.current?.querySelector<HTMLElement>(
-            'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
-        )
-        focusable?.focus()
-      }, 50)
-    } else {
+    previousFocusRef.current = document.activeElement as HTMLElement
+    const focusTimer = setTimeout(() => {
+      const focusable = modalRef.current?.querySelector<HTMLElement>(
+          'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+      )
+      focusable?.focus()
+    }, 50)
+
+    return () => {
+      clearTimeout(focusTimer)
       previousFocusRef.current?.focus()
     }
-  }, [isOpen])
+  }, [])
 
   const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
     if (e.key !== 'Tab') return
@@ -63,12 +77,10 @@ export function EditProfileModal({ isOpen, onClose, user, onUpdate }: Props) {
     }
   }, [])
 
-  if (!isOpen) return null
-
-
   const handleRemovePhotoClick = () => {
     setPhotoFile(null)
     setRemovePhoto(true)
+    setPhotoFailed(false)
     setPreviewUrl(resolvePhotoUrl(null, name))
   }
 
@@ -77,6 +89,7 @@ export function EditProfileModal({ isOpen, onClose, user, onUpdate }: Props) {
     if (file) {
       setPhotoFile(file)
       setRemovePhoto(false)
+      setPhotoFailed(false)
       setPreviewUrl(URL.createObjectURL(file))
     }
   }
@@ -109,9 +122,11 @@ export function EditProfileModal({ isOpen, onClose, user, onUpdate }: Props) {
           const textResponse = await photoRes.text()
           let photoPath = textResponse
           try {
-            const jsonObj = JSON.parse(textResponse)
+            const jsonObj = JSON.parse(textResponse) as { photo?: string; photoUrl?: string; path?: string }
             photoPath = jsonObj.photo || jsonObj.photoUrl || jsonObj.path || textResponse
-          } catch (e) {}
+          } catch {
+            photoPath = textResponse
+          }
 
           updatedUser = { ...updatedUser, photo: photoPath }
         } else {
@@ -131,8 +146,8 @@ export function EditProfileModal({ isOpen, onClose, user, onUpdate }: Props) {
       }
       onUpdate(updatedUser)
       onClose()
-    } catch (err: any) {
-      setError(err.message)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Não foi possível salvar as alterações.')
     } finally {
       setLoading(false)
     }
@@ -145,7 +160,7 @@ export function EditProfileModal({ isOpen, onClose, user, onUpdate }: Props) {
         method: 'DELETE',
       })
       if (res.ok) window.location.href = '/'
-    } catch (err) {
+    } catch {
       alert('Erro ao deletar conta')
     }
   }
@@ -158,53 +173,74 @@ export function EditProfileModal({ isOpen, onClose, user, onUpdate }: Props) {
           aria-labelledby="edit-profile-title"
           onKeyDown={handleKeyDown}
       >
-        <div ref={modalRef} className="bg-surface-container border border-outline-variant w-full max-w-2xl rounded-xl shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-200">
+        <div ref={modalRef} className="card-surface max-h-[90vh] w-full max-w-2xl overflow-y-auto p-0">
 
-          {/* Modal Header */}
-          <div className="p-lg border-b border-outline-variant flex justify-between items-center bg-surface-container-high">
+          <div className="flex items-start justify-between gap-4 border-b border-outline-variant px-6 py-5">
             <div>
-              <h2 id="edit-profile-title" className="text-h3 font-h3 font-bold text-on-surface">Editar Perfil</h2>
-              <p className="text-label font-label text-on-surface-variant uppercase tracking-wider">Atualize suas informações</p>
+              <h2 id="edit-profile-title" className="font-serif text-2xl text-primary">Editar Perfil</h2>
+              <p className="mt-1 font-mono text-xs uppercase tracking-widest text-on-surface-variant">Atualize suas informações</p>
             </div>
-            <button onClick={onClose} aria-label="Fechar modal" className="text-on-surface-variant hover:text-primary transition-colors p-xs rounded-lg">
-              <span className="material-symbols-outlined">close</span>
+            <button
+              onClick={onClose}
+              aria-label="Fechar modal"
+              className="-mr-1 -mt-1 p-1 text-on-surface-variant transition-colors hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+            >
+              <span className="material-symbols-outlined text-xl" aria-hidden="true">close</span>
             </button>
           </div>
 
-          <form onSubmit={handleSave} className="p-lg space-y-xl overflow-y-auto max-h-[80vh]">
+          <form onSubmit={handleSave} className="space-y-8 px-6 py-6">
 
-            {/* Avatar Section */}
-            <div className="flex flex-col md:flex-row items-center gap-lg border-b border-outline-variant pb-lg">
-              <div className="relative group">
-                <div className="w-28 h-28 rounded-full border-4 border-primary/20 p-1 overflow-hidden shadow-md">
-                  <img alt="User Avatar" className="w-full h-full rounded-full object-cover" src={previewUrl} />
+            <div className="flex flex-col items-start gap-6 border-b border-outline-variant pb-6 sm:flex-row sm:items-center">
+              <div className="relative">
+                <div className="h-24 w-24 overflow-hidden border border-outline-variant bg-surface-container">
+                  {photoFailed ? (
+                    <span className="flex h-full w-full items-center justify-center" aria-hidden="true">
+                      <span className="material-symbols-outlined text-4xl text-outline">person</span>
+                    </span>
+                  ) : (
+                    <img
+                      alt={`Foto de perfil de ${name}`}
+                      className="h-full w-full object-cover"
+                      src={previewUrl}
+                      onError={() => setPhotoFailed(true)}
+                    />
+                  )}
                 </div>
-                <label className="absolute bottom-1 right-1 bg-primary text-on-primary p-1.5 rounded-full cursor-pointer hover:scale-110 transition-transform shadow-lg border-2 border-surface-container" htmlFor="avatar-upload">
-                  <span className="material-symbols-outlined text-[20px]">photo_camera</span>
+                <label
+                  className="absolute -bottom-2 -right-2 flex h-8 w-8 cursor-pointer items-center justify-center border border-outline-variant bg-primary text-on-primary transition-opacity hover:opacity-90 focus-within:ring-2 focus-within:ring-primary focus-within:ring-offset-2 focus-within:ring-offset-background"
+                  htmlFor="avatar-upload"
+                >
+                  <span className="sr-only">Escolher nova foto</span>
+                  <span className="material-symbols-outlined text-lg" aria-hidden="true">photo_camera</span>
                 </label>
-                <input className="hidden" id="avatar-upload" type="file" accept="image/*" onChange={handlePhotoChange} />
+                <input className="sr-only" id="avatar-upload" type="file" accept="image/*" onChange={handlePhotoChange} />
               </div>
-              <div className="text-center md:text-left flex-1">
-                <h3 className="text-h3 font-h3 font-semibold text-on-surface">Sua Foto</h3>
-                <p className="text-body-sm font-body-sm text-on-surface-variant mb-2">JPG ou PNG • Máx 2MB</p>
 
-                {}
-                <div className="flex gap-2 justify-center md:justify-start">
-                  <label htmlFor="avatar-upload" className="btn-secondary !h-9 !px-md !text-[12px] cursor-pointer">Trocar Foto</label>
-                  {(user.photo || previewUrl !== resolvePhotoUrl(null, name)) && (
-                      <button type="button" onClick={handleRemovePhotoClick} className="btn-danger !h-9 !px-md !text-[12px]">Remover</button>
+              <div className="min-w-0 flex-1">
+                <h3 className="text-base text-primary">Sua Foto</h3>
+                <p className="mt-1 text-sm text-on-surface-variant">JPG ou PNG, até 2MB</p>
+                {photoFailed && (
+                  <p className="mt-2 text-sm text-error" role="status">
+                    Não foi possível carregar a imagem atual. Envie uma nova ou remova a foto.
+                  </p>
+                )}
+
+                <div className="mt-4 flex flex-wrap gap-3">
+                  <label htmlFor="avatar-upload" className="btn-secondary cursor-pointer">Trocar Foto</label>
+                  {(user.photo || removePhoto) && (
+                      <button type="button" onClick={handleRemovePhotoClick} className="btn-secondary">Remover</button>
                   )}
                 </div>
               </div>
             </div>
 
-            {/* Form Fields */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-lg">
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
               <div>
                 <label className="form-label" htmlFor="edit-name">Nome Completo</label>
                 <input
                     id="edit-name"
-                    className="input-field"
+                    className="input-field mt-2"
                     type="text"
                     value={name}
                     onChange={e => setName(e.target.value)}
@@ -215,48 +251,53 @@ export function EditProfileModal({ isOpen, onClose, user, onUpdate }: Props) {
                 <label className="form-label" htmlFor="edit-email">E-mail</label>
                 <input
                     id="edit-email"
-                    className="input-field"
+                    className="input-field mt-2"
                     type="email"
                     value={email}
                     onChange={e => setEmail(e.target.value)}
                     required
                 />
               </div>
-              <div className="md:col-span-2">
+              <div className="sm:col-span-2">
                 <label className="form-label" htmlFor="edit-password">Nova Senha (opcional)</label>
                 <input
                     id="edit-password"
-                    className="input-field"
+                    className="input-field mt-2"
                     type="password"
-                    placeholder="••••••••"
+                    placeholder="Deixe em branco para manter a atual"
                     value={password}
                     onChange={e => setPassword(e.target.value)}
+                    aria-describedby="edit-password-hint"
                 />
+                <p id="edit-password-hint" className="mt-2 text-xs text-on-surface-variant">
+                  Só preencha se quiser trocar a senha da conta.
+                </p>
               </div>
             </div>
 
-            {error && <p className="text-body-sm font-body-sm text-error font-semibold" role="alert">{error}</p>}
+            {error && (
+              <p className="border border-error px-4 py-3 text-sm text-error" role="alert">{error}</p>
+            )}
 
-            {/* Footer Actions */}
-            <div className="pt-lg border-t border-outline-variant flex flex-col md:flex-row items-center justify-between gap-4">
-              <div className="flex gap-md w-full md:w-auto">
-                <button
-                    type="submit"
-                    disabled={loading}
-                    className="btn-primary flex-1 md:flex-none"
-                >
-                  {loading ? 'Salvando...' : 'Salvar Alterações'}
-                </button>
-                <button type="button" onClick={onClose} className="btn-secondary hidden md:inline-flex">Cancelar</button>
-              </div>
+            <div className="flex flex-col-reverse items-stretch justify-between gap-4 border-t border-outline-variant pt-6 sm:flex-row sm:items-center">
               <button
                   type="button"
                   onClick={handleDeleteAccount}
                   className="btn-danger"
               >
-                <span className="material-symbols-outlined text-[18px]">delete</span>
+                <span className="material-symbols-outlined text-lg" aria-hidden="true">delete</span>
                 Deletar Conta
               </button>
+              <div className="flex flex-col gap-3 sm:flex-row">
+                <button type="button" onClick={onClose} className="btn-secondary">Cancelar</button>
+                <button
+                    type="submit"
+                    disabled={loading}
+                    className="btn-primary"
+                >
+                  {loading ? 'Salvando...' : 'Salvar Alterações'}
+                </button>
+              </div>
             </div>
           </form>
         </div>

@@ -1,6 +1,5 @@
 import { useEffect, useMemo } from 'react'
 import { AccessibilityToolbar } from './components/AccessibilityToolbar'
-import { BackgroundDecor } from './components/BackgroundDecor'
 import { LoginPage } from './pages/LoginPage'
 import { RegisterPage } from './pages/RegisterPage'
 import { ProfilePage } from './pages/ProfilePage'
@@ -45,7 +44,7 @@ export default function App() {
   }, [pageTitle])
 
   return (
-    <div className="bg-background font-body-md text-on-background min-h-screen flex flex-col antialiased">
+    <div className="flex min-h-screen flex-col bg-background font-sans text-on-background antialiased selection:bg-primary selection:text-on-primary">
       <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[999] focus:px-4 focus:py-2 focus:bg-primary focus:text-on-primary focus:rounded-lg focus:shadow-lg focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background">
         Pular para o conteúdo principal
       </a>
@@ -67,7 +66,6 @@ export default function App() {
       ) : (
         <LoginPage registered={registered} />
       )}
-      <BackgroundDecor />
       <AccessibilityToolbar />
       </div>
     </div>

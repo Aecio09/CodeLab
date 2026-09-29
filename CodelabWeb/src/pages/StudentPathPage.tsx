@@ -3,7 +3,8 @@ import { API_BASE_URL } from '../constants'
 import { authFetch, apiLogout } from '../lib/api'
 import type { TopicStatus, UserProfile } from '../types'
 import { EditProfileModal } from '../components/EditProfileModal'
-import {resolvePhotoUrl} from "../utils.ts";
+import { AppSidebar } from '../components/AppSidebar'
+import { resolvePhotoUrl } from '../utils.ts'
 
 const TOPIC_METADATA: Record<string, { label: string; icon: string }> = {
   OPERADORES_TIPOS_E_VARIAVEIS: { label: 'Variáveis e Tipos', icon: 'variables' },
@@ -16,11 +17,168 @@ const TOPIC_METADATA: Record<string, { label: string; icon: string }> = {
   TIPOS_CRIADOS_PELO_PROGRAMADOR: { label: 'Estruturas', icon: 'account_tree' },
 }
 
+type LessonState = 'COMPLETED' | 'AVAILABLE' | 'LOCKED'
+
+const LESSON_STATE_LABEL: Record<LessonState, string> = {
+  COMPLETED: 'Concluída',
+  AVAILABLE: 'Atual',
+  LOCKED: 'Bloqueada',
+}
+
+const LESSON_STATE_ICON: Record<LessonState, string> = {
+  COMPLETED: 'check',
+  AVAILABLE: 'play_arrow',
+  LOCKED: 'lock',
+}
+
+function getLessonStates(unit: TopicStatus): LessonState[] {
+  return Array.from({ length: unit.totalLessons }, (_, index) => {
+    const lessonNum = index + 1
+    if (unit.status === 'COMPLETED') return 'COMPLETED'
+    if (unit.status !== 'AVAILABLE') return 'LOCKED'
+    if (lessonNum < unit.currentLesson) return 'COMPLETED'
+    if (lessonNum === unit.currentLesson) return 'AVAILABLE'
+    return 'LOCKED'
+  })
+}
+
+function getMasteryPercent(unit: TopicStatus): number {
+  const total = unit.totalLessons * 2
+  if (total === 0) return 0
+  return Math.min(100, Math.round((unit.totalActivitiesCompleted / total) * 100))
+}
+
+function StatBadge({
+  icon,
+  value,
+  accent,
+  label,
+}: {
+  icon: string
+  value: string | number
+  accent: string
+  label: string
+}) {
+  return (
+    <div className="flex items-center gap-2 border border-outline-variant px-3 py-1.5">
+      <span
+        className={`material-symbols-outlined text-lg ${accent}`}
+        style={{ fontVariationSettings: "'FILL' 1" }}
+        aria-hidden="true"
+      >
+        {icon}
+      </span>
+      <span className="font-mono text-sm text-primary">{value}</span>
+      <span className="sr-only">{label}</span>
+    </div>
+  )
+}
+
+function LessonRow({
+  unit,
+  lessonNum,
+  state,
+  isFirst,
+  isLast,
+  connectorSolid,
+  topicIcon,
+  onNavigate,
+}: {
+  unit: TopicStatus
+  lessonNum: number
+  state: LessonState
+  isFirst: boolean
+  isLast: boolean
+  connectorSolid: boolean
+  topicIcon: string
+  onNavigate: (topicKey: string) => void
+}) {
+  const locked = state === 'LOCKED'
+  const isCurrent = state === 'AVAILABLE'
+
+  const nodeClass = state === 'COMPLETED'
+    ? 'border-primary bg-primary text-on-primary'
+    : isCurrent
+      ? 'border-primary bg-background text-primary'
+      : 'border-outline-variant bg-background text-on-surface-variant'
+
+  const nodeIcon = state === 'COMPLETED' ? 'check' : locked ? 'lock' : topicIcon
+
+  const rowBody = (
+    <>
+      <div className="relative flex w-10 shrink-0 self-stretch justify-center">
+        {!isFirst && (
+          <span
+            aria-hidden="true"
+            className={`absolute left-1/2 top-0 w-px -translate-x-1/2 ${isLast ? 'h-1/2' : 'h-full'} ${
+              connectorSolid ? 'bg-primary' : 'bg-outline-variant'
+            }`}
+          />
+        )}
+        <span
+          aria-hidden="true"
+          className={`relative z-10 mt-0.5 flex h-10 w-10 items-center justify-center rounded-full border ${nodeClass}`}
+        >
+          <span className="material-symbols-outlined text-lg">{nodeIcon}</span>
+        </span>
+      </div>
+
+      <div className="min-w-0 flex-1 pb-8">
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
+          <span className="font-mono text-xs text-on-surface-variant">
+            {String(lessonNum).padStart(2, '0')}
+          </span>
+          <span className={`text-lg ${isCurrent ? 'text-primary' : 'text-on-surface'}`}>
+            Lição {String(lessonNum).padStart(2, '0')}
+          </span>
+          <span className="ml-auto flex items-center gap-1.5 text-xs uppercase tracking-widest text-on-surface-variant">
+            <span className="material-symbols-outlined text-sm" aria-hidden="true">
+              {LESSON_STATE_ICON[state]}
+            </span>
+            {LESSON_STATE_LABEL[state]}
+          </span>
+        </div>
+
+        {isCurrent && (
+          <div className="mt-3 flex flex-wrap items-center gap-4">
+            <span className="flex items-center gap-2 border border-primary bg-primary px-3 py-1.5 text-sm text-on-primary">
+              Continuar
+              <span className="material-symbols-outlined text-base" aria-hidden="true">arrow_forward</span>
+            </span>
+            <span className="font-mono text-xs text-on-surface-variant">
+              {unit.currentLesson} de {unit.totalLessons}
+            </span>
+          </div>
+        )}
+      </div>
+    </>
+  )
+
+  if (locked) {
+    return (
+      <li className="flex gap-5">{rowBody}</li>
+    )
+  }
+
+  return (
+    <li>
+      <button
+        type="button"
+        onClick={() => onNavigate(unit.topicName)}
+        className="flex w-full gap-5 rounded-none text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-4 focus-visible:ring-offset-background"
+      >
+        {rowBody}
+      </button>
+    </li>
+  )
+}
+
 export function StudentPathPage() {
   const [user, setUser] = useState<UserProfile | null>(null)
   const [progress, setProgress] = useState<TopicStatus[]>([])
   const [loading, setLoading] = useState(true)
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false)
+  const [avatarFailed, setAvatarFailed] = useState(false)
 
   useEffect(() => {
     const fetchData = async () => {
@@ -29,6 +187,7 @@ export function StudentPathPage() {
         if (!userRes.ok) throw new Error('Não autenticado')
         const userData = (await userRes.json()) as UserProfile
         setUser(userData)
+        setAvatarFailed(false)
 
         const progressRes = await authFetch(`${API_BASE_URL}/api/trail/progress`)
         if (progressRes.ok) {
@@ -66,213 +225,114 @@ export function StudentPathPage() {
 
   if (loading || !user)
     return (
-      <div className="flex min-h-screen items-center justify-center bg-background text-primary animate-pulse font-mono" role="status" aria-live="polite">
-        Carregando Sua Jornada...
+      <div className="flex min-h-screen items-center justify-center bg-background font-mono text-primary" role="status" aria-live="polite">
+        Carregando sua trilha...
       </div>
     )
 
-  // Pattern offset in pixels
-  const getXOffset = (index: number) => {
-    const pattern = [0, 80, 140, 80, 0, -80, -140, -80]
-    return pattern[index % pattern.length]
-  }
-
-  // Vertical math: py-32 (128px) + half bubble (48px) + index * (bubble 96px + gap 128px)
-  const getNodeY = (index: number) => 128 + 48 + index * 224
-
   return (
-    <div className="flex min-h-screen w-full bg-background text-on-surface font-sans absolute top-0 left-0 z-50 overflow-x-hidden">
-      
-      {/* Neon Background Glows */}
-      <div className="fixed top-0 left-0 w-[600px] h-[600px] bg-primary/10 rounded-full blur-[140px] -translate-x-1/2 -translate-y-1/2 pointer-events-none z-0"></div>
-      <div className="fixed top-0 right-0 w-[600px] h-[600px] bg-primary/10 rounded-full blur-[140px] translate-x-1/2 -translate-y-1/2 pointer-events-none z-0"></div>
+    <div className="flex h-screen w-full overflow-hidden bg-background font-sans text-on-surface">
+      <AppSidebar
+        items={[
+          { key: 'trilha', label: 'Minha Trilha', icon: 'map', href: '/trilha' },
+          { key: 'playground', label: 'Playground', icon: 'terminal', href: '/playground' },
+          { key: 'perfil', label: 'Meu Perfil', icon: 'account_circle', onClick: () => setIsProfileModalOpen(true) },
+        ]}
+        activeKey="trilha"
+        onLogout={handleLogout}
+      />
 
-      {/* Sidebar do Estudante */}
-      <aside className="fixed left-0 top-0 h-full flex flex-col py-6 px-4 border-r border-outline-variant bg-surface-container-low w-64 z-[60]">
-        <div className="flex items-center gap-3 mb-8 px-2">
-          <div className="w-10 h-10 rounded-lg bg-primary flex items-center justify-center shadow-md">
-            <span className="material-symbols-outlined text-on-primary">terminal</span>
+      <main className="ml-[var(--sidebar-w)] flex h-screen min-w-0 flex-1 flex-col">
+        <header className="flex h-16 shrink-0 items-center justify-between border-b border-outline-variant px-8">
+          <div className="flex items-center gap-3">
+            <StatBadge icon="local_fire_department" accent="text-orange-500" value={user.userStreak} label="dias de sequência" />
+            <StatBadge icon="stars" accent="text-yellow-500" value={Math.floor(user.userPoints)} label="pontos acumulados" />
           </div>
-          <div>
-            <h1 className="text-lg font-h2 font-bold text-primary tracking-tight">CodeLab</h1>
-          </div>
-        </div>
-        <nav className="flex-1 space-y-1" aria-label="Navegação principal">
-          <a className="w-full flex items-center gap-3 bg-secondary-container text-on-secondary-container rounded-lg px-4 py-2 text-left font-semibold text-sm" href="/trilha" aria-current="page">
-            <span className="material-symbols-outlined">map</span>
-            Minha Trilha
-          </a>
-          <a
-            href="/playground"
-            className="w-full flex items-center gap-3 text-on-surface-variant hover:text-on-surface px-4 py-2 hover:bg-surface-container-highest rounded-lg text-left font-semibold text-sm transition-all"
-          >
-            <span className="material-symbols-outlined">terminal</span>
-            Playground
-          </a>
-          <button
-            onClick={() => setIsProfileModalOpen(true)}
-            className="w-full flex items-center gap-3 text-on-surface-variant hover:text-on-surface px-4 py-2 hover:bg-surface-container-highest rounded-lg text-left font-semibold text-sm transition-all"
-          >
-            <span className="material-symbols-outlined">account_circle</span>
-            Meu Perfil
-          </button>
-        </nav>
-        <div className="mt-auto pt-4 border-t border-outline-variant">
-          <button
-            onClick={handleLogout}
-            className="btn-danger w-full !h-10"
-          >
-            <span className="material-symbols-outlined text-[18px]">logout</span>
-            Sair
-          </button>
-        </div>
-      </aside>
 
-      {/* Painel Central */}
-      <main className="flex-1 ml-64 flex flex-col relative min-h-screen z-10">
-        <header className="sticky top-0 z-[60] w-full flex justify-between items-center h-16 px-8 bg-background/80 backdrop-blur-md border-b border-outline-variant">
-          <div className="flex items-center gap-6">
-            <div className="flex items-center gap-2 bg-surface-container px-4 py-1.5 rounded-full border border-outline-variant shadow-inner">
-              <span className="material-symbols-outlined text-orange-500" style={{ fontVariationSettings: "'FILL' 1" }}>local_fire_department</span>
-              <span className="text-md font-black text-on-surface">{user.userStreak}</span>
-            </div>
-            <div className="flex items-center gap-2 bg-surface-container px-4 py-1.5 rounded-full border border-outline-variant shadow-inner">
-              <span className="material-symbols-outlined text-yellow-500" style={{ fontVariationSettings: "'FILL' 1" }}>stars</span>
-              <span className="text-md font-black text-on-surface">{Math.floor(user.userPoints)}</span>
-            </div>
-          </div>
-          <div className="flex items-center gap-4">
-            <button
-              onClick={() => setIsProfileModalOpen(true)}
-              className="w-10 h-10 rounded-full border-2 border-primary/50 p-0.5 overflow-hidden transition-all hover:border-primary hover:scale-105 active:scale-95"
-            >
-              <img alt="Profile" className="w-full h-full rounded-full object-cover" src={resolvePhotoUrl(user?.photo, user?.name)} />
-            </button>
-          </div>
+      <button
+        onClick={() => setIsProfileModalOpen(true)}
+        className="h-10 w-10 overflow-hidden border border-outline-variant transition-colors hover:border-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+      >
+        <span className="sr-only">Abrir meu perfil</span>
+        {avatarFailed ? (
+          <span className="flex h-full w-full items-center justify-center" aria-hidden="true">
+            <span className="material-symbols-outlined text-xl text-outline">person</span>
+          </span>
+        ) : (
+          <img
+            alt=""
+            className="h-full w-full object-cover"
+            src={resolvePhotoUrl(user?.photo, user?.name)}
+            onError={() => setAvatarFailed(true)}
+          />
+        )}
+      </button>
         </header>
 
-        <div className="flex-1 w-full">
+        <div className="flex-1 overflow-y-auto pb-16">
           {progress.map((unit, unitIndex) => {
             const meta = TOPIC_METADATA[unit.topicName] || { label: unit.topicName, icon: 'help' }
-            const unitProgress = (unit.totalActivitiesCompleted / (unit.totalLessons * 2)) * 100
+            const states = getLessonStates(unit)
+            const completedCount = states.filter((state) => state === 'COMPLETED').length
+            const mastery = getMasteryPercent(unit)
             const isUnitLocked = unit.status === 'LOCKED'
 
             return (
-              <section key={unit.topicName} className={`relative ${isUnitLocked ? 'opacity-30 grayscale pointer-events-none' : ''}`}>
-                
-                {/* Full-width Unit Header */}
-                <div className="sticky top-16 z-50 w-full bg-surface-container-low/95 backdrop-blur-md py-6 px-12 border-b border-outline-variant shadow-xl">
-                  <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-                    <div className="flex-1">
-                       <span className="text-[10px] text-primary uppercase tracking-[0.4em] font-black block mb-1 opacity-80">Unidade {unitIndex + 1}</span>
-                       <h2 className="text-2xl font-black text-on-surface uppercase tracking-tight italic">{meta.label}</h2>
+              <section key={unit.topicName} className="border-b border-outline-variant last:border-b-0">
+                <div className="sticky top-0 z-20 border-b border-outline-variant bg-background px-8 py-5">
+                  <div className="flex flex-wrap items-end justify-between gap-x-8 gap-y-4">
+                    <div className="min-w-0">
+                      <p className="flex items-center gap-2 font-mono text-xs uppercase tracking-[0.3em] text-on-surface-variant">
+                        Unidade {String(unitIndex + 1).padStart(2, '0')}
+                        {isUnitLocked && (
+                          <span className="flex items-center gap-1">
+                            <span className="material-symbols-outlined text-sm" aria-hidden="true">lock</span>
+                            Bloqueada
+                          </span>
+                        )}
+                      </p>
+                      <h2 className="mt-1 font-serif text-2xl text-primary">{meta.label}</h2>
                     </div>
-                    <div className="flex-1 max-w-sm">
-                       <div className="flex justify-between items-end mb-1.5">
-                          <span className="text-[10px] text-on-surface-variant uppercase font-black tracking-widest">Maestria</span>
-                          <span className="text-[10px] text-primary font-black tracking-tighter bg-primary/10 px-2 py-0.5 rounded">{Math.round(unitProgress)}%</span>
-                       </div>
-                       <div className="w-full bg-background h-2 rounded-full overflow-hidden border border-outline-variant">
-                         <div 
-                           className="bg-primary h-full transition-all duration-1000 shadow-sm" 
-                           style={{ width: `${unitProgress}%` }}
-                         ></div>
-                       </div>
+
+                    <div className="w-full max-w-xs shrink-0">
+                      <div className="flex items-baseline justify-between font-mono text-xs text-on-surface-variant">
+                        <span>{completedCount} de {unit.totalLessons} lições</span>
+                        <span>{mastery}%</span>
+                      </div>
+                      <div className="mt-2 h-1 w-full bg-outline-variant">
+                        <div
+                          className="h-full bg-primary transition-[width] duration-500"
+                          style={{ width: `${mastery}%` }}
+                        />
+                      </div>
                     </div>
                   </div>
                 </div>
 
-                {/* Path Area */}
-                <div className="relative py-32 flex flex-col items-center gap-32 min-h-[500px]">
-                  
-                  {/* SVG Path - Accurate Geometry */}
-                  {!isUnitLocked && (
-                    <svg className="absolute top-0 left-1/2 -translate-x-1/2 w-[400px] h-full pointer-events-none z-0" preserveAspectRatio="none">
-                      <path
-                        className="stroke-surface-container-high stroke-[12] fill-none"
-                        d={`M ${200 + getXOffset(0)},176 ${Array.from({ length: unit.totalLessons - 1 }).map((_, i) => {
-                          const x1 = 200 + getXOffset(i)
-                          const y1 = getNodeY(i)
-                          const x2 = 200 + getXOffset(i + 1)
-                          const y2 = getNodeY(i + 1)
-                          return `C ${x1},${y1 + 112} ${x2},${y1 + 112} ${x2},${y2}`
-                        }).join(' ')}`}
-                      />
-                      <path
-                        className="stroke-primary stroke-[4] fill-none opacity-30"
-                        style={{ strokeDasharray: '12 12' }}
-                        d={`M ${200 + getXOffset(0)},176 ${Array.from({ length: unit.totalLessons - 1 }).map((_, i) => {
-                          const x1 = 200 + getXOffset(i)
-                          const y1 = getNodeY(i)
-                          const x2 = 200 + getXOffset(i + 1)
-                          const y2 = getNodeY(i + 1)
-                          return `C ${x1},${y1 + 112} ${x2},${y1 + 112} ${x2},${y2}`
-                        }).join(' ')}`}
-                      />
-                    </svg>
-                  )}
-
-                  {Array.from({ length: unit.totalLessons }).map((_, lessonIdx) => {
-                    const lessonNum = lessonIdx + 1
-                    let lessonStatus: 'COMPLETED' | 'AVAILABLE' | 'LOCKED' = 'LOCKED'
-                    
-                    if (unit.status === 'COMPLETED') {
-                      lessonStatus = 'COMPLETED'
-                    } else if (unit.status === 'AVAILABLE') {
-                      if (lessonNum < unit.currentLesson) lessonStatus = 'COMPLETED'
-                      else if (lessonNum === unit.currentLesson) lessonStatus = 'AVAILABLE'
-                    }
-
-                    const xOffsetPx = getXOffset(lessonIdx)
-                    const isCompleted = lessonStatus === 'COMPLETED'
-                    const isAvailable = lessonStatus === 'AVAILABLE'
-
-                    return (
-                      <div 
-                        key={`${unit.topicName}-${lessonNum}`} 
-                        className="relative z-10"
-                        style={{ transform: `translateX(${xOffsetPx}px)` }}
-                      >
-                        <button
-                          disabled={lessonStatus === 'LOCKED'}
-                          onClick={() => handleNavigateToPlayground(unit.topicName)}
-                          className={`
-                            relative w-24 h-24 rounded-full flex items-center justify-center shadow-2xl transition-all duration-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-surface border-4 cursor-pointer
-                            ${lessonStatus === 'LOCKED' ? 'bg-surface-container-low border-surface-container-highest text-outline cursor-not-allowed scale-90' : 
-                              isCompleted ? 'bg-primary border-primary/20 text-on-primary hover:scale-110 shadow-md' : 
-                              'bg-primary-container border-primary text-on-surface hover:scale-110 shadow-lg animate-pulse'}
-                          `}
-                        >
-                          <span className="material-symbols-outlined text-[42px]">
-                            {lessonStatus === 'LOCKED' ? 'lock' : (isCompleted ? 'check' : meta.icon)}
-                          </span>
-
-                          <div className={`absolute -bottom-1 -right-1 w-10 h-10 rounded-full border-2 flex items-center justify-center text-[10px] font-black
-                            ${lessonStatus === 'LOCKED' ? 'bg-surface-container border-surface-container-highest text-outline' : 'bg-background border-primary text-primary shadow-lg'}
-                          `}>
-                            {lessonNum}
-                          </div>
-                        </button>
-                        
-                        {isAvailable && (
-                          <div className="absolute top-1/2 -translate-y-1/2 left-full ml-8 whitespace-nowrap bg-primary text-on-primary px-4 py-2 rounded-xl text-[10px] font-black shadow-lg animate-bounce">
-                            LIÇÃO ATUAL
-                            <div className="absolute top-1/2 -left-2 -translate-y-1/2 w-4 h-4 bg-primary rotate-45"></div>
-                          </div>
-                        )}
-                      </div>
-                    )
-                  })}
-                </div>
+                <ol className="px-8 pt-8">
+                  {states.map((state, lessonIdx) => (
+                    <LessonRow
+                      key={`${unit.topicName}-${lessonIdx + 1}`}
+                      unit={unit}
+                      lessonNum={lessonIdx + 1}
+                      state={state}
+                      isFirst={lessonIdx === 0}
+                      isLast={lessonIdx === states.length - 1}
+                      connectorSolid={lessonIdx > 0 && states[lessonIdx - 1] === 'COMPLETED'}
+                      topicIcon={meta.icon}
+                      onNavigate={handleNavigateToPlayground}
+                    />
+                  ))}
+                </ol>
               </section>
             )
           })}
         </div>
       </main>
 
-      <EditProfileModal 
-        isOpen={isProfileModalOpen} 
-        onClose={() => setIsProfileModalOpen(false)} 
+      <EditProfileModal
+        isOpen={isProfileModalOpen}
+        onClose={() => setIsProfileModalOpen(false)}
         user={user}
         onUpdate={(updated) => setUser(updated)}
       />

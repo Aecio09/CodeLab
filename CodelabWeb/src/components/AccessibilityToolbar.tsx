@@ -54,113 +54,107 @@ export function AccessibilityToolbar() {
     })
   }, [])
 
+  const toggleClass = (active: boolean) =>
+    `w-full flex items-center justify-between px-3 py-2.5 border transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary ${
+      active
+        ? 'bg-primary text-on-primary border-primary'
+        : 'bg-background text-on-surface border-outline-variant hover:border-outline'
+    }`
+
+  const checkMark = (active: boolean) => (
+    <span
+      className={`w-4 h-4 border-2 flex items-center justify-center transition-colors ${
+        active ? 'bg-on-primary border-on-primary' : 'border-outline'
+      }`}
+    >
+      {active && <span className="material-symbols-outlined text-[12px] text-primary" style={{ fontVariationSettings: "'FILL' 1" }}>check</span>}
+    </span>
+  )
+
   return (
     <>
       <button
         onClick={() => setOpen(!open)}
-        className="fixed bottom-6 right-6 z-[9999] w-14 h-14 rounded-full bg-primary text-on-primary shadow-2xl flex items-center justify-center hover:scale-110 active:scale-95 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+        className="fixed bottom-6 right-6 z-[9999] w-12 h-12 flex items-center justify-center bg-primary text-on-primary shadow-2xl transition-transform duration-150 hover:scale-110 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background"
         aria-label="Abrir recursos de acessibilidade"
         aria-expanded={open}
       >
-        <span className="material-symbols-outlined text-[28px]" style={{ fontVariationSettings: "'FILL' 1" }}>accessibility_new</span>
+        <span className="material-symbols-outlined text-2xl" style={{ fontVariationSettings: "'FILL' 1" }}>accessibility_new</span>
       </button>
 
       {open && (
         <div
-          className="fixed bottom-24 right-6 z-[9999] w-72 bg-surface-container border border-outline-variant rounded-2xl shadow-2xl p-4 animate-in fade-in slide-in-from-bottom-4 duration-200"
+          className="fixed bottom-24 right-6 z-[9999] w-72 bg-surface-container border border-outline-variant p-4 shadow-2xl animate-panel-in"
           role="dialog"
           aria-label="Recursos de acessibilidade"
         >
-          <div className="flex items-center justify-between mb-3">
-            <h3 className="font-h3 text-h3 text-on-surface font-bold">Acessibilidade</h3>
+          <div className="mb-3 flex items-center justify-between">
+            <h3 className="text-xs font-semibold uppercase tracking-widest text-on-surface">Acessibilidade</h3>
             <button
               onClick={() => setOpen(false)}
-              className="text-on-surface-variant hover:text-on-surface p-1 rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+              className="p-1 text-on-surface-variant transition-colors hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
               aria-label="Fechar painel de acessibilidade"
             >
-              <span className="material-symbols-outlined">close</span>
+              <span className="material-symbols-outlined" aria-hidden="true">close</span>
             </button>
           </div>
 
-          <div className="space-y-3">
-            {/* Fonte */}
+          <div className="space-y-2">
             <button
               onClick={cycleFontSize}
-              className="w-full flex items-center justify-between px-3 py-2.5 bg-surface-container-highest rounded-xl hover:brightness-110 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+              className="flex items-center justify-between border border-outline-variant bg-background px-3 py-2.5 text-on-surface transition-colors hover:border-outline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
               aria-label={`Tamanho da fonte: ${FONT_SIZE_LABELS[settings.fontSize]}. Clique para alternar.`}
             >
               <div className="flex items-center gap-2">
-                <span className="material-symbols-outlined text-on-surface-variant">text_fields</span>
-                <span className="font-body-sm text-body-sm text-on-surface">Fonte</span>
+                <span className="material-symbols-outlined text-on-surface-variant" aria-hidden="true">text_fields</span>
+                <span className="text-sm">Fonte</span>
               </div>
-              <span className="font-label text-label text-primary font-semibold">{FONT_SIZE_LABELS[settings.fontSize]}</span>
+              <span className="font-mono text-xs text-primary">{FONT_SIZE_LABELS[settings.fontSize]}</span>
             </button>
 
-            {/* Alto Contraste */}
             <button
               onClick={() => update({ highContrast: !settings.highContrast })}
-              className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary ${
-                settings.highContrast ? 'bg-primary/20 text-primary border border-primary/50' : 'bg-surface-container-highest hover:brightness-110'
-              }`}
+              className={toggleClass(settings.highContrast)}
               aria-pressed={settings.highContrast}
               aria-label={`Alto contraste: ${settings.highContrast ? 'ativado' : 'desativado'}`}
             >
               <div className="flex items-center gap-2">
-                <span className="material-symbols-outlined text-on-surface-variant">contrast</span>
-                <span className="font-body-sm text-body-sm text-on-surface">Alto Contraste</span>
+                <span className="material-symbols-outlined" aria-hidden="true">contrast</span>
+                <span className="text-sm">Alto Contraste</span>
               </div>
-              <span className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-all ${
-                settings.highContrast ? 'bg-primary border-primary' : 'border-outline'
-              }`}>
-                {settings.highContrast && <span className="material-symbols-outlined text-[14px] text-on-primary" style={{ fontVariationSettings: "'FILL' 1" }}>check</span>}
-              </span>
+              {checkMark(settings.highContrast)}
             </button>
 
-            {/* Escala de Cinza */}
             <button
               onClick={() => update({ grayscale: !settings.grayscale })}
-              className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary ${
-                settings.grayscale ? 'bg-primary/20 text-primary border border-primary/50' : 'bg-surface-container-highest hover:brightness-110'
-              }`}
+              className={toggleClass(settings.grayscale)}
               aria-pressed={settings.grayscale}
               aria-label={`Escala de cinza: ${settings.grayscale ? 'ativado' : 'desativado'}`}
             >
               <div className="flex items-center gap-2">
-                <span className="material-symbols-outlined text-on-surface-variant">invert_colors</span>
-                <span className="font-body-sm text-body-sm text-on-surface">Escala de Cinza</span>
+                <span className="material-symbols-outlined" aria-hidden="true">invert_colors</span>
+                <span className="text-sm">Escala de Cinza</span>
               </div>
-              <span className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-all ${
-                settings.grayscale ? 'bg-primary border-primary' : 'border-outline'
-              }`}>
-                {settings.grayscale && <span className="material-symbols-outlined text-[14px] text-on-primary" style={{ fontVariationSettings: "'FILL' 1" }}>check</span>}
-              </span>
+              {checkMark(settings.grayscale)}
             </button>
 
-            {/* Destacar Links */}
             <button
               onClick={() => update({ highlightLinks: !settings.highlightLinks })}
-              className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary ${
-                settings.highlightLinks ? 'bg-primary/20 text-primary border border-primary/50' : 'bg-surface-container-highest hover:brightness-110'
-              }`}
+              className={toggleClass(settings.highlightLinks)}
               aria-pressed={settings.highlightLinks}
               aria-label={`Destacar links: ${settings.highlightLinks ? 'ativado' : 'desativado'}`}
             >
               <div className="flex items-center gap-2">
-                <span className="material-symbols-outlined text-on-surface-variant">link</span>
-                <span className="font-body-sm text-body-sm text-on-surface">Destacar Links</span>
+                <span className="material-symbols-outlined" aria-hidden="true">link</span>
+                <span className="text-sm">Destacar Links</span>
               </div>
-              <span className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-all ${
-                settings.highlightLinks ? 'bg-primary border-primary' : 'border-outline'
-              }`}>
-                {settings.highlightLinks && <span className="material-symbols-outlined text-[14px] text-on-primary" style={{ fontVariationSettings: "'FILL' 1" }}>check</span>}
-              </span>
+              {checkMark(settings.highlightLinks)}
             </button>
           </div>
 
-          {/* Reset */}
           <button
             onClick={reset}
-            className="w-full mt-3 px-3 py-2 rounded-xl text-label text-on-surface-variant hover:text-on-surface hover:bg-surface-container-highest transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+            className="mt-3 w-full border border-outline-variant px-3 py-2 text-xs uppercase tracking-wider text-on-surface-variant transition-colors hover:border-outline hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
           >
             Redefinir
           </button>

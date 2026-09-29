@@ -10,6 +10,7 @@ import { authFetch, apiLogout } from '../lib/api'
 import type { UserProfile } from '../types'
 import { PlaygroundCodeEditor } from '../components/PlaygroundCodeEditor'
 import { EditProfileModal } from '../components/EditProfileModal'
+import { AppSidebar } from '../components/AppSidebar'
 
 const mintDarkTheme = {
     colors: {
@@ -88,52 +89,18 @@ export function GeneralPlaygroundPage() {
         <div className="flex h-screen w-full bg-background text-on-surface font-sans overflow-hidden">
 
             {/* Sidebar */}
-            <aside className="fixed left-0 top-0 h-full flex flex-col py-6 px-4 border-r border-outline-variant bg-surface-container-low w-64 z-50 shrink-0">
-                <div className="flex items-center gap-3 mb-8 px-2">
-                    <div className="w-10 h-10 rounded-lg bg-primary flex items-center justify-center shadow-md">
-                        <span className="material-symbols-outlined text-on-primary">terminal</span>
-                    </div>
-                    <div>
-                        <h1 className="text-lg font-h2 font-bold text-primary tracking-tight">CodeLab</h1>
-                    </div>
-                </div>
-                <nav className="flex-1 space-y-1" aria-label="Navegação principal">
-                    <a
-                        href="/trilha"
-                        className="w-full flex items-center gap-3 text-on-surface-variant hover:text-on-surface px-4 py-2 hover:bg-surface-container-highest rounded-lg text-left font-semibold text-sm transition-all"
-                    >
-                        <span className="material-symbols-outlined">map</span>
-                        Minha Trilha
-                    </a>
-                    <a
-                        href="/playground"
-                        className="w-full flex items-center gap-3 bg-secondary-container text-on-secondary-container rounded-lg px-4 py-2 text-left font-semibold text-sm"
-                        aria-current="page"
-                    >
-                        <span className="material-symbols-outlined text-primary">terminal</span>
-                        Playground
-                    </a>
-                    <button
-                        onClick={() => setIsProfileModalOpen(true)}
-                        className="w-full flex items-center gap-3 text-on-surface-variant hover:text-on-surface px-4 py-2 hover:bg-surface-container-highest rounded-lg text-left font-semibold text-sm transition-all"
-                    >
-                        <span className="material-symbols-outlined">account_circle</span>
-                        Meu Perfil
-                    </button>
-                </nav>
-                <div className="mt-auto pt-4 border-t border-outline-variant">
-                    <button
-                        onClick={handleLogout}
-                        className="btn-danger w-full !h-10"
-                    >
-                        <span className="material-symbols-outlined text-[18px]">logout</span>
-                        Sair
-                    </button>
-                </div>
-            </aside>
+            <AppSidebar
+                items={[
+                    { key: 'trilha', label: 'Minha Trilha', icon: 'map', href: '/trilha' },
+                    { key: 'playground', label: 'Playground', icon: 'terminal', href: '/playground' },
+                    { key: 'perfil', label: 'Meu Perfil', icon: 'account_circle', onClick: () => setIsProfileModalOpen(true) },
+                ]}
+                activeKey="playground"
+                onLogout={handleLogout}
+            />
 
             {/* Main Content */}
-            <main className="flex-1 ml-64 min-w-0 min-h-0 flex flex-col h-screen overflow-hidden">
+            <main className="flex-1 ml-[var(--sidebar-w)] min-w-0 min-h-0 flex flex-col h-screen overflow-hidden">
 
                 {/* Header */}
                 <header className="shrink-0 w-full flex justify-between items-center h-16 px-8 bg-background/80 backdrop-blur-md border-b border-outline-variant z-[60]">
