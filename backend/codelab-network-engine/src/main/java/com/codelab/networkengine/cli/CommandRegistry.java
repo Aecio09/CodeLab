@@ -14,6 +14,7 @@ import com.codelab.networkengine.cli.commands.IpDefaultGatewayCommand;
 import com.codelab.networkengine.cli.commands.IpRouteCommand;
 import com.codelab.networkengine.cli.commands.NameCommand;
 import com.codelab.networkengine.cli.commands.PingCommand;
+import com.codelab.networkengine.cli.commands.TracerouteCommand;
 import com.codelab.networkengine.cli.commands.ShowInterfacesCommand;
 import com.codelab.networkengine.cli.commands.ShowIpArpCommand;
 import com.codelab.networkengine.cli.commands.ShowIpInterfaceBriefCommand;
@@ -53,6 +54,7 @@ public class CommandRegistry {
         register(new DescriptionCommand());
         register(new ShutdownCommand());
         register(new PingCommand());
+        register(new TracerouteCommand());
         register(new ShowIpArpCommand());
         register(new ShowIpRouteCommand());
         register(new ShowIpInterfaceBriefCommand());
@@ -119,7 +121,13 @@ public class CommandRegistry {
         if (commandMode == CliMode.ANY || commandMode == mode) {
             return true;
         }
-        return commandMode == CliMode.USER && mode == CliMode.PRIVILEGED;
+        if (commandMode == CliMode.USER && mode == CliMode.PRIVILEGED) {
+            return true;
+        }
+        // Sub-modos aceitam os comandos do modo pai, como no IOS: dentro de
+        // (config-if) da para pular direto para outra interface sem voltar.
+        return commandMode == CliMode.CONFIG
+                && (mode == CliMode.CONFIG_INTERFACE || mode == CliMode.CONFIG_VLAN);
     }
 
     private boolean matchesPrefix(String name, List<String> tokens) {

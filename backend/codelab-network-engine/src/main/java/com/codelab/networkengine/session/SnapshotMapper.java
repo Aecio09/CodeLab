@@ -39,7 +39,9 @@ public class SnapshotMapper {
             }
             case SWITCH -> factory.networkSwitch(hostname);
             case ROUTER -> factory.router(hostname);
-            default -> throw new IllegalArgumentException("tipo nao suportado: " + ds.getKind());
+            // Firewall nao tem semantica propria ainda; treatamos como roteador
+            // para que criar o device pela UI nao quebre a sessao.
+            case FIREWALL -> factory.router(hostname);
         };
 
         ctx.getSession().addDevice(dev);
@@ -117,7 +119,9 @@ public class SnapshotMapper {
         DeviceFactory factory = ctx.getFactory();
         NetworkInterface intfA = findOrCreateInterface(factory, devA, ls.getInterfaceA());
         NetworkInterface intfB = findOrCreateInterface(factory, devB, ls.getInterfaceB());
-        ctx.getSession().addLink(intfA, intfB);
+        Link.LinkStatus status = "DOWN".equalsIgnoreCase(ls.getStatus())
+                ? Link.LinkStatus.DOWN : Link.LinkStatus.UP;
+        ctx.getSession().addLink(intfA, intfB, status);
     }
 
     public static PlaygroundSnapshot mergeLiveConfig(PlaygroundSnapshot stored, SessionContext ctx) {

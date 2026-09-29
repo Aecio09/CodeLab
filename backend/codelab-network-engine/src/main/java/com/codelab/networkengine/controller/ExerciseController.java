@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -82,10 +83,14 @@ public class ExerciseController {
     }
 
     @PostMapping("/{id}/links")
-    public ResponseEntity<LinkSnapshot> addLink(@PathVariable String id, @RequestBody CreateLinkRequest req) {
+    public ResponseEntity<?> addLink(@PathVariable String id, @RequestBody CreateLinkRequest req) {
         PlaygroundSnapshot snap = store.load(id).orElse(null);
         if (snap == null) {
             return ResponseEntity.notFound().build();
+        }
+        if (!hasDevice(snap, req.deviceRefA()) || !hasDevice(snap, req.deviceRefB())) {
+            return ResponseEntity.badRequest()
+                    .body(Map.of("error", "deviceRefA/deviceRefB nao existem no exercicio"));
         }
         LinkSnapshot ls = new LinkSnapshot();
         ls.setDeviceRefA(req.deviceRefA());
@@ -98,6 +103,13 @@ public class ExerciseController {
         snap.getLinks().add(ls);
         store.save(snap);
         return ResponseEntity.ok(ls);
+    }
+
+    private static boolean hasDevice(PlaygroundSnapshot snap, String ref) {
+        if (snap.getDevices() == null || ref == null) {
+            return false;
+        }
+        return snap.getDevices().stream().anyMatch(d -> ref.equals(d.getRef()));
     }
 
     private static String defaultHostname(DeviceModel kind) {

@@ -13,6 +13,7 @@ public class IcmpMessage {
 
     public enum IcmpType {
         ECHO_REQUEST,
-        ECHO_REPLY
+        ECHO_REPLY,
+        TIME_EXCEEDED
     }
 }

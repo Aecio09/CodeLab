@@ -40,7 +40,7 @@ public class ShowIpInterfaceBriefCommand implements Command {
             sb.append("\n").append(String.format("%-22s%-16s%-4s%-7s%-22s%s",
                     intf.getName(),
                     ip,
-                    "YES",
+                    lineUp ? "YES" : "NO",
                     method,
                     adminUp ? "up" : "administratively down",
                     lineUp ? "up" : "down"));

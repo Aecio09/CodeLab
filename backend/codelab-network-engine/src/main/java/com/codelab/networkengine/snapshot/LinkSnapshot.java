@@ -10,4 +10,6 @@ public class LinkSnapshot {
     private String interfaceA;
     private String deviceRefB;
     private String interfaceB;
+    /** UP (padrao) ou DOWN. Permite "cortar" o cabo pela UI. */
+    private String status = "UP";
 }

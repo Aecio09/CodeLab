@@ -36,4 +36,18 @@ public class IcmpProtocol {
         packet.setIcmp(icmp);
         return packet;
     }
+    public Ipv4Packet buildTimeExceeded(Ipv4Packet incoming, String routerIp) {
+        IcmpMessage icmp = new IcmpMessage();
+        icmp.setType(IcmpMessage.IcmpType.TIME_EXCEEDED);
+        icmp.setIdentifier(1);
+        icmp.setSequenceNumber(0);
+        icmp.setTimestamp(System.currentTimeMillis());
+
+        Ipv4Packet packet = new Ipv4Packet();
+        packet.setSourceIp(routerIp);
+        packet.setDestinationIp(incoming.getSourceIp());
+        packet.setTtl(64);
+        packet.setIcmp(icmp);
+        return packet;
+    }
 }

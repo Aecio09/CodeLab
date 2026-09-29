@@ -87,18 +87,86 @@ public class NetworkEngine {
         }
         if (ipv4.getIcmp().getType() == IcmpMessage.IcmpType.ECHO_REQUEST) {
             Ipv4Packet reply = icmpProtocol.buildEchoReply(ipv4);
+            // Quem responde e o proprio destino do probe, nao o remetente.
+            recordTraceResponder(ipv4.getDestinationIp());
             sendIpv4(session, receiver, reply.getDestinationIp(), reply);
         } else if (ipv4.getIcmp().getType() == IcmpMessage.IcmpType.ECHO_REPLY) {
             completePing(receiver, ipv4.getSourceIp(), ipv4.getIcmp().getSequenceNumber());
+            recordTraceResponder(ipv4.getSourceIp());
+        } else if (ipv4.getIcmp().getType() == IcmpMessage.IcmpType.TIME_EXCEEDED) {
+            // O TTL zerou antes de chegar: quem responde e o roteador que descartou.
+            recordTraceResponder(ipv4.getSourceIp());
         }
+    }
+
+    private void recordTraceResponder(String ip) {
+        if (traceResponder != null && !traceResponder.contains(ip)) {
+            traceResponder.add(ip);
+        }
+    }
+
+    /** IP que respondeu (TIME_EXCEEDED ou ECHO_REPLY) durante um traceroute, se houver. */
+    private List<String> traceResponder;
+
+    public List<String> traceroute(NetworkSession session, Device source, String targetIp, int maxHops) {
+        List<String> hops = new ArrayList<>();
+        for (int ttl = 1; ttl <= maxHops; ttl++) {
+            if (hasInterfaceWithIp(source, targetIp) && ttl == 1) {
+                hops.add(targetIp);
+                break;
+            }
+            String responder = probeWithTtl(session, source, targetIp, ttl);
+            if (responder == null) {
+                hops.add("*");
+            } else {
+                hops.add(responder);
+                if (responder.equals(targetIp)) {
+                    break;
+                }
+            }
+        }
+        return hops;
+    }
+
+    private String probeWithTtl(NetworkSession session, Device source, String targetIp, int ttl) {
+        RouteHint route = computeRoute(source, targetIp);
+        if (route == null) {
+            return null;
+        }
+        String sourceIp = route.outInterface().getIpAddress();
+        Ipv4Packet probe = icmpProtocol.buildEchoRequest(sourceIp, targetIp, ttl);
+        probe.setTtl(ttl);
+        List<String> captured = new ArrayList<>();
+        traceResponder = captured;
+        try {
+            sendIpv4(session, source, targetIp, probe);
+        } finally {
+            traceResponder = null;
+        }
+        return captured.isEmpty() ? null : captured.get(0);
     }
 
     private void forward(NetworkSession session, Router router, Ipv4Packet ipv4) {
         if (ipv4.getTtl() <= 1) {
+            // TTL zerado: o roteador avisa o origem em vez de descartar em silencio.
+            NetworkInterface outgoing = interfaceToSource(router, ipv4.getSourceIp());
+            if (outgoing != null) {
+                sendIpv4(session, router, ipv4.getSourceIp(),
+                        icmpProtocol.buildTimeExceeded(ipv4, outgoing.getIpAddress()));
+            }
             return;
         }
         ipv4.setTtl(ipv4.getTtl() - 1);
         sendIpv4(session, router, ipv4.getDestinationIp(), ipv4);
+    }
+
+    private NetworkInterface interfaceToSource(Device device, String sourceIp) {
+        for (NetworkInterface intf : device.getInterfaces()) {
+            if (isActive(intf) && IpMath.sameSubnet(sourceIp, intf.getSubnetMask(), intf.getIpAddress())) {
+                return intf;
+            }
+        }
+        return activeInterface(device);
     }
 
     private void sendIpv4(NetworkSession session, Device source, String destinationIp, Ipv4Packet packet) {
