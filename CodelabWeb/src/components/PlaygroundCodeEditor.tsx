@@ -4,7 +4,7 @@ import { SandpackCodeEditor, useActiveCode } from '@codesandbox/sandpack-react'
 export function PlaygroundCodeEditor({
                                        loading,
                                        onCodeChange,
-                                     }: {
+                                   }: {
   loading: boolean
   onCodeChange: (value: string) => void
 }) {
@@ -19,13 +19,8 @@ export function PlaygroundCodeEditor({
           showLineNumbers
           showInlineErrors
           wrapContent={false}
-          style={{
-            height: '100%',
-            minHeight: '100%',
-            background: '#050a07',
-            backgroundColor: '#050a07',
-          }}
-          className="!bg-[#050a07]"
+          style={{ height: '100%', minHeight: '100%' }}
+          className="!bg-transparent"
           readOnly={loading}
       />
   )

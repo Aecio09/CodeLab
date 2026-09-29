@@ -9,6 +9,7 @@ import { API_BASE_URL, DEFAULT_PLAYGROUND_CODE } from '../constants'
 import { authFetch } from '../lib/api'
 import type { AnswerReviewResponse, QuestionItem, ReviewApiError, UserProfile } from '../types'
 import { PlaygroundCodeEditor } from '../components/PlaygroundCodeEditor'
+import { codelabSandpackTheme } from '../lib/sandpackTheme'
 
 export function AdminPlaygroundPage({ questionId }: { questionId: number }) {
   const [profile, setProfile] = useState<UserProfile | null>(null)
@@ -141,7 +142,7 @@ export function AdminPlaygroundPage({ questionId }: { questionId: number }) {
 
       <SandpackProvider
         template="vanilla-ts"
-        theme="dark"
+        theme={codelabSandpackTheme}
         files={{
           '/index.ts': code,
         }}

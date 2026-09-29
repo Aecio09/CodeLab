@@ -4,6 +4,7 @@ import { authFetch, apiLogout } from '../lib/api'
 import type { TopicStatus, UserProfile } from '../types'
 import { EditProfileModal } from '../components/EditProfileModal'
 import { AppSidebar } from '../components/AppSidebar'
+import { StatBadge } from '../components/PlaygroundShell'
 import { resolvePhotoUrl } from '../utils.ts'
 
 const TOPIC_METADATA: Record<string, { label: string; icon: string }> = {
@@ -46,32 +47,6 @@ function getMasteryPercent(unit: TopicStatus): number {
   const total = unit.totalLessons * 2
   if (total === 0) return 0
   return Math.min(100, Math.round((unit.totalActivitiesCompleted / total) * 100))
-}
-
-function StatBadge({
-  icon,
-  value,
-  accent,
-  label,
-}: {
-  icon: string
-  value: string | number
-  accent: string
-  label: string
-}) {
-  return (
-    <div className="flex items-center gap-2 border border-outline-variant px-3 py-1.5">
-      <span
-        className={`material-symbols-outlined text-lg ${accent}`}
-        style={{ fontVariationSettings: "'FILL' 1" }}
-        aria-hidden="true"
-      >
-        {icon}
-      </span>
-      <span className="font-mono text-sm text-primary">{value}</span>
-      <span className="sr-only">{label}</span>
-    </div>
-  )
 }
 
 function LessonRow({

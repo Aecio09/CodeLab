@@ -19,7 +19,7 @@ export function resolvePhotoUrl(photo: string | null | undefined, name?: string)
 
   if (!photo || photo === 'null' || photo.trim() === '') {
     const fallbackName = name ? encodeURIComponent(name) : 'User'
-    return `https://ui-avatars.com/api/?name=${fallbackName}&background=2f3633&color=72db9f&size=160`
+    return `https://ui-avatars.com/api/?name=${fallbackName}&background=141416&color=e5e1e4&size=160`
   }
 
 
