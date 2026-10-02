@@ -10,7 +10,19 @@ public final class IpMath {
     }
 
     public static boolean covers(String network, String mask, String ip) {
-        return (toInt(ip) & toInt(mask)) == toInt(network);
+        int m = toInt(mask);
+        return (toInt(ip) & m) == (toInt(network) & m);
+    }
+
+    /**
+     * Uma mascara e valida quando os bits 1 sao contiguos a partir do bit mais
+     * signifcativo. O Cisco tambem recusa mascaras como 255.0.255.0, que teriam
+     * um prefixo sem significado real.
+     */
+    public static boolean isValidNetmask(String mask) {
+        int m = toInt(mask);
+        int inverted = ~m;
+        return ((inverted + 1) & inverted) == 0;
     }
 
     public static String networkOf(String ip, String mask) {

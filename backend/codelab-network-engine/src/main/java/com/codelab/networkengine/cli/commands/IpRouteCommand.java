@@ -6,10 +6,12 @@ import com.codelab.networkengine.cli.DeviceCli;
 import com.codelab.networkengine.domain.Device;
 import com.codelab.networkengine.domain.Router;
 import com.codelab.networkengine.domain.RoutingTable;
+import com.codelab.networkengine.protocols.routing.IpMath;
 import com.codelab.networkengine.simulation.NetworkEngine;
 import com.codelab.networkengine.simulation.NetworkSession;
 
 import java.util.List;
+import java.util.Map;
 
 public class IpRouteCommand implements Command {
 
@@ -52,6 +54,9 @@ public class IpRouteCommand implements Command {
         if (!CommandSupport.isValidIp(mask)) {
             return "% mascara invalida: " + mask;
         }
+        if (!IpMath.isValidNetmask(mask)) {
+            return "% mascara invalida: " + mask + " (use uma mascara contigua, como 255.255.255.0)";
+        }
         if (!CommandSupport.isValidIp(nextHop)) {
             return "% proximo salto invalido: " + nextHop;
         }
@@ -64,7 +69,10 @@ public class IpRouteCommand implements Command {
         entry.setNextHop(nextHop);
         entry.setMetric(1);
         entry.setType(RoutingTable.RouteEntry.RouteType.STATIC);
-        router.getRoutingTable().getRoutes().put(network, entry);
+        // O Cisco normaliza a rede digitada: 'ip route 10.9.9.5 255.255.255.0'
+        // e gravado como 10.9.9.0/24. Sem isso a rota nunca casa com o destino.
+        String normalized = IpMath.networkOf(network, mask);
+        router.getRoutingTable().getRoutes().put(normalized, entry);
         return "";
     }
 
@@ -77,7 +85,21 @@ public class IpRouteCommand implements Command {
         if (router.getRoutingTable() == null || router.getRoutingTable().getRoutes() == null) {
             return "";
         }
-        router.getRoutingTable().getRoutes().remove(args.get(0));
+        Map<String, RoutingTable.RouteEntry> routes = router.getRoutingTable().getRoutes();
+        // Remove pela rede normalizada, a mesma que foi gravada no execute.
+        boolean maskGiven = args.size() > 1
+                && CommandSupport.isValidIp(args.get(1))
+                && IpMath.isValidNetmask(args.get(1));
+        final String network = maskGiven
+                ? IpMath.networkOf(args.get(0), args.get(1))
+                : args.get(0);
+        routes.remove(network);
+        if (!maskGiven) {
+            // Sem mascara na linha, remove qualquer entrada cuja rede normalizada
+            // corresponda, cobrindo rotas gravadas antes da normalizacao.
+            routes.entrySet().removeIf(e -> e.getValue().getSubnetMask() != null
+                    && network.equals(IpMath.networkOf(e.getKey(), e.getValue().getSubnetMask())));
+        }
         return "";
     }
 }
