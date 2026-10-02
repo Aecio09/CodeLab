@@ -2,6 +2,7 @@ package com.codelab.networkengine.session;
 
 import com.codelab.networkengine.cli.DeviceCli;
 import com.codelab.networkengine.domain.Device;
+import com.codelab.networkengine.domain.NetworkInterface;
 import com.codelab.networkengine.simulation.DeviceFactory;
 import com.codelab.networkengine.simulation.NetworkEngine;
 import com.codelab.networkengine.simulation.NetworkSession;
@@ -31,6 +32,19 @@ public class SessionContext {
 
     public void touch() {
         this.lastActivity = System.nanoTime();
+    }
+
+    /** Ref (do snapshot) do device dono da porta, para exportar links de volta. */
+    public String refOfInterface(NetworkInterface intf) {
+        if (intf == null) {
+            return null;
+        }
+        for (Map.Entry<String, Device> e : deviceByRef.entrySet()) {
+            if (e.getValue().getInterfaces() != null && e.getValue().getInterfaces().contains(intf)) {
+                return e.getKey();
+            }
+        }
+        return null;
     }
 
     public boolean idleNanos(long thresholdNanos) {

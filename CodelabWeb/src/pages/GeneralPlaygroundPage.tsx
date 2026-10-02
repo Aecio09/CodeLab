@@ -113,6 +113,13 @@ export function GeneralPlaygroundPage() {
                         <span className="material-symbols-outlined text-primary">terminal</span>
                         Playground
                     </a>
+                    <a
+                        href="/networkplayground"
+                        className="w-full flex items-center gap-3 text-on-surface-variant hover:text-on-surface px-4 py-2 hover:bg-surface-container-highest rounded-lg text-left font-semibold text-sm transition-all"
+                    >
+                        <span className="material-symbols-outlined">lan</span>
+                        Playground de Redes
+                    </a>
                     <button
                         onClick={() => setIsProfileModalOpen(true)}
                         className="w-full flex items-center gap-3 text-on-surface-variant hover:text-on-surface px-4 py-2 hover:bg-surface-container-highest rounded-lg text-left font-semibold text-sm transition-all"

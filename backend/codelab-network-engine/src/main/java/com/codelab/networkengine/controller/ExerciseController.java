@@ -2,6 +2,7 @@ package com.codelab.networkengine.controller;
 
 import com.codelab.networkengine.domain.DeviceModel;
 import com.codelab.networkengine.persistence.SnapshotStore;
+import com.codelab.networkengine.session.SnapshotMapper;
 import com.codelab.networkengine.snapshot.*;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -73,7 +74,10 @@ public class ExerciseController {
         ds.setKind(req.kind());
         ds.setX(req.x() != null ? req.x() : 0.0);
         ds.setY(req.y() != null ? req.y() : 0.0);
-        ds.setHostname(defaultHostname(req.kind()));
+        ds.setHostname(req.hostname() != null && !req.hostname().isBlank()
+                ? req.hostname() : defaultHostname(req.kind()));
+        ds.setInterfaces(SnapshotMapper.defaultInterfaces(req.kind(),
+                req.ports() != null ? req.ports() : req.kind().getDefaultPortCount()));
         if (snap.getDevices() == null) {
             snap.setDevices(new ArrayList<>());
         }
@@ -105,6 +109,96 @@ public class ExerciseController {
         return ResponseEntity.ok(ls);
     }
 
+    @GetMapping("/device-models")
+    public ResponseEntity<List<DeviceModelInfo>> deviceModels() {
+        return ResponseEntity.ok(List.of(DeviceModel.values()).stream()
+                .map(m -> new DeviceModelInfo(m.name(), m.getDisplayName(),
+                        m.getDefaultPortPrefix(), m.getDefaultPortCount()))
+                .toList());
+    }
+
+    @PatchMapping("/{id}/devices/{ref}")
+    public ResponseEntity<?> patchDevice(@PathVariable String id, @PathVariable String ref,
+                                        @RequestBody PatchDeviceRequest req) {
+        PlaygroundSnapshot snap = store.load(id).orElse(null);
+        if (snap == null) {
+            return ResponseEntity.notFound().build();
+        }
+        DeviceSnapshot ds = findDevice(snap, ref);
+        if (ds == null) {
+            return ResponseEntity.notFound().build();
+        }
+        if (req.x() != null) {
+            ds.setX(req.x());
+        }
+        if (req.y() != null) {
+            ds.setY(req.y());
+        }
+        if (req.hostname() != null && !req.hostname().isBlank()) {
+            ds.setHostname(req.hostname());
+        }
+        store.save(snap);
+        return ResponseEntity.ok(ds);
+    }
+
+    /** Remove o device e todos os cabos ligados a ele. */
+    @DeleteMapping("/{id}/devices/{ref}")
+    public ResponseEntity<Void> deleteDevice(@PathVariable String id, @PathVariable String ref) {
+        PlaygroundSnapshot snap = store.load(id).orElse(null);
+        if (snap == null) {
+            return ResponseEntity.notFound().build();
+        }
+        if (findDevice(snap, ref) == null) {
+            return ResponseEntity.notFound().build();
+        }
+        snap.getDevices().removeIf(d -> ref.equals(d.getRef()));
+        if (snap.getLinks() != null) {
+            snap.getLinks().removeIf(l -> ref.equals(l.getDeviceRefA()) || ref.equals(l.getDeviceRefB()));
+        }
+        store.save(snap);
+        return ResponseEntity.noContent().build();
+    }
+
+    /** Corta ou religa o cabo pelo indice na lista de links do snapshot. */
+    @PatchMapping("/{id}/links/{index}")
+    public ResponseEntity<?> patchLink(@PathVariable String id, @PathVariable int index,
+                                       @RequestBody PatchLinkRequest req) {
+        PlaygroundSnapshot snap = store.load(id).orElse(null);
+        if (snap == null) {
+            return ResponseEntity.notFound().build();
+        }
+        if (snap.getLinks() == null || index < 0 || index >= snap.getLinks().size()) {
+            return ResponseEntity.notFound().build();
+        }
+        LinkSnapshot ls = snap.getLinks().get(index);
+        if (req.status() != null) {
+            ls.setStatus("DOWN".equalsIgnoreCase(req.status()) ? "DOWN" : "UP");
+        }
+        store.save(snap);
+        return ResponseEntity.ok(ls);
+    }
+
+    @DeleteMapping("/{id}/links/{index}")
+    public ResponseEntity<Void> deleteLink(@PathVariable String id, @PathVariable int index) {
+        PlaygroundSnapshot snap = store.load(id).orElse(null);
+        if (snap == null) {
+            return ResponseEntity.notFound().build();
+        }
+        if (snap.getLinks() == null || index < 0 || index >= snap.getLinks().size()) {
+            return ResponseEntity.notFound().build();
+        }
+        snap.getLinks().remove(index);
+        store.save(snap);
+        return ResponseEntity.noContent().build();
+    }
+
+    private static DeviceSnapshot findDevice(PlaygroundSnapshot snap, String ref) {
+        if (snap.getDevices() == null) {
+            return null;
+        }
+        return snap.getDevices().stream().filter(d -> ref.equals(d.getRef())).findFirst().orElse(null);
+    }
+
     private static boolean hasDevice(PlaygroundSnapshot snap, String ref) {
         if (snap.getDevices() == null || ref == null) {
             return false;
@@ -122,6 +216,9 @@ public class ExerciseController {
     }
 
     public record CreateExerciseRequest(String name) {}
-    public record CreateDeviceRequest(DeviceModel kind, Double x, Double y) {}
+    public record CreateDeviceRequest(DeviceModel kind, Double x, Double y, String hostname, Integer ports) {}
+    public record PatchDeviceRequest(Double x, Double y, String hostname) {}
+    public record PatchLinkRequest(String status) {}
+    public record DeviceModelInfo(String kind, String displayName, String portPrefix, int defaultPorts) {}
     public record CreateLinkRequest(String deviceRefA, String interfaceA, String deviceRefB, String interfaceB) {}
 }

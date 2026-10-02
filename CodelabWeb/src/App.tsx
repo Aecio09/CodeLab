@@ -9,6 +9,7 @@ import { AdminPlaygroundPage } from './pages/AdminPlaygroundPage'
 import { StudentPlaygroundPage } from './pages/StudentPlaygroundPage'
 import { GeneralPlaygroundPage } from './pages/GeneralPlaygroundPage'
 import { StudentPathPage } from './pages/StudentPathPage'
+import { NetworkPlaygroundPage } from './pages/NetworkPlaygroundPage'
 
 export default function App() {
   const currentPath = window.location.pathname
@@ -17,6 +18,7 @@ export default function App() {
   const isAdminQuestionsPage = currentPath === '/admin/questions'
   const isStudentPathPage = currentPath === '/trilha'
   const isGeneralPlaygroundPage = currentPath === '/playground'
+  const isNetworkPlaygroundPage = currentPath === '/networkplayground'
 
   const adminPlaygroundMatch = currentPath.match(/^\/admin\/questions\/(\d+)\/playground$/)
   const playgroundQuestionId = adminPlaygroundMatch ? Number(adminPlaygroundMatch[1]) : null
@@ -31,6 +33,7 @@ export default function App() {
 
   const pageTitle = useMemo(() => {
     if (isRegisterPage) return 'Cadastro'
+    if (isNetworkPlaygroundPage) return 'Playground de Redes'
     if (isGeneralPlaygroundPage) return 'Playground'
     if (studentQuestionId) return 'Desafio'
     if (playgroundQuestionId) return 'Playground - Admin'
@@ -38,7 +41,7 @@ export default function App() {
     if (isProfilePage) return 'Meu Perfil'
     if (isStudentPathPage) return 'Trilha de Aprendizado'
     return 'Login'
-  }, [isRegisterPage, isGeneralPlaygroundPage, studentQuestionId, playgroundQuestionId, isAdminQuestionsPage, isProfilePage, isStudentPathPage])
+  }, [isRegisterPage, isGeneralPlaygroundPage, isNetworkPlaygroundPage, studentQuestionId, playgroundQuestionId, isAdminQuestionsPage, isProfilePage, isStudentPathPage])
 
   useEffect(() => {
     document.title = `CodeLab - ${pageTitle}`
@@ -52,6 +55,8 @@ export default function App() {
       <div id="main-content" className="flex flex-col flex-1">
       {isRegisterPage ? (
         <RegisterPage />
+      ) : isNetworkPlaygroundPage ? (
+        <NetworkPlaygroundPage />
       ) : isGeneralPlaygroundPage ? (
         <GeneralPlaygroundPage />
       ) : studentQuestionId ? (
@@ -67,7 +72,7 @@ export default function App() {
       ) : (
         <LoginPage registered={registered} />
       )}
-      <BackgroundDecor />
+      {!isNetworkPlaygroundPage && <BackgroundDecor />}
       <AccessibilityToolbar />
       </div>
     </div>

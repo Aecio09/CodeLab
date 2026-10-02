@@ -7,6 +7,7 @@ import com.codelab.networkengine.simulation.DeviceFactory;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 public class SnapshotMapper {
@@ -137,9 +138,17 @@ public class SnapshotMapper {
         }
 
         merged.setDevices(new ArrayList<>());
-        for (Map.Entry<String, Device> entry : ctx.getDeviceByRef().entrySet()) {
-            String ref = entry.getKey();
-            Device live = entry.getValue();
+        List<String> order = new ArrayList<>(storedByRef.keySet());
+        for (String ref : ctx.getDeviceByRef().keySet()) {
+            if (!order.contains(ref)) {
+                order.add(ref);
+            }
+        }
+        for (String ref : order) {
+            Device live = ctx.getDeviceByRef().get(ref);
+            if (live == null) {
+                continue;
+            }
             DeviceSnapshot base = storedByRef.get(ref);
 
             DeviceSnapshot md = new DeviceSnapshot();
@@ -190,8 +199,22 @@ public class SnapshotMapper {
             merged.getDevices().add(md);
         }
 
-        merged.setLinks(stored.getLinks() != null ? new ArrayList<>(stored.getLinks()) : new ArrayList<>());
+        merged.setLinks(exportLiveLinks(ctx));
         return merged;
+    }
+
+    public static List<LinkSnapshot> exportLiveLinks(SessionContext ctx) {
+        List<LinkSnapshot> list = new ArrayList<>();
+        for (Link link : ctx.getSession().getLinks()) {
+            LinkSnapshot ls = new LinkSnapshot();
+            ls.setDeviceRefA(ctx.refOfInterface(link.getInterfaceA()));
+            ls.setInterfaceA(link.getInterfaceA() != null ? link.getInterfaceA().getName() : null);
+            ls.setDeviceRefB(ctx.refOfInterface(link.getInterfaceB()));
+            ls.setInterfaceB(link.getInterfaceB() != null ? link.getInterfaceB().getName() : null);
+            ls.setStatus(link.getStatus() == Link.LinkStatus.DOWN ? "DOWN" : "UP");
+            list.add(ls);
+        }
+        return list;
     }
 
     private static void applyInterfaceConfig(NetworkInterface intf, InterfaceSnapshot is, Device dev) {
@@ -218,7 +241,18 @@ public class SnapshotMapper {
                 : NetworkInterface.AdminState.DOWN);
     }
 
-    private static NetworkInterface findOrCreateInterface(DeviceFactory factory, Device dev, String name) {
+    public static List<InterfaceSnapshot> defaultInterfaces(DeviceModel kind, int ports) {
+        List<InterfaceSnapshot> list = new ArrayList<>();
+        int count = Math.max(1, Math.min(ports, 64));
+        for (int i = 1; i <= count; i++) {
+            InterfaceSnapshot is = new InterfaceSnapshot();
+            is.setName(kind.portName(i));
+            list.add(is);
+        }
+        return list;
+    }
+
+    public static NetworkInterface findOrCreateInterface(DeviceFactory factory, Device dev, String name) {
         return dev.getInterfaces().stream()
                 .filter(i -> i.getName().equals(name))
                 .findFirst()

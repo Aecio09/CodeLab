@@ -53,6 +53,11 @@ public class NetworkEngine {
         packetSimulator.send(session, source, intf, frame, this::onFrame);
     }
 
+    /** Coleta os saltos de quadro para o cliente animar o trafego. */
+    public void setTraceSink(NetworkEvent.TraceSink traceSink) {
+        packetSimulator.setTraceSink(traceSink);
+    }
+
     private void onFrame(NetworkSession session, Device receiver, NetworkInterface intf, EthernetFrame frame) {
         if (receiver instanceof Switch switchDevice) {
             switchingProtocol.process(session, this::send, switchDevice, intf, frame);

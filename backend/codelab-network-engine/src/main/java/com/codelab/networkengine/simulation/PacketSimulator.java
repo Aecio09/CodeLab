@@ -11,6 +11,11 @@ public class PacketSimulator {
     private static final int MAX_HOPS = 64;
 
     private int hops;
+    private NetworkEvent.TraceSink traceSink;
+
+    public void setTraceSink(NetworkEvent.TraceSink traceSink) {
+        this.traceSink = traceSink;
+    }
 
     public void send(NetworkSession session, Device source, NetworkInterface sourceInterface,
                      EthernetFrame frame, FrameReceiver receiver) {
@@ -22,6 +27,10 @@ public class PacketSimulator {
             return;
         }
         hops++;
+        if (traceSink != null) {
+            traceSink.onEvent(NetworkEvent.of(hops, frame, source, sourceInterface,
+                    peer.get().device(), peer.get().intf()));
+        }
         try {
             receiver.onFrame(session, peer.get().device(), peer.get().intf(), frame);
         } finally {
