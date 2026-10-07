@@ -49,7 +49,7 @@ public class SecurityConfig {
                 .cors(Customizer.withDefaults())
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(session ->
-                        session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
+                        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS) //IF_REQUIRED
                 )
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/", "/login", "/api/users/login", "/api/users/register", "/register", "/oauth2/**", "/images/**", "/uploads/**").permitAll()
@@ -60,11 +60,11 @@ public class SecurityConfig {
                         .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))
                 )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
-                 .formLogin(form -> form
-                         .loginPage("/login")
-                         .defaultSuccessUrl(frontendUrl , true)
-                         .permitAll()
-                 );
+                 .formLogin(form -> form.disable());
+                         //.loginPage("/login"));
+//                         .defaultSuccessUrl(frontendUrl , true)
+//                         .permitAll()
+
                  
          if (!"test".equals(activeProfile)) {
              http.oauth2Login(oauth2login -> {
