@@ -35,6 +35,15 @@ public class SessionManager {
         return ctx;
     }
 
+    public SessionContext create(PlaygroundSnapshot snapshot) {
+        String sessionId = UUID.randomUUID().toString();
+        SessionContext ctx = new SessionContext(sessionId, snapshot.getExerciseId());
+        SnapshotMapper.buildFromSnapshot(ctx, snapshot);
+        sessions.put(sessionId, ctx);
+        log.info("sessao criada: {} a partir de snapshot", sessionId);
+        return ctx;
+    }
+
     public Optional<SessionContext> get(String sessionId) {
         SessionContext ctx = sessions.get(sessionId);
         if (ctx != null) {

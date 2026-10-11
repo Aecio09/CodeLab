@@ -6,6 +6,8 @@ public enum VerificationStatus {
     NODE_REJECTED,        // Rejeitado pelo Node (não atende requisitos)
     AI_VERIFIED,          // Passou na verificação da IA
     AI_REJECTED,          // Rejeitado pela IA
-    APPROVED              // Resposta aprovada
+    APPROVED,             // Resposta aprovada
+    NETWORK_APPROVED,     // Aprovado pela verificacao deterministica do network-engine
+    NETWORK_REJECTED      // Rejeitado pela verificacao deterministica do network-engine
 }
 

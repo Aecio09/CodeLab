@@ -2,12 +2,23 @@ package com.codelab.core.controllers;
 
 import com.codelab.core.exceptions.AnswerRejectedByAiException;
 import com.codelab.core.exceptions.AnswerRejectedByNodeException;
+import com.codelab.core.exceptions.SessionNotFoundException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
+    @ExceptionHandler(SessionNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleSessionNotFound(SessionNotFoundException ex) {
+        ErrorResponse error = new ErrorResponse(
+                "SESSION_NOT_FOUND",
+                ex.getMessage(),
+                404
+        );
+        return ResponseEntity.status(404).body(error);
+    }
 
     @ExceptionHandler(AnswerRejectedByNodeException.class)
     public ResponseEntity<ErrorResponse> handleAnswerRejected(AnswerRejectedByNodeException ex) {

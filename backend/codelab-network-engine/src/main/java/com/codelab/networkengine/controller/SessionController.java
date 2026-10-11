@@ -13,6 +13,7 @@ import com.codelab.networkengine.simulation.NetworkEvent;
 import com.codelab.networkengine.snapshot.DeviceSnapshot;
 import com.codelab.networkengine.snapshot.LinkSnapshot;
 import com.codelab.networkengine.snapshot.PlaygroundSnapshot;
+import com.codelab.networkengine.verification.VerificationService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -27,10 +28,13 @@ public class SessionController {
 
     private final SessionManager sessionManager;
     private final SnapshotStore store;
+    private final VerificationService verificationService;
 
-    public SessionController(SessionManager sessionManager, SnapshotStore store) {
+    public SessionController(SessionManager sessionManager, SnapshotStore store,
+                             VerificationService verificationService) {
         this.sessionManager = sessionManager;
         this.store = store;
+        this.verificationService = verificationService;
     }
 
     @PostMapping
@@ -41,6 +45,12 @@ public class SessionController {
         } catch (IllegalArgumentException e) {
             return ResponseEntity.notFound().build();
         }
+    }
+
+    @PostMapping("/from-snapshot")
+    public ResponseEntity<SessionResponse> createFromSnapshot(@RequestBody CreateSessionWithSnapshot req) {
+        SessionContext ctx = sessionManager.create(req.snapshot());
+        return ResponseEntity.ok(new SessionResponse(ctx.getSessionId(), ctx.getExerciseId()));
     }
 
     @PostMapping("/{sessionId}/cli")
@@ -62,6 +72,16 @@ public class SessionController {
             ctx.getEngine().setTraceSink(null);
         }
         return ResponseEntity.ok(new CliResponse(req.deviceRef(), cli.prompt(), output, events));
+    }
+
+    @PostMapping("/{sessionId}/verify")
+    public ResponseEntity<VerificationService.VerifyResponse> verify(@PathVariable String sessionId,
+                                                                      @RequestBody VerificationService.VerifyRequest request) {
+        SessionContext ctx = sessionManager.get(sessionId).orElse(null);
+        if (ctx == null) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(verificationService.verify(ctx, request));
     }
 
     private static TraceEvent toTraceEvent(SessionContext ctx, NetworkEvent e) {
@@ -250,6 +270,7 @@ public class SessionController {
     }
 
     public record CreateSessionRequest(String exerciseId) {}
+    public record CreateSessionWithSnapshot(PlaygroundSnapshot snapshot) {}
     public record SessionResponse(String sessionId, String exerciseId) {}
     public record CliRequest(String deviceRef, String line) {}
     public record CliResponse(String deviceRef, String prompt, String output, List<TraceEvent> events) {}
