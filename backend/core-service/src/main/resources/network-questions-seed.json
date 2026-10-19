@@ -1,0 +1,371 @@
+[
+  {
+    "title": "Modulo 1 - Dois hosts na mesma rede",
+    "type": "PRACTICE",
+    "topic": "BASIC_NETWORKING",
+    "difficulty": "EASY",
+    "scenery": {
+      "name": "Dois hosts na mesma rede",
+      "exerciseId": "net-m1-q1",
+      "links": [
+        { "status": "UP", "deviceRefA": "pc1", "deviceRefB": "sw1", "interfaceA": "eth0", "interfaceB": "fa0/1" },
+        { "status": "UP", "deviceRefA": "pc2", "deviceRefB": "sw1", "interfaceA": "eth0", "interfaceB": "fa0/2" }
+      ],
+      "devices": [
+        {
+          "x": 120, "y": 80, "ref": "pc1", "kind": "HOST", "hostname": "PC1",
+          "interfaces": [{ "name": "eth0", "adminUp": true, "ipAddress": "192.168.1.10", "subnetMask": "255.255.255.0" }]
+        },
+        {
+          "x": 320, "y": 80, "ref": "pc2", "kind": "HOST", "hostname": "PC2",
+          "interfaces": [{ "name": "eth0", "adminUp": true, "ipAddress": "192.168.2.20", "subnetMask": "255.255.255.0" }]
+        },
+        {
+          "x": 220, "y": 220, "ref": "sw1", "kind": "SWITCH", "hostname": "SW1",
+          "interfaces": [{ "name": "fa0/1", "adminUp": true }, { "name": "fa0/2", "adminUp": true }]
+        }
+      ]
+    },
+    "sceneryAnswers": [
+      { "field": "devices.pc1.interfaces.eth0.ipAddress", "check": "equals", "value": "192.168.1.10" },
+      { "field": "devices.pc1.interfaces.eth0.subnetMask", "check": "equals", "value": "255.255.255.0" },
+      { "field": "devices.pc2.interfaces.eth0.ipAddress", "check": "equals", "value": "192.168.1.20" },
+      { "field": "devices.pc2.interfaces.eth0.subnetMask", "check": "equals", "value": "255.255.255.0" }
+    ]
+  },
+  {
+    "title": "Modulo 2 - Primeiro IP do host",
+    "type": "PRACTICE",
+    "topic": "BASIC_NETWORKING",
+    "difficulty": "EASY",
+    "scenery": {
+      "name": "Primeiro IP do host",
+      "exerciseId": "net-m2-q1",
+      "links": [
+        { "status": "UP", "deviceRefA": "pc1", "deviceRefB": "sw1", "interfaceA": "eth0", "interfaceB": "fa0/1" }
+      ],
+      "devices": [
+        {
+          "x": 120, "y": 100, "ref": "pc1", "kind": "HOST", "hostname": "PC1",
+          "interfaces": [{ "name": "eth0", "adminUp": true }]
+        },
+        {
+          "x": 320, "y": 100, "ref": "sw1", "kind": "SWITCH", "hostname": "SW1",
+          "interfaces": [{ "name": "fa0/1", "adminUp": true }]
+        }
+      ]
+    },
+    "sceneryAnswers": [
+      { "field": "devices.pc1.interfaces.eth0.ipAddress", "check": "equals", "value": "10.0.0.10" },
+      { "field": "devices.pc1.interfaces.eth0.subnetMask", "check": "equals", "value": "255.255.255.0" },
+      { "field": "devices.pc1.interfaces.eth0.adminUp", "check": "equals", "value": true }
+    ]
+  },
+  {
+    "title": "Modulo 3 - Gateway padrao do host",
+    "type": "PRACTICE",
+    "topic": "BASIC_NETWORKING",
+    "difficulty": "EASY",
+    "scenery": {
+      "name": "Gateway padrao do host",
+      "exerciseId": "net-m3-q1",
+      "links": [
+        { "status": "UP", "deviceRefA": "pc1", "deviceRefB": "sw1", "interfaceA": "eth0", "interfaceB": "fa0/1" },
+        { "status": "UP", "deviceRefA": "sw1", "deviceRefB": "r1", "interfaceA": "fa0/2", "interfaceB": "gi0/1" }
+      ],
+      "devices": [
+        {
+          "x": 100, "y": 100, "ref": "pc1", "kind": "HOST", "hostname": "PC1",
+          "interfaces": [{ "name": "eth0", "adminUp": true, "ipAddress": "192.168.1.10", "subnetMask": "255.255.255.0" }]
+        },
+        {
+          "x": 280, "y": 100, "ref": "sw1", "kind": "SWITCH", "hostname": "SW1",
+          "interfaces": [{ "name": "fa0/1", "adminUp": true }, { "name": "fa0/2", "adminUp": true }]
+        },
+        {
+          "x": 460, "y": 100, "ref": "r1", "kind": "ROUTER", "hostname": "R1",
+          "interfaces": [{ "name": "gi0/1", "adminUp": true, "ipAddress": "192.168.1.1", "subnetMask": "255.255.255.0" }]
+        }
+      ]
+    },
+    "sceneryAnswers": [
+      { "field": "devices.pc1.defaultGateway", "check": "equals", "value": "192.168.1.1" },
+      { "field": "devices.pc1.interfaces.eth0.ipAddress", "check": "equals", "value": "192.168.1.10" }
+    ]
+  },
+  {
+    "title": "Modulo 4 - Corrigindo a mascara",
+    "type": "PRACTICE",
+    "topic": "BASIC_NETWORKING",
+    "difficulty": "MEDIUM",
+    "scenery": {
+      "name": "Corrigindo a mascara",
+      "exerciseId": "net-m4-q1",
+      "links": [
+        { "status": "UP", "deviceRefA": "pc1", "deviceRefB": "sw1", "interfaceA": "eth0", "interfaceB": "fa0/1" },
+        { "status": "UP", "deviceRefA": "pc2", "deviceRefB": "sw1", "interfaceA": "eth0", "interfaceB": "fa0/2" }
+      ],
+      "devices": [
+        {
+          "x": 100, "y": 100, "ref": "pc1", "kind": "HOST", "hostname": "PC1",
+          "interfaces": [{ "name": "eth0", "adminUp": true, "ipAddress": "192.168.10.10", "subnetMask": "255.255.255.0" }]
+        },
+        {
+          "x": 400, "y": 100, "ref": "pc2", "kind": "HOST", "hostname": "PC2",
+          "interfaces": [{ "name": "eth0", "adminUp": true, "ipAddress": "192.168.10.20", "subnetMask": "255.255.0.0" }]
+        },
+        {
+          "x": 250, "y": 220, "ref": "sw1", "kind": "SWITCH", "hostname": "SW1",
+          "interfaces": [{ "name": "fa0/1", "adminUp": true }, { "name": "fa0/2", "adminUp": true }]
+        }
+      ]
+    },
+    "sceneryAnswers": [
+      { "field": "devices.pc2.interfaces.eth0.ipAddress", "check": "equals", "value": "192.168.10.20" },
+      { "field": "devices.pc2.interfaces.eth0.subnetMask", "check": "equals", "value": "255.255.255.0" }
+    ]
+  },
+  {
+    "title": "Modulo 5 - VLAN de vendas",
+    "type": "PRACTICE",
+    "topic": "BASIC_NETWORKING",
+    "difficulty": "MEDIUM",
+    "scenery": {
+      "name": "VLAN de vendas",
+      "exerciseId": "net-m5-q1",
+      "links": [
+        { "status": "UP", "deviceRefA": "pc1", "deviceRefB": "sw1", "interfaceA": "eth0", "interfaceB": "fa0/1" },
+        { "status": "UP", "deviceRefA": "pc2", "deviceRefB": "sw1", "interfaceA": "eth0", "interfaceB": "fa0/2" }
+      ],
+      "devices": [
+        {
+          "x": 100, "y": 100, "ref": "pc1", "kind": "HOST", "hostname": "PC1",
+          "interfaces": [{ "name": "eth0", "adminUp": true, "ipAddress": "192.168.10.10", "subnetMask": "255.255.255.0" }]
+        },
+        {
+          "x": 400, "y": 100, "ref": "pc2", "kind": "HOST", "hostname": "PC2",
+          "interfaces": [{ "name": "eth0", "adminUp": true, "ipAddress": "192.168.10.20", "subnetMask": "255.255.255.0" }]
+        },
+        {
+          "x": 250, "y": 220, "ref": "sw1", "kind": "SWITCH", "hostname": "SW1",
+          "interfaces": [{ "name": "fa0/1", "adminUp": true }, { "name": "fa0/2", "adminUp": true }]
+        }
+      ]
+    },
+    "sceneryAnswers": [
+      { "field": "devices.sw1.interfaces.fa0/1.accessVlanId", "check": "equals", "value": 10 },
+      { "field": "devices.sw1.interfaces.fa0/2.accessVlanId", "check": "equals", "value": 10 },
+      { "field": "devices.sw1.vlans.VENDAS.id", "check": "equals", "value": 10 }
+    ]
+  },
+  {
+    "title": "Modulo 6 - Reativando a interface",
+    "type": "PRACTICE",
+    "topic": "BASIC_NETWORKING",
+    "difficulty": "MEDIUM",
+    "scenery": {
+      "name": "Reativando a interface",
+      "exerciseId": "net-m6-q1",
+      "links": [
+        { "status": "UP", "deviceRefA": "pc1", "deviceRefB": "sw1", "interfaceA": "eth0", "interfaceB": "fa0/1" },
+        { "status": "UP", "deviceRefA": "sw1", "deviceRefB": "r1", "interfaceA": "fa0/2", "interfaceB": "gi0/1" }
+      ],
+      "devices": [
+        {
+          "x": 100, "y": 100, "ref": "pc1", "kind": "HOST", "hostname": "PC1",
+          "defaultGateway": "10.0.0.1",
+          "interfaces": [{ "name": "eth0", "adminUp": true, "ipAddress": "10.0.0.10", "subnetMask": "255.255.255.0" }]
+        },
+        {
+          "x": 280, "y": 100, "ref": "sw1", "kind": "SWITCH", "hostname": "SW1",
+          "interfaces": [{ "name": "fa0/1", "adminUp": true }, { "name": "fa0/2", "adminUp": true }]
+        },
+        {
+          "x": 460, "y": 100, "ref": "r1", "kind": "ROUTER", "hostname": "R1",
+          "interfaces": [{ "name": "gi0/1", "adminUp": false }]
+        }
+      ]
+    },
+    "sceneryAnswers": [
+      { "field": "devices.r1.interfaces.gi0/1.adminUp", "check": "equals", "value": true },
+      { "field": "devices.r1.interfaces.gi0/1.ipAddress", "check": "equals", "value": "10.0.0.1" },
+      { "field": "devices.r1.interfaces.gi0/1.subnetMask", "check": "equals", "value": "255.255.255.0" }
+    ]
+  },
+  {
+    "title": "Modulo 7 - Rota estatica",
+    "type": "PRACTICE",
+    "topic": "BASIC_NETWORKING",
+    "difficulty": "HARD",
+    "scenery": {
+      "name": "Rota estatica",
+      "exerciseId": "net-m7-q1",
+      "links": [
+        { "status": "UP", "deviceRefA": "pc1", "deviceRefB": "sw1", "interfaceA": "eth0", "interfaceB": "fa0/1" },
+        { "status": "UP", "deviceRefA": "sw1", "deviceRefB": "r1", "interfaceA": "fa0/2", "interfaceB": "gi0/1" },
+        { "status": "UP", "deviceRefA": "r1", "deviceRefB": "r2", "interfaceA": "gi0/2", "interfaceB": "gi0/1" },
+        { "status": "UP", "deviceRefA": "r2", "deviceRefB": "sw2", "interfaceA": "gi0/2", "interfaceB": "fa0/1" },
+        { "status": "UP", "deviceRefA": "srv1", "deviceRefB": "sw2", "interfaceA": "eth0", "interfaceB": "fa0/2" }
+      ],
+      "devices": [
+        {
+          "x": 80, "y": 120, "ref": "pc1", "kind": "HOST", "hostname": "PC1",
+          "defaultGateway": "10.0.0.1",
+          "interfaces": [{ "name": "eth0", "adminUp": true, "ipAddress": "10.0.0.10", "subnetMask": "255.255.255.0" }]
+        },
+        {
+          "x": 240, "y": 120, "ref": "sw1", "kind": "SWITCH", "hostname": "SW1",
+          "interfaces": [{ "name": "fa0/1", "adminUp": true }, { "name": "fa0/2", "adminUp": true }]
+        },
+        {
+          "x": 400, "y": 120, "ref": "r1", "kind": "ROUTER", "hostname": "R1",
+          "interfaces": [
+            { "name": "gi0/1", "adminUp": true, "ipAddress": "10.0.0.1", "subnetMask": "255.255.255.0" },
+            { "name": "gi0/2", "adminUp": true, "ipAddress": "192.168.1.1", "subnetMask": "255.255.255.0" }
+          ]
+        },
+        {
+          "x": 600, "y": 120, "ref": "r2", "kind": "ROUTER", "hostname": "R2",
+          "interfaces": [
+            { "name": "gi0/1", "adminUp": true, "ipAddress": "192.168.1.2", "subnetMask": "255.255.255.0" },
+            { "name": "gi0/2", "adminUp": true, "ipAddress": "172.16.0.1", "subnetMask": "255.255.255.0" }
+          ]
+        },
+        {
+          "x": 760, "y": 120, "ref": "sw2", "kind": "SWITCH", "hostname": "SW2",
+          "interfaces": [{ "name": "fa0/1", "adminUp": true }, { "name": "fa0/2", "adminUp": true }]
+        },
+        {
+          "x": 900, "y": 120, "ref": "srv1", "kind": "HOST", "hostname": "SRV1",
+          "defaultGateway": "172.16.0.1",
+          "interfaces": [{ "name": "eth0", "adminUp": true, "ipAddress": "172.16.0.10", "subnetMask": "255.255.255.0" }]
+        }
+      ]
+    },
+    "sceneryAnswers": [
+      {
+        "field": "devices.r1.routes",
+        "check": "contains",
+        "value": { "network": "172.16.0.0", "subnetMask": "255.255.255.0", "nextHop": "192.168.1.2" }
+      }
+    ]
+  },
+  {
+    "title": "Modulo 8 - Trunk entre switches",
+    "type": "PRACTICE",
+    "topic": "BASIC_NETWORKING",
+    "difficulty": "HARD",
+    "scenery": {
+      "name": "Trunk entre switches",
+      "exerciseId": "net-m8-q1",
+      "links": [
+        { "status": "UP", "deviceRefA": "pc1", "deviceRefB": "sw1", "interfaceA": "eth0", "interfaceB": "fa0/1" },
+        { "status": "UP", "deviceRefA": "sw1", "deviceRefB": "sw2", "interfaceA": "fa0/24", "interfaceB": "fa0/24" },
+        { "status": "UP", "deviceRefA": "pc2", "deviceRefB": "sw2", "interfaceA": "eth0", "interfaceB": "fa0/1" }
+      ],
+      "devices": [
+        {
+          "x": 80, "y": 120, "ref": "pc1", "kind": "HOST", "hostname": "PC1",
+          "interfaces": [{ "name": "eth0", "adminUp": true, "ipAddress": "192.168.10.10", "subnetMask": "255.255.255.0" }]
+        },
+        {
+          "x": 240, "y": 120, "ref": "sw1", "kind": "SWITCH", "hostname": "SW1",
+          "interfaces": [{ "name": "fa0/1", "adminUp": true }, { "name": "fa0/24", "adminUp": true }]
+        },
+        {
+          "x": 480, "y": 120, "ref": "sw2", "kind": "SWITCH", "hostname": "SW2",
+          "interfaces": [{ "name": "fa0/1", "adminUp": true }, { "name": "fa0/24", "adminUp": true }]
+        },
+        {
+          "x": 640, "y": 120, "ref": "pc2", "kind": "HOST", "hostname": "PC2",
+          "interfaces": [{ "name": "eth0", "adminUp": true, "ipAddress": "192.168.10.20", "subnetMask": "255.255.255.0" }]
+        }
+      ]
+    },
+    "sceneryAnswers": [
+      { "field": "devices.sw1.interfaces.fa0/24.portMode", "check": "equals", "value": "TRUNK" },
+      { "field": "devices.sw2.interfaces.fa0/24.portMode", "check": "equals", "value": "TRUNK" }
+    ]
+  },
+  {
+    "title": "Modulo 9 - Identificacao do roteador",
+    "type": "PRACTICE",
+    "topic": "BASIC_NETWORKING",
+    "difficulty": "EASY",
+    "scenery": {
+      "name": "Identificacao do roteador",
+      "exerciseId": "net-m9-q1",
+      "links": [
+        { "status": "UP", "deviceRefA": "pc1", "deviceRefB": "sw1", "interfaceA": "eth0", "interfaceB": "fa0/1" },
+        { "status": "UP", "deviceRefA": "sw1", "deviceRefB": "r1", "interfaceA": "fa0/2", "interfaceB": "gi0/1" }
+      ],
+      "devices": [
+        {
+          "x": 100, "y": 100, "ref": "pc1", "kind": "HOST", "hostname": "PC1",
+          "interfaces": [{ "name": "eth0", "adminUp": true, "ipAddress": "192.168.1.10", "subnetMask": "255.255.255.0" }]
+        },
+        {
+          "x": 280, "y": 100, "ref": "sw1", "kind": "SWITCH", "hostname": "SW1",
+          "interfaces": [{ "name": "fa0/1", "adminUp": true }, { "name": "fa0/2", "adminUp": true }]
+        },
+        {
+          "x": 460, "y": 100, "ref": "r1", "kind": "ROUTER", "hostname": "R1",
+          "interfaces": [{ "name": "gi0/1", "adminUp": true, "ipAddress": "192.168.1.1", "subnetMask": "255.255.255.0" }]
+        }
+      ]
+    },
+    "sceneryAnswers": [
+      { "field": "devices.r1.hostname", "check": "equals", "value": "R-EDGE" },
+      { "field": "devices.r1.interfaces.gi0/1.description", "check": "equals", "value": "link-isp" }
+    ]
+  },
+  {
+    "title": "Modulo 10 - Duas redes com roteador",
+    "type": "PRACTICE",
+    "topic": "BASIC_NETWORKING",
+    "difficulty": "HARD",
+    "scenery": {
+      "name": "Duas redes com roteador",
+      "exerciseId": "net-m10-q1",
+      "links": [
+        { "status": "UP", "deviceRefA": "pc1", "deviceRefB": "sw1", "interfaceA": "eth0", "interfaceB": "fa0/1" },
+        { "status": "UP", "deviceRefA": "sw1", "deviceRefB": "r1", "interfaceA": "fa0/2", "interfaceB": "gi0/1" },
+        { "status": "UP", "deviceRefA": "r1", "deviceRefB": "sw2", "interfaceA": "gi0/2", "interfaceB": "fa0/2" },
+        { "status": "UP", "deviceRefA": "pc2", "deviceRefB": "sw2", "interfaceA": "eth0", "interfaceB": "fa0/1" }
+      ],
+      "devices": [
+        {
+          "x": 80, "y": 120, "ref": "pc1", "kind": "HOST", "hostname": "PC1",
+          "defaultGateway": "10.0.0.1",
+          "interfaces": [{ "name": "eth0", "adminUp": true, "ipAddress": "10.0.0.10", "subnetMask": "255.255.255.0" }]
+        },
+        {
+          "x": 240, "y": 120, "ref": "sw1", "kind": "SWITCH", "hostname": "SW1",
+          "interfaces": [{ "name": "fa0/1", "adminUp": true }, { "name": "fa0/2", "adminUp": true }]
+        },
+        {
+          "x": 420, "y": 120, "ref": "r1", "kind": "ROUTER", "hostname": "R1",
+          "interfaces": [
+            { "name": "gi0/1", "adminUp": true, "ipAddress": "10.0.0.1", "subnetMask": "255.255.255.0" },
+            { "name": "gi0/2", "adminUp": true }
+          ]
+        },
+        {
+          "x": 600, "y": 120, "ref": "sw2", "kind": "SWITCH", "hostname": "SW2",
+          "interfaces": [{ "name": "fa0/1", "adminUp": true }, { "name": "fa0/2", "adminUp": true }]
+        },
+        {
+          "x": 760, "y": 120, "ref": "pc2", "kind": "HOST", "hostname": "PC2",
+          "defaultGateway": "10.0.1.1",
+          "interfaces": [{ "name": "eth0", "adminUp": true, "ipAddress": "10.0.1.10", "subnetMask": "255.255.255.0" }]
+        }
+      ]
+    },
+    "sceneryAnswers": [
+      { "field": "devices.r1.interfaces.gi0/2.ipAddress", "check": "equals", "value": "10.0.1.1" },
+      { "field": "devices.r1.interfaces.gi0/2.subnetMask", "check": "equals", "value": "255.255.255.0" },
+      { "field": "devices.pc1.defaultGateway", "check": "equals", "value": "10.0.0.1" },
+      { "field": "devices.pc2.defaultGateway", "check": "equals", "value": "10.0.1.1" }
+    ]
+  }
+]

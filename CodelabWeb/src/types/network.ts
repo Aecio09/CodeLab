@@ -83,3 +83,47 @@ export type DeviceState = {
   vlans: { id: number; name: string }[]
   defaultGateway: string | null
 }
+
+// --- Trilha e lab de rede (questões) ---
+export type LabStatus = 'COMPLETED' | 'AVAILABLE' | 'LOCKED'
+
+export type NetworkTrailItem = {
+  questionId: number
+  title: string
+  type: string
+  difficulty: string
+  status: LabStatus
+}
+
+export type NetworkTrailTopic = {
+  topic: string
+  status: LabStatus
+  totalQuestions: number
+  completedQuestions: number
+  questions: NetworkTrailItem[]
+}
+
+export type NetworkTrailResponse = { topics: NetworkTrailTopic[] }
+
+export type LabScenario = {
+  name?: string
+  exerciseId?: string
+  devices: NetDevice[]
+  links: NetLink[]
+}
+
+export type StartLabResponse = { sessionId: string; scenario: LabScenario }
+
+export type LabCheck = {
+  field: string
+  check: string
+  expected: unknown
+  actual: unknown
+  passed: boolean
+}
+
+export type LabResult = {
+  answerId: number
+  status: string
+  result: { verdict: string; checks: LabCheck[] }
+}

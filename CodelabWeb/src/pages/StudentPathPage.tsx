@@ -3,6 +3,7 @@ import { API_BASE_URL } from '../constants'
 import { authFetch, apiLogout } from '../lib/api'
 import type { TopicStatus, UserProfile } from '../types'
 import { EditProfileModal } from '../components/EditProfileModal'
+import { AreaSwitch } from '../components/network/AreaSwitch'
 import {resolvePhotoUrl} from "../utils.ts";
 
 const TOPIC_METADATA: Record<string, { label: string; icon: string }> = {
@@ -109,13 +110,6 @@ export function StudentPathPage() {
             <span className="material-symbols-outlined">terminal</span>
             Playground
           </a>
-          <a
-            href="/networkplayground"
-            className="w-full flex items-center gap-3 text-on-surface-variant hover:text-on-surface px-4 py-2 hover:bg-surface-container-highest rounded-lg text-left font-semibold text-sm transition-all"
-          >
-            <span className="material-symbols-outlined">lan</span>
-            Playground de Redes
-          </a>
           <button
             onClick={() => setIsProfileModalOpen(true)}
             className="w-full flex items-center gap-3 text-on-surface-variant hover:text-on-surface px-4 py-2 hover:bg-surface-container-highest rounded-lg text-left font-semibold text-sm transition-all"
@@ -123,6 +117,7 @@ export function StudentPathPage() {
             <span className="material-symbols-outlined">account_circle</span>
             Meu Perfil
           </button>
+          <AreaSwitch area="code" />
         </nav>
         <div className="mt-auto pt-4 border-t border-outline-variant">
           <button

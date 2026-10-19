@@ -30,7 +30,7 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/questions", "/questions/**", "/answers", "/answers/**", "/api/trail/**").permitAll()
+                        .requestMatchers("/questions", "/questions/**", "/answers", "/answers/**", "/api/trail/**", "/api/network-trail/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);

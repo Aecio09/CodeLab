@@ -36,8 +36,9 @@ public class QuestionNetworkController {
     @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('USER')")
     public ResponseEntity<StartNetworkQuestionResponse> startQuestionNetwork(
             @PathVariable long id,
-            @RequestHeader("Authorization") String authHeader) {
-        return ResponseEntity.ok(questionNetworkService.startQuestionNetwork(id, authHeader));
+            @RequestHeader("Authorization") String authHeader,
+            Principal principal) {
+        return ResponseEntity.ok(questionNetworkService.startQuestionNetwork(id, authHeader, principal));
     }
 
     @PostMapping("/{id}/submit")
@@ -59,13 +60,13 @@ public class QuestionNetworkController {
     }
 
     @GetMapping
-    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('USER')")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<List<QuestionNetwork>> getAllQuestionNetworks() {
         return ResponseEntity.ok(questionNetworkService.getAllQuestionNetworks());
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('USER')")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<QuestionNetwork> getQuestionNetworkById(@PathVariable long id) {
         return ResponseEntity.ok(questionNetworkService.getQuestionNetworkById(id));
     }
