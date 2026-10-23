@@ -8,6 +8,27 @@ export default {
   theme: {
     extend: {
       colors: {
+        auth: {
+          background: '#070709',
+          surface: '#0d0d0f',
+          'surface-container-lowest': '#070709',
+          'surface-container-low': '#151518',
+          'surface-container': '#1a1a1d',
+          'surface-container-high': '#232326',
+          'surface-container-highest': '#303035',
+          'on-background': '#e5e1e4',
+          'on-surface': '#e5e1e4',
+          'on-surface-variant': '#9ba0a5',
+          primary: '#ffffff',
+          'on-primary': '#121214',
+          secondary: '#c1c7cf',
+          outline: '#4a4d52',
+          'outline-variant': '#2a2a2e',
+          error: '#ffb4ab',
+          'error-container': '#93000a',
+          'on-error': '#690005',
+          'on-error-container': '#ffdad6',
+        },
         'on-tertiary-fixed-variant': '#7f2831',
         'tertiary-fixed-dim': '#ffb3b5',
         'on-secondary-fixed': '#121e19',
@@ -76,6 +97,8 @@ export default {
         'max-width': '1280px',
       },
       fontFamily: {
+        mono: ['JetBrains Mono', 'ui-monospace', 'SFMono-Regular', 'Menlo', 'monospace'],
+        'auth-body': ['Plus Jakarta Sans', 'sans-serif'],
         h2: ['Manrope'],
         'body-sm': ['Manrope'],
         'body-lg': ['Manrope'],

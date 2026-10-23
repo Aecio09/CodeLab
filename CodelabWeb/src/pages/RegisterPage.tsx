@@ -1,13 +1,23 @@
 import { useState } from 'react'
 import type { FormEvent } from 'react'
 import { API_BASE_URL } from '../constants'
-import { SharedFooter } from '../components/SharedFooter'
+import { AuthBackground } from '../components/AuthBackground'
+
+const fieldWrapperClass =
+  'relative flex items-center rounded bg-[#0a0a0c] border border-white/10 hover:border-white/20 focus-within:border-white/40 focus-within:ring-1 focus-within:ring-white/20 transition-all'
+
+const inputClass =
+  'w-full min-h-11 bg-transparent border-0 py-2.5 pl-2.5 pr-3.5 text-sm text-white placeholder:text-neutral-500 focus:ring-0 focus:outline-none'
+
+const labelClass = 'block text-xs font-medium text-neutral-300 mb-1.5'
 
 export function RegisterPage() {
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [acceptTerms, setAcceptTerms] = useState(false)
   const [error, setError] = useState('')
   const [submitting, setSubmitting] = useState(false)
@@ -55,140 +65,253 @@ export function RegisterPage() {
   }
 
   return (
-    <>
-      <header className="bg-surface border-b border-outline-variant z-50 sticky top-0">
-        <div className="flex justify-between items-center px-lg md:px-margin-desktop h-16 max-w-max-width mx-auto">
-          <div className="text-lg font-h2 font-bold text-primary tracking-tight">CodeLab</div>
-          <div className="flex items-center gap-md">
-            <a className="text-body-md font-body-md text-on-surface-variant hover:text-primary transition-colors cursor-pointer" href="/">
-              Entrar
-            </a>
-            <a className="btn-secondary !h-9 !px-md" href="mailto:suporte@codelab.com">
-              Contate-nos
-            </a>
-          </div>
+    <div className="relative flex min-h-screen w-full flex-col overflow-hidden bg-[#070709] text-auth-on-surface antialiased font-auth-body selection:bg-white selection:text-black">
+      <AuthBackground />
+
+      <header className="relative z-20 w-full border-b border-white/[0.06] bg-[#070709]/60 backdrop-blur-md">
+        <div className="mx-auto flex h-16 w-full max-w-[1200px] items-center justify-between px-6 lg:px-12">
+          <a className="flex items-center gap-2.5" href="/" aria-label="CodeLab — página inicial">
+            <span className="w-7 h-7 rounded bg-white/[0.05] border border-white/10 flex items-center justify-center text-white">
+              <span className="material-symbols-outlined text-[17px]" style={{ fontVariationSettings: "'FILL' 1" }}>
+                terminal
+              </span>
+            </span>
+            <span className="text-base font-semibold text-white tracking-tight">CodeLab</span>
+          </a>
+
+          <a
+            className="inline-flex h-9 items-center justify-center gap-1.5 rounded border border-white/10 bg-white/[0.05] px-4 text-xs font-medium text-white transition-colors hover:border-white/20 hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40"
+            href="/"
+          >
+            <span className="material-symbols-outlined text-[15px]" aria-hidden="true">login</span>
+            Entrar
+          </a>
         </div>
       </header>
-      <main className="flex-grow flex items-center justify-center py-xl px-margin-mobile">
-        <div className="w-full max-w-[480px] bg-surface-container rounded-xl border border-outline-variant tinted-shadow overflow-hidden">
-          <div className="p-lg md:p-xl space-y-lg">
-            <div className="text-center space-y-xs">
-              <h1 className="text-h1 font-h1 font-bold text-on-surface">Começar agora</h1>
-              <p className="text-body-md font-body-md text-on-surface-variant">Crie sua conta no CodeLab e domine a lógica</p>
+
+      <main className="relative z-10 flex flex-1 justify-center px-4 sm:px-6 py-10 sm:py-12">
+        <div className="my-auto w-full max-w-[480px]">
+          <div className="bg-[#121215]/95 backdrop-blur-md border border-white/[0.08] rounded-lg p-7 sm:p-9 shadow-2xl relative">
+            <div className="absolute top-0 left-0 right-0 h-[2px] rounded-t-lg bg-gradient-to-r from-violet-500 via-cyan-400 to-sky-300 opacity-60"></div>
+
+            <div className="mb-7 text-left">
+              <h1
+                className="text-3xl leading-tight text-white font-normal"
+                style={{ fontFamily: 'Times New Roman, Times, serif', letterSpacing: '-0.01em' }}
+              >
+                Crie sua conta
+              </h1>
+              <p className="text-sm text-neutral-400 mt-2">
+                Comece sua jornada na programação. Aprenda lógica na prática.
+              </p>
             </div>
-            <form className="space-y-md" onSubmit={handleSubmit}>
-              <div>
-                <label className="form-label" htmlFor="name">
-                  Nome Completo
-                </label>
-                <input
-                  className="input-field"
-                  id="name"
-                  placeholder="Ex: João Silva"
-                  type="text"
-                  required
-                  value={name}
-                  onChange={(event) => setName(event.target.value)}
-                />
+
+            {error ? (
+              <div
+                className="mb-4 flex items-start gap-2 rounded border border-auth-error/30 bg-auth-error-container/20 px-3 py-2 text-sm text-auth-error"
+                role="alert"
+              >
+                <span className="material-symbols-outlined text-[17px] mt-px" aria-hidden="true">error</span>
+                <span>{error}</span>
               </div>
+            ) : null}
+
+            <form className="space-y-4" onSubmit={handleSubmit}>
               <div>
-                <label className="form-label" htmlFor="register-email">
+                <label className={labelClass} htmlFor="name">
+                  Nome completo
+                </label>
+                <div className={fieldWrapperClass}>
+                  <span className="pl-3.5 text-cyan-400/80 flex items-center justify-center pointer-events-none" aria-hidden="true">
+                    <span className="material-symbols-outlined text-[17px]">person</span>
+                  </span>
+                  <input
+                    autoComplete="name"
+                    className={inputClass}
+                    id="name"
+                    name="name"
+                    placeholder="Seu nome"
+                    type="text"
+                    required
+                    value={name}
+                    onChange={(event) => setName(event.target.value)}
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className={labelClass} htmlFor="register-email">
                   E-mail
                 </label>
-                <input
-                  className="input-field"
-                  id="register-email"
-                  placeholder="nome@email.com"
-                  type="email"
-                  required
-                  value={email}
-                  onChange={(event) => setEmail(event.target.value)}
-                />
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-md">
-                <div>
-                  <label className="form-label" htmlFor="register-password">
-                    Senha
-                  </label>
+                <div className={fieldWrapperClass}>
+                  <span className="pl-3.5 text-cyan-400/80 flex items-center justify-center pointer-events-none" aria-hidden="true">
+                    <span className="material-symbols-outlined text-[17px]">alternate_email</span>
+                  </span>
                   <input
-                    className="input-field"
+                    autoComplete="email"
+                    className={inputClass}
+                    id="register-email"
+                    name="email"
+                    placeholder="seu@email.com"
+                    type="email"
+                    required
+                    value={email}
+                    onChange={(event) => setEmail(event.target.value)}
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className={labelClass} htmlFor="register-password">
+                  Senha
+                </label>
+                <div className={fieldWrapperClass}>
+                  <span className="pl-3.5 text-violet-400/80 flex items-center justify-center pointer-events-none" aria-hidden="true">
+                    <span className="material-symbols-outlined text-[17px]">key</span>
+                  </span>
+                  <input
+                    autoComplete="new-password"
+                    className={`${inputClass} pr-10 font-mono tracking-widest`}
                     id="register-password"
-                    placeholder="••••••••"
-                    type="password"
+                    name="password"
+                    placeholder="••••••••••••"
+                    type={showPassword ? 'text' : 'password'}
                     required
                     value={password}
                     onChange={(event) => setPassword(event.target.value)}
                   />
+                  <button
+                    aria-label={showPassword ? 'Ocultar senha' : 'Mostrar senha'}
+                    aria-pressed={showPassword}
+                    className="absolute right-0 pr-3.5 text-neutral-400 hover:text-white transition-colors flex items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40 rounded"
+                    onClick={() => setShowPassword((visible) => !visible)}
+                    type="button"
+                  >
+                    <span className="material-symbols-outlined text-[17px]" aria-hidden="true">
+                      {showPassword ? 'visibility_off' : 'visibility'}
+                    </span>
+                  </button>
                 </div>
-                <div>
-                  <label className="form-label" htmlFor="confirm-password">
-                    Confirmar Senha
-                  </label>
+              </div>
+
+              <div>
+                <label className={labelClass} htmlFor="confirm-password">
+                  Confirmar senha
+                </label>
+                <div className={fieldWrapperClass}>
+                  <span className="pl-3.5 text-violet-400/80 flex items-center justify-center pointer-events-none" aria-hidden="true">
+                    <span className="material-symbols-outlined text-[17px]">lock</span>
+                  </span>
                   <input
-                    className="input-field"
+                    autoComplete="new-password"
+                    className={`${inputClass} pr-10 font-mono tracking-widest`}
                     id="confirm-password"
-                    placeholder="••••••••"
-                    type="password"
+                    name="confirmPassword"
+                    placeholder="••••••••••••"
+                    type={showConfirmPassword ? 'text' : 'password'}
                     required
                     value={confirmPassword}
                     onChange={(event) => setConfirmPassword(event.target.value)}
                   />
+                  <button
+                    aria-label={showConfirmPassword ? 'Ocultar confirmação de senha' : 'Mostrar confirmação de senha'}
+                    aria-pressed={showConfirmPassword}
+                    className="absolute right-0 pr-3.5 text-neutral-400 hover:text-white transition-colors flex items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40 rounded"
+                    onClick={() => setShowConfirmPassword((visible) => !visible)}
+                    type="button"
+                  >
+                    <span className="material-symbols-outlined text-[17px]" aria-hidden="true">
+                      {showConfirmPassword ? 'visibility_off' : 'visibility'}
+                    </span>
+                  </button>
                 </div>
               </div>
-              <div className="flex items-start gap-sm pt-xs">
-                <div className="flex items-center h-5">
-                  <input
-                    className="w-4 h-4 text-primary bg-surface-container-highest border-outline-variant rounded focus:ring-primary focus:ring-offset-surface-container accent-primary"
-                    id="terms"
-                    type="checkbox"
-                    checked={acceptTerms}
-                    onChange={(event) => setAcceptTerms(event.target.checked)}
-                  />
-                </div>
-                <label className="text-body-sm font-body-sm text-on-surface-variant" htmlFor="terms">
-                  Eu aceito os <span className="text-primary font-semibold">termos de serviço</span> e a{' '}
-                  <span className="text-primary font-semibold">política de privacidade</span> do CodeLab.
+
+              <div className="flex items-start gap-2 pt-1">
+                <input
+                  className="mt-0.5 h-4 w-4 shrink-0 rounded border border-white/20 bg-[#0a0a0c] text-white accent-white focus:ring-2 focus:ring-white/30 focus:ring-offset-0"
+                  id="terms"
+                  type="checkbox"
+                  checked={acceptTerms}
+                  onChange={(event) => setAcceptTerms(event.target.checked)}
+                />
+                <label className="text-xs leading-relaxed text-neutral-400" htmlFor="terms">
+                  Eu aceito os <span className="font-medium text-neutral-200">termos de serviço</span> e a{' '}
+                  <span className="font-medium text-neutral-200">política de privacidade</span> do CodeLab.
                 </label>
               </div>
-              {error ? <p className="text-error text-body-sm font-semibold" role="alert">{error}</p> : null}
-              <button className="btn-primary w-full mt-md" type="submit" disabled={submitting}>
-                {submitting ? 'Criando conta...' : 'Criar Conta'}
-              </button>
+
+              <div className="pt-2">
+                <button
+                  className="w-full min-h-11 bg-white hover:bg-neutral-200 text-neutral-950 text-sm font-semibold py-2.5 px-4 rounded flex items-center justify-center gap-2 transition-all duration-150 shadow-sm active:scale-[0.99] disabled:opacity-60 disabled:pointer-events-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/50 focus-visible:ring-offset-2 focus-visible:ring-offset-[#121215]"
+                  type="submit"
+                  disabled={submitting}
+                >
+                  {submitting ? (
+                    <>
+                      <span className="material-symbols-outlined text-[18px] animate-spin" aria-hidden="true">
+                        progress_activity
+                      </span>
+                      Criando conta...
+                    </>
+                  ) : (
+                    <>
+                      Criar conta
+                      <span className="material-symbols-outlined text-[18px]" aria-hidden="true">arrow_forward</span>
+                    </>
+                  )}
+                </button>
+              </div>
             </form>
-            <div className="relative py-md">
+
+            <div className="relative my-6 flex items-center justify-center">
               <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-outline-variant"></div>
+                <div className="w-full border-t border-white/[0.08]"></div>
               </div>
-              <div className="relative flex justify-center text-label">
-                <span className="bg-surface-container px-md text-on-surface-variant font-medium">Ou registre-se com</span>
-              </div>
+              <span className="relative bg-[#121215] px-3 text-[11px] font-mono text-neutral-400 tracking-wider">
+                ou registre-se com
+              </span>
             </div>
-            <div className="grid grid-cols-1">
-              <a
-                className="btn-secondary w-full"
-                href={`${API_BASE_URL}/oauth2/authorization/google`}
-              >
-                <svg viewBox="0 0 48 48" className="w-5 h-5" aria-hidden="true">
-                  <path fill="#EA4335" d="M24 9.5c3.54 0 6.35 1.22 8.33 3.22l6.2-6.2C34.68 2.82 29.74 1 24 1 14.82 1 6.73 6.98 3.36 15.36l7.48 5.8C12.67 14.37 17.91 9.5 24 9.5z" />
-                  <path fill="#4285F4" d="M46.5 24.5c0-1.64-.15-3.22-.43-4.74H24v9h12.66c-.55 2.96-2.2 5.47-4.7 7.16l7.27 5.66C43.97 37.18 46.5 31.41 46.5 24.5z" />
-                  <path fill="#FBBC05" d="M10.84 28.16A14.5 14.5 0 019.5 24c0-1.45.25-2.85.7-4.16l-7.48-5.8A23.97 23.97 0 001.5 24c0 3.77.9 7.34 2.72 10.53l7.62-6.37z" />
-                  <path fill="#34A853" d="M24 47c6.48 0 11.92-2.14 15.9-5.82l-7.27-5.66c-2.02 1.36-4.6 2.17-8.63 2.17-6.08 0-11.32-4.87-13.16-11.66l-7.62 6.37C6.73 41.02 14.82 47 24 47z" />
-                </svg>
-                Google
+
+            <a
+              className="w-full min-h-11 bg-[#18181c] hover:bg-[#202025] border border-white/10 hover:border-white/20 text-neutral-200 text-sm font-medium py-2.5 px-4 rounded flex items-center justify-center gap-2.5 transition-all duration-150 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#121215]"
+              href={`${API_BASE_URL}/oauth2/authorization/google`}
+            >
+              <svg aria-hidden="true" className="w-4 h-4 shrink-0" viewBox="0 0 24 24">
+                <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" />
+                <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853" />
+                <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" fill="#FBBC05" />
+                <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" fill="#EA4335" />
+              </svg>
+              <span>Registrar com o Google</span>
+            </a>
+
+            <div className="mt-6 pt-4 border-t border-white/[0.08] text-[11px] font-mono text-neutral-400">
+              Aprenda no seu ritmo
+            </div>
+          </div>
+
+          <div className="mt-5 text-center">
+            <p className="text-xs text-neutral-400">
+              Já possui uma conta?
+              <a className="text-white hover:underline font-medium ml-1 transition-colors" href="/">
+                Entrar
               </a>
-            </div>
-            <div className="pt-lg text-center border-t border-outline-variant">
-              <p className="text-body-sm text-on-surface-variant">
-                Já possui uma conta?
-                <a className="text-primary font-semibold hover:underline transition-all ml-xs" href="/">
-                  Fazer Login
-                </a>
-              </p>
-            </div>
+            </p>
           </div>
         </div>
       </main>
-      <SharedFooter />
-    </>
+
+      <footer className="relative z-20 w-full border-t border-white/[0.06] bg-[#070709]/40 backdrop-blur-sm">
+        <div className="mx-auto flex w-full max-w-[1200px] flex-col items-center justify-between gap-3 px-6 py-5 md:flex-row lg:px-12">
+          <div className="text-xs text-neutral-400">
+            © {new Date().getFullYear()} CodeLab. Todos os direitos reservados.
+          </div>
+          <a className="text-xs text-neutral-400 hover:text-white transition-colors" href="/">
+            Entrar
+          </a>
+        </div>
+      </footer>
+    </div>
   )
 }
