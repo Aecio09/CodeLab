@@ -126,3 +126,90 @@ html.access-highlight-links button:not(.btn-primary):not(.btn-secondary):not(.bt
   border-radius: 2px !important;
 }
 
+
+/* ─── Trilha: navegação horizontal entre módulos ─── */
+
+:root {
+  --sidebar-w: 16rem;
+}
+
+@keyframes trail-slide-next {
+  from {
+    opacity: 0;
+    transform: translateX(2.5rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes trail-slide-prev {
+  from {
+    opacity: 0;
+    transform: translateX(-2.5rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.trail-enter-next {
+  animation: trail-slide-next 320ms cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: transform, opacity;
+}
+
+.trail-enter-prev {
+  animation: trail-slide-prev 320ms cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: transform, opacity;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .trail-enter-next,
+  .trail-enter-prev {
+    animation: none;
+  }
+}
+
+/* ─── Trilha: efeitos orbitais ─── */
+
+@keyframes trail-pulse-ring {
+  0% {
+    transform: scale(0.96);
+    opacity: 0.75;
+  }
+  50% {
+    transform: scale(1.08);
+    opacity: 0.22;
+  }
+  100% {
+    transform: scale(0.96);
+    opacity: 0.75;
+  }
+}
+
+.trail-pulse-ring {
+  animation: trail-pulse-ring 3.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes trail-shimmer {
+  from {
+    stroke-dashoffset: 400;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+.trail-shimmer-path {
+  stroke-dasharray: 12 16;
+  animation: trail-shimmer 20s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .trail-pulse-ring,
+  .trail-shimmer-path {
+    animation: none;
+  }
+}
