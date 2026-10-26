@@ -10,15 +10,28 @@ export type LessonNode = {
 type LessonConstellationProps = {
   lessons: LessonNode[]
   icon: string
+  itemLabel?: string
+  ariaLabel?: string
+  stateLabels?: Record<LessonState, string>
+  selectedNumber?: number
+  onSelect?: (number: number) => void
 }
 
-const STATE_LABEL: Record<LessonState, string> = {
+const DEFAULT_STATE_LABEL: Record<LessonState, string> = {
   COMPLETED: 'Concluída',
   AVAILABLE: 'Disponível',
   LOCKED: 'Bloqueada',
 }
 
-export function LessonConstellation({ lessons, icon }: LessonConstellationProps) {
+export function LessonConstellation({
+  lessons,
+  icon,
+  itemLabel = 'Lição',
+  ariaLabel = 'Lições do módulo',
+  stateLabels = DEFAULT_STATE_LABEL,
+  selectedNumber,
+  onSelect,
+}: LessonConstellationProps) {
   const total = Math.max(lessons.length, 1)
   const dense = lessons.length > 7
   const completedCount = lessons.filter((lesson) => lesson.state === 'COMPLETED').length
@@ -28,7 +41,7 @@ export function LessonConstellation({ lessons, icon }: LessonConstellationProps)
     <div
       className="relative h-[180px] w-full sm:h-[280px]"
       role="list"
-      aria-label="Lições do módulo"
+      aria-label={ariaLabel}
     >
       <svg
         className="pointer-events-none absolute inset-0 h-full w-full"
@@ -87,6 +100,8 @@ export function LessonConstellation({ lessons, icon }: LessonConstellationProps)
         const y = 30 + 40 * Math.pow(2 * t - 1, 2)
         const position: CSSProperties = { left: `${x}%`, top: `${y}%` }
         const isActive = lesson.state === 'AVAILABLE'
+        const isSelected = selectedNumber === lesson.number
+        const isCurrent = selectedNumber !== undefined ? isSelected : isActive
 
         const nodeClass =
           lesson.state === 'COMPLETED'
@@ -94,6 +109,11 @@ export function LessonConstellation({ lessons, icon }: LessonConstellationProps)
             : isActive
               ? 'border border-trail-cyan bg-[#07131c] text-trail-cyan shadow-[0_0_32px_rgba(56,189,248,0.38)] ring-4 ring-trail-cyan/10'
               : 'border-[0.5px] border-trail-line bg-trail-subtle text-trail-muted'
+
+        const selectedClass =
+          isSelected && !isActive
+            ? 'ring-2 ring-white/25 shadow-[0_0_24px_rgba(255,255,255,0.1)]'
+            : ''
 
         const sizeClass = dense
           ? isActive
@@ -109,13 +129,45 @@ export function LessonConstellation({ lessons, icon }: LessonConstellationProps)
 
         const nodeIcon =
           lesson.state === 'COMPLETED' ? 'check' : lesson.state === 'LOCKED' ? 'lock' : icon
+        const itemNumber = `${itemLabel} ${String(lesson.number).padStart(2, '0')}`
+        const nodeAriaLabel = `${itemLabel} ${lesson.number}, ${stateLabels[lesson.state]}`
+        const nodeClassName = `relative flex items-center justify-center rounded-full transition-colors ${sizeClass} ${nodeClass} ${selectedClass} ${
+          onSelect
+            ? 'cursor-pointer p-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white'
+            : ''
+        }`
+
+        const nodeContents = (
+          <>
+            <span
+              className={`material-symbols-outlined ${
+                dense
+                  ? 'text-[10px] sm:text-[18px] md:text-[13px] lg:text-[18px]'
+                  : 'text-[14px] sm:text-[22px]'
+              }`}
+              aria-hidden="true"
+            >
+              {nodeIcon}
+            </span>
+            <span
+              className={`absolute -bottom-1 -right-1 flex items-center justify-center rounded-full border-[0.5px] border-trail-line bg-trail-background font-mono font-medium text-neutral-300 ${
+                dense
+                  ? 'h-2.5 min-w-2.5 px-0.5 text-[6px] sm:h-4 sm:min-w-4 sm:text-[9px] md:h-3 md:min-w-3 md:text-[7px] lg:h-4 lg:min-w-4 lg:text-[9px]'
+                  : 'h-3 min-w-3 px-0.5 text-[7px] sm:h-4 sm:min-w-4 sm:text-[9px]'
+              }`}
+              aria-hidden="true"
+            >
+              {String(lesson.number).padStart(2, '0')}
+            </span>
+          </>
+        )
 
         return (
           <div
             key={lesson.number}
             role="listitem"
-            aria-label={`Lição ${lesson.number}, ${STATE_LABEL[lesson.state]}`}
-            aria-current={isActive ? 'step' : undefined}
+            aria-label={nodeAriaLabel}
+            aria-current={isCurrent ? 'step' : undefined}
             className="absolute -translate-x-1/2 -translate-y-1/2"
             style={position}
           >
@@ -126,36 +178,25 @@ export function LessonConstellation({ lessons, icon }: LessonConstellationProps)
                   aria-hidden="true"
                 />
               )}
-              <div
-                className={`relative flex items-center justify-center rounded-full transition-colors ${sizeClass} ${nodeClass}`}
-              >
-                <span
-                  className={`material-symbols-outlined ${
-                    dense
-                      ? 'text-[10px] sm:text-[18px] md:text-[13px] lg:text-[18px]'
-                      : 'text-[14px] sm:text-[22px]'
-                  }`}
-                  aria-hidden="true"
+              {onSelect ? (
+                <button
+                  type="button"
+                  onClick={() => onSelect(lesson.number)}
+                  aria-label={`Selecionar ${nodeAriaLabel}`}
+                  aria-pressed={isSelected}
+                  className={nodeClassName}
                 >
-                  {nodeIcon}
-                </span>
-                <span
-                  className={`absolute -bottom-1 -right-1 flex items-center justify-center rounded-full border-[0.5px] border-trail-line bg-trail-background font-mono font-medium text-neutral-300 ${
-                    dense
-                      ? 'h-2.5 min-w-2.5 px-0.5 text-[6px] sm:h-4 sm:min-w-4 sm:text-[9px] md:h-3 md:min-w-3 md:text-[7px] lg:h-4 lg:min-w-4 lg:text-[9px]'
-                      : 'h-3 min-w-3 px-0.5 text-[7px] sm:h-4 sm:min-w-4 sm:text-[9px]'
-                  }`}
-                  aria-hidden="true"
-                >
-                  {String(lesson.number).padStart(2, '0')}
-                </span>
-              </div>
+                  {nodeContents}
+                </button>
+              ) : (
+                <div className={nodeClassName}>{nodeContents}</div>
+              )}
             </div>
             <span
               className={`absolute left-1/2 top-full mt-2 -translate-x-1/2 whitespace-nowrap font-mono text-[10px] ${
                 dense ? 'hidden lg:block' : 'hidden sm:block'
               } ${
-                lesson.state === 'AVAILABLE'
+                isSelected || lesson.state === 'AVAILABLE'
                   ? 'text-white'
                   : lesson.state === 'COMPLETED'
                     ? 'text-neutral-300'
@@ -163,7 +204,7 @@ export function LessonConstellation({ lessons, icon }: LessonConstellationProps)
               }`}
               aria-hidden="true"
             >
-              Lição {String(lesson.number).padStart(2, '0')}
+              {itemNumber}
             </span>
           </div>
         )

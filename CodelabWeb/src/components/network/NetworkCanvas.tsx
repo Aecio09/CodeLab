@@ -94,10 +94,10 @@ export function NetworkCanvas({
       onPointerMove={handlePointerMove}
       onPointerUp={handlePointerUp}
       onClick={onCanvasClick}
-      className="relative h-full w-full overflow-auto bg-background"
+      className="relative h-full w-full overflow-auto bg-[#0b0b0d]"
       style={{
         backgroundImage:
-          'linear-gradient(rgba(114,219,159,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(114,219,159,0.05) 1px, transparent 1px)',
+          'linear-gradient(rgba(255,255,255,0.045) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.045) 1px, transparent 1px)',
         backgroundSize: '32px 32px',
       }}
     >
@@ -133,7 +133,7 @@ export function NetworkCanvas({
                 fill="none"
                 strokeWidth={isSelected || isActive ? 3.5 : 2}
                 strokeDasharray={down ? '6 6' : undefined}
-                stroke={down ? '#ffb4ab' : isActive ? '#8ef8b9' : isSelected ? '#72db9f' : '#5f7a6c'}
+                stroke={down ? '#f87171' : isActive ? '#38bdf8' : isSelected ? '#e5e1e4' : '#3f3f46'}
               >
                 <animate
                   attributeName="opacity"
@@ -156,23 +156,26 @@ export function NetworkCanvas({
           <div
             key={device.ref}
             onPointerDown={(e) => handlePointerDown(e, device)}
-            className={`absolute select-none rounded-xl border bg-surface-container shadow-lg ${
-              selected ? 'border-primary' : 'border-outline-variant'
+            className={`absolute select-none rounded-lg border-[0.5px] bg-trail-surface shadow-[0_12px_30px_rgba(0,0,0,0.65)] ${
+              selected ? 'border-white ring-1 ring-white/20' : 'border-trail-line'
             } ${dragging?.ref === device.ref ? 'cursor-grabbing' : 'cursor-grab'}`}
             style={{ left: device.x, top: device.y, width: DEVICE_W, height }}
           >
-            <div className="flex items-center gap-2 border-b border-outline-variant px-2.5" style={{ height: HEADER_H }}>
-              <span className="material-symbols-outlined text-lg text-primary" aria-hidden="true">
+            <div
+              className="flex items-center gap-2 border-b-[0.5px] border-trail-line px-2.5"
+              style={{ height: HEADER_H }}
+            >
+              <span className="material-symbols-outlined text-lg text-trail-cyan" aria-hidden="true">
                 {meta.icon}
               </span>
               <div className="min-w-0 flex-1">
-                <p className="truncate text-sm font-semibold text-on-surface">{device.hostname}</p>
-                <p className="truncate font-label text-[10px] uppercase tracking-wider text-on-surface-variant">
+                <p className="truncate text-sm font-semibold text-white">{device.hostname}</p>
+                <p className="truncate font-mono text-[10px] uppercase tracking-wider text-trail-muted">
                   {meta.label}
                 </p>
               </div>
               {device.kind === 'SWITCH' && (
-                <span className="rounded bg-surface-container-highest px-1.5 py-0.5 font-label text-[10px] text-on-surface-variant">
+                <span className="rounded border-[0.5px] border-trail-line bg-white/[0.04] px-1.5 py-0.5 font-mono text-[10px] text-trail-muted">
                   {device.interfaces.length}p
                 </span>
               )}
@@ -194,12 +197,12 @@ export function NetworkCanvas({
                       e.stopPropagation()
                       onPortClick(device.ref, intf.name)
                     }}
-                    className={`h-3 w-3 rounded-sm border transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary ${
+                    className={`h-3 w-3 rounded-sm border transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white ${
                       isPending
-                        ? 'border-primary bg-primary'
+                        ? 'border-white bg-white shadow-[0_0_8px_rgba(255,255,255,0.55)]'
                         : isLinked
-                          ? 'border-primary/70 bg-primary/40'
-                          : 'border-outline bg-surface-container-highest hover:border-primary'
+                          ? 'border-trail-cyan/70 bg-trail-cyan/40'
+                          : 'border-neutral-600 bg-neutral-800 hover:border-white hover:bg-neutral-700'
                     } ${intf.adminUp ? '' : 'opacity-40'}`}
                     style={portOffset(index).x === 10 ? { marginLeft: -2 } : undefined}
                   />
@@ -211,13 +214,13 @@ export function NetworkCanvas({
       })}
 
       {devices.length === 0 && (
-        <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center gap-2 text-center">
-          <span className="material-symbols-outlined text-5xl text-outline" aria-hidden="true">
+        <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center gap-2 px-6 text-center">
+          <span className="material-symbols-outlined text-5xl text-trail-muted" aria-hidden="true">
             lan
           </span>
-          <p className="font-h3 text-on-surface">Seu playground está vazio</p>
-          <p className="max-w-xs text-sm text-on-surface-variant">
-            Escolha um dispositivo na barra lateral para começar a montar sua topologia.
+          <p className="font-serif text-lg text-white">Seu playground está vazio</p>
+          <p className="max-w-xs text-sm leading-relaxed text-trail-muted">
+            Escolha um dispositivo na barra de ferramentas para começar a montar sua topologia.
           </p>
         </div>
       )}

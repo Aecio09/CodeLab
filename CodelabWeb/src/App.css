@@ -184,32 +184,34 @@
 }
 
 /* ─── CodeMirror / Sandpack overrides ─── */
+/* Os wrappers do Sandpack (wrapper/layout/stack) recebem surface1 pela regra do
+   tema, o que pinta a área externa do editor com a cor do editor. Deixamos
+   esses wrappers transparentes e aplicamos surface1 só no CodeMirror, para o
+   fundo padrão do projeto aparecer ao redor do editor. */
+.sp-wrapper,
+.sp-layout,
+.sp-stack {
+  background-color: transparent !important;
+}
+
 .cm-editor,
 .cm-editor .cm-scroller,
-.cm-editor .cm-content {
-  background-color: #050a07 !important;
+.cm-editor .cm-content,
+.sp-code-editor {
+  background-color: #151515 !important;
 }
 
 .cm-gutters {
-  background-color: #050a07 !important;
-  border-right-color: #1a211e !important;
+  background-color: #151515 !important;
+  border-right-color: #2F2F2F !important;
 }
 
 .cm-activeLine,
 .cm-activeLineGutter {
-  background-color: #0e1512 !important;
+  background-color: #252525 !important;
 }
 
 .cm-selectionBackground,
 .cm-focused .cm-selectionBackground {
-  background-color: #1a211e !important;
-}
-
-.sp-wrapper,
-.sp-layout,
-.sp-stack,
-.sp-code-editor,
-.sp-preview-container,
-.sp-preview-iframe {
-  background-color: #050a07 !important;
+  background-color: #2F2F2F !important;
 }

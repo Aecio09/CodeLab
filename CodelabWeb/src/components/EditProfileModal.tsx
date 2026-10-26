@@ -41,6 +41,11 @@ export function EditProfileModal({ isOpen, onClose, user, onUpdate }: Props) {
   }, [isOpen])
 
   const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
+    if (e.key === 'Escape') {
+      e.preventDefault()
+      onClose()
+      return
+    }
     if (e.key !== 'Tab') return
     const focusable = modalRef.current?.querySelectorAll<HTMLElement>(
         'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
@@ -61,7 +66,7 @@ export function EditProfileModal({ isOpen, onClose, user, onUpdate }: Props) {
         first.focus()
       }
     }
-  }, [])
+  }, [onClose])
 
   if (!isOpen) return null
 
@@ -111,7 +116,9 @@ export function EditProfileModal({ isOpen, onClose, user, onUpdate }: Props) {
           try {
             const jsonObj = JSON.parse(textResponse)
             photoPath = jsonObj.photo || jsonObj.photoUrl || jsonObj.path || textResponse
-          } catch (e) {}
+          } catch {
+            // resposta em texto puro; mantém o caminho original
+          }
 
           updatedUser = { ...updatedUser, photo: photoPath }
         } else {
@@ -131,8 +138,8 @@ export function EditProfileModal({ isOpen, onClose, user, onUpdate }: Props) {
       }
       onUpdate(updatedUser)
       onClose()
-    } catch (err: any) {
-      setError(err.message)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Erro ao atualizar perfil.')
     } finally {
       setLoading(false)
     }
@@ -145,121 +152,185 @@ export function EditProfileModal({ isOpen, onClose, user, onUpdate }: Props) {
         method: 'DELETE',
       })
       if (res.ok) window.location.href = '/'
-    } catch (err) {
+    } catch {
       alert('Erro ao deletar conta')
     }
   }
 
   return (
+    <div
+      className="fixed inset-0 z-[100] flex items-center justify-center bg-trail-background/85 p-4 backdrop-blur-md"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="edit-profile-title"
+      onKeyDown={handleKeyDown}
+    >
       <div
-          className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm"
-          role="dialog"
-          aria-modal="true"
-          aria-labelledby="edit-profile-title"
-          onKeyDown={handleKeyDown}
+        ref={modalRef}
+        className="relative flex max-h-[90vh] w-full max-w-2xl flex-col overflow-hidden rounded-lg border-[0.5px] border-trail-line bg-trail-surface/95 shadow-[0_24px_80px_rgba(0,0,0,0.8)] backdrop-blur-md"
       >
-        <div ref={modalRef} className="bg-surface-container border border-outline-variant w-full max-w-2xl rounded-xl shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-200">
+        <div
+          className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-violet-500 via-cyan-400 to-sky-300 opacity-60"
+          aria-hidden="true"
+        />
 
-          {/* Modal Header */}
-          <div className="p-lg border-b border-outline-variant flex justify-between items-center bg-surface-container-high">
-            <div>
-              <h2 id="edit-profile-title" className="text-h3 font-h3 font-bold text-on-surface">Editar Perfil</h2>
-              <p className="text-label font-label text-on-surface-variant uppercase tracking-wider">Atualize suas informações</p>
+        {/* Modal Header */}
+        <div className="flex shrink-0 items-start justify-between gap-4 border-b-[0.5px] border-trail-line bg-white/[0.02] px-5 py-4 sm:px-6">
+          <div>
+            <p className="font-mono text-[10px] uppercase tracking-[0.25em] text-trail-cyan">
+              Conta
+            </p>
+            <h2 id="edit-profile-title" className="mt-1 font-serif text-2xl leading-tight text-white sm:text-3xl">
+              Editar perfil
+            </h2>
+            <p className="mt-1 text-xs font-light text-neutral-400">
+              Atualize suas informações.
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label="Fechar modal"
+            className="flex h-8 w-8 shrink-0 items-center justify-center rounded border-[0.5px] border-trail-line bg-white/[0.04] text-neutral-400 transition-colors hover:border-trail-accent hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
+          >
+            <span className="material-symbols-outlined text-[18px]" aria-hidden="true">close</span>
+          </button>
+        </div>
+
+        <form onSubmit={handleSave} className="flex-1 space-y-6 overflow-y-auto px-5 py-5 sm:px-6" aria-busy={loading}>
+          {/* Avatar Section */}
+          <div className="flex flex-col items-center gap-4 border-b-[0.5px] border-trail-line pb-5 sm:flex-row">
+            <div className="relative shrink-0">
+              <div className="h-24 w-24 overflow-hidden rounded-full border-[0.5px] border-trail-line bg-white/[0.04] p-1">
+                <img alt="Foto de perfil" className="h-full w-full rounded-full object-cover" src={previewUrl} />
+              </div>
+              <label
+                htmlFor="avatar-upload"
+                className="absolute bottom-0 right-0 flex h-8 w-8 cursor-pointer items-center justify-center rounded-full border-[0.5px] border-trail-line bg-trail-surface text-neutral-300 shadow-[0_4px_16px_rgba(0,0,0,0.6)] transition-colors hover:border-cyan-400/30 hover:text-white"
+              >
+                <span className="material-symbols-outlined text-[17px]" aria-hidden="true">photo_camera</span>
+                <span className="sr-only">Trocar foto</span>
+              </label>
+              <input className="hidden" id="avatar-upload" type="file" accept="image/*" onChange={handlePhotoChange} />
             </div>
-            <button onClick={onClose} aria-label="Fechar modal" className="text-on-surface-variant hover:text-primary transition-colors p-xs rounded-lg">
-              <span className="material-symbols-outlined">close</span>
-            </button>
+
+            <div className="text-center sm:text-left">
+              <h3 className="font-serif text-lg text-white">Sua foto</h3>
+              <p className="mt-1 font-mono text-[10px] uppercase tracking-wider text-neutral-500">
+                JPG ou PNG • Máx 2MB
+              </p>
+              <div className="mt-3 flex flex-wrap justify-center gap-2 sm:justify-start">
+                <label
+                  htmlFor="avatar-upload"
+                  className="inline-flex h-9 cursor-pointer items-center justify-center rounded border-[0.5px] border-trail-line bg-white/[0.04] px-3 font-mono text-[10px] uppercase tracking-wider text-neutral-300 transition-colors hover:border-trail-accent hover:text-white"
+                >
+                  Trocar foto
+                </label>
+                {(user.photo || previewUrl !== resolvePhotoUrl(null, name)) && (
+                  <button
+                    type="button"
+                    onClick={handleRemovePhotoClick}
+                    className="inline-flex h-9 items-center justify-center rounded border-[0.5px] border-red-500/20 bg-red-500/[0.06] px-3 font-mono text-[10px] uppercase tracking-wider text-red-300 transition-colors hover:border-red-500/40 hover:bg-red-500/10"
+                  >
+                    Remover
+                  </button>
+                )}
+              </div>
+            </div>
           </div>
 
-          <form onSubmit={handleSave} className="p-lg space-y-xl overflow-y-auto max-h-[80vh]">
-
-            {/* Avatar Section */}
-            <div className="flex flex-col md:flex-row items-center gap-lg border-b border-outline-variant pb-lg">
-              <div className="relative group">
-                <div className="w-28 h-28 rounded-full border-4 border-primary/20 p-1 overflow-hidden shadow-md">
-                  <img alt="User Avatar" className="w-full h-full rounded-full object-cover" src={previewUrl} />
-                </div>
-                <label className="absolute bottom-1 right-1 bg-primary text-on-primary p-1.5 rounded-full cursor-pointer hover:scale-110 transition-transform shadow-lg border-2 border-surface-container" htmlFor="avatar-upload">
-                  <span className="material-symbols-outlined text-[20px]">photo_camera</span>
-                </label>
-                <input className="hidden" id="avatar-upload" type="file" accept="image/*" onChange={handlePhotoChange} />
-              </div>
-              <div className="text-center md:text-left flex-1">
-                <h3 className="text-h3 font-h3 font-semibold text-on-surface">Sua Foto</h3>
-                <p className="text-body-sm font-body-sm text-on-surface-variant mb-2">JPG ou PNG • Máx 2MB</p>
-
-                {}
-                <div className="flex gap-2 justify-center md:justify-start">
-                  <label htmlFor="avatar-upload" className="btn-secondary !h-9 !px-md !text-[12px] cursor-pointer">Trocar Foto</label>
-                  {(user.photo || previewUrl !== resolvePhotoUrl(null, name)) && (
-                      <button type="button" onClick={handleRemovePhotoClick} className="btn-danger !h-9 !px-md !text-[12px]">Remover</button>
-                  )}
-                </div>
-              </div>
+          {/* Form Fields */}
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            <div>
+              <label className="mb-1.5 block font-mono text-[10px] uppercase tracking-[0.2em] text-neutral-400" htmlFor="edit-name">
+                Nome completo
+              </label>
+              <input
+                id="edit-name"
+                className="w-full rounded border-[0.5px] border-trail-line bg-trail-background px-3 py-2.5 text-sm text-white placeholder:text-neutral-500 transition-colors hover:border-trail-accent focus:border-cyan-400/40 focus:outline-none focus:ring-1 focus:ring-cyan-400/20"
+                type="text"
+                autoComplete="name"
+                value={name}
+                onChange={(event) => setName(event.target.value)}
+                required
+              />
             </div>
-
-            {/* Form Fields */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-lg">
-              <div>
-                <label className="form-label" htmlFor="edit-name">Nome Completo</label>
-                <input
-                    id="edit-name"
-                    className="input-field"
-                    type="text"
-                    value={name}
-                    onChange={e => setName(e.target.value)}
-                    required
-                />
-              </div>
-              <div>
-                <label className="form-label" htmlFor="edit-email">E-mail</label>
-                <input
-                    id="edit-email"
-                    className="input-field"
-                    type="email"
-                    value={email}
-                    onChange={e => setEmail(e.target.value)}
-                    required
-                />
-              </div>
-              <div className="md:col-span-2">
-                <label className="form-label" htmlFor="edit-password">Nova Senha (opcional)</label>
-                <input
-                    id="edit-password"
-                    className="input-field"
-                    type="password"
-                    placeholder="••••••••"
-                    value={password}
-                    onChange={e => setPassword(e.target.value)}
-                />
-              </div>
+            <div>
+              <label className="mb-1.5 block font-mono text-[10px] uppercase tracking-[0.2em] text-neutral-400" htmlFor="edit-email">
+                E-mail
+              </label>
+              <input
+                id="edit-email"
+                className="w-full rounded border-[0.5px] border-trail-line bg-trail-background px-3 py-2.5 text-sm text-white placeholder:text-neutral-500 transition-colors hover:border-trail-accent focus:border-cyan-400/40 focus:outline-none focus:ring-1 focus:ring-cyan-400/20"
+                type="email"
+                autoComplete="email"
+                value={email}
+                onChange={(event) => setEmail(event.target.value)}
+                required
+              />
             </div>
+            <div className="md:col-span-2">
+              <label className="mb-1.5 block font-mono text-[10px] uppercase tracking-[0.2em] text-neutral-400" htmlFor="edit-password">
+                Nova senha <span className="normal-case tracking-normal text-neutral-500">(opcional)</span>
+              </label>
+              <input
+                id="edit-password"
+                className="w-full rounded border-[0.5px] border-trail-line bg-trail-background px-3 py-2.5 font-mono text-sm tracking-widest text-white placeholder:text-neutral-500 transition-colors hover:border-trail-accent focus:border-cyan-400/40 focus:outline-none focus:ring-1 focus:ring-cyan-400/20"
+                type="password"
+                autoComplete="new-password"
+                placeholder="••••••••"
+                value={password}
+                onChange={(event) => setPassword(event.target.value)}
+              />
+              <p className="mt-1.5 font-mono text-[10px] text-neutral-500">
+                Deixe em branco para manter a senha atual.
+              </p>
+            </div>
+          </div>
 
-            {error && <p className="text-body-sm font-body-sm text-error font-semibold" role="alert">{error}</p>}
+          {error && (
+            <div className="flex items-start gap-2 rounded border-[0.5px] border-red-500/20 bg-red-500/10 px-3 py-2 text-xs text-red-300" role="alert">
+              <span className="material-symbols-outlined mt-px text-[16px]" aria-hidden="true">error</span>
+              <span>{error}</span>
+            </div>
+          )}
 
-            {/* Footer Actions */}
-            <div className="pt-lg border-t border-outline-variant flex flex-col md:flex-row items-center justify-between gap-4">
-              <div className="flex gap-md w-full md:w-auto">
-                <button
-                    type="submit"
-                    disabled={loading}
-                    className="btn-primary flex-1 md:flex-none"
-                >
-                  {loading ? 'Salvando...' : 'Salvar Alterações'}
-                </button>
-                <button type="button" onClick={onClose} className="btn-secondary hidden md:inline-flex">Cancelar</button>
-              </div>
+          {/* Footer Actions */}
+          <div className="flex flex-col gap-3 border-t-[0.5px] border-trail-line pt-5 md:flex-row md:items-center md:justify-between">
+            <div className="flex w-full flex-col gap-2 sm:flex-row md:w-auto">
               <button
-                  type="button"
-                  onClick={handleDeleteAccount}
-                  className="btn-danger"
+                type="submit"
+                disabled={loading}
+                className="inline-flex min-h-10 w-full items-center justify-center gap-2 rounded bg-white px-4 py-2 font-mono text-[11px] font-bold uppercase tracking-wider text-neutral-950 shadow-[0_0_22px_rgba(255,255,255,0.12)] transition-all hover:bg-neutral-200 active:scale-[0.99] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-trail-surface disabled:pointer-events-none disabled:opacity-50 sm:w-auto"
               >
-                <span className="material-symbols-outlined text-[18px]">delete</span>
-                Deletar Conta
+                {loading ? (
+                  <>
+                    <span className="material-symbols-outlined text-[16px] animate-spin" aria-hidden="true">progress_activity</span>
+                    Salvando...
+                  </>
+                ) : (
+                  'Salvar alterações'
+                )}
+              </button>
+              <button
+                type="button"
+                onClick={onClose}
+                className="inline-flex min-h-10 w-full items-center justify-center rounded border-[0.5px] border-trail-line bg-white/[0.04] px-4 py-2 font-mono text-[11px] uppercase tracking-wider text-neutral-300 transition-colors hover:border-trail-accent hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-trail-surface sm:w-auto"
+              >
+                Cancelar
               </button>
             </div>
-          </form>
-        </div>
+            <button
+              type="button"
+              onClick={handleDeleteAccount}
+              className="inline-flex min-h-10 w-full items-center justify-center gap-1.5 rounded border-[0.5px] border-red-500/20 bg-red-500/[0.06] px-4 py-2 font-mono text-[11px] uppercase tracking-wider text-red-300 transition-colors hover:border-red-500/40 hover:bg-red-500/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-400/50 md:w-auto"
+            >
+              <span className="material-symbols-outlined text-[16px]" aria-hidden="true">delete</span>
+              Deletar conta
+            </button>
+          </div>
+        </form>
       </div>
+    </div>
   )
 }

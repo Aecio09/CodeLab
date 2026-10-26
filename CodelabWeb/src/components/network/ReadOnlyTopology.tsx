@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import type { NetDevice, NetLink } from '../../types/network'
-import { DEVICE_W, deviceHeight, portOffset } from './geometry'
+import { DEVICE_W, PORT_COLS, deviceHeight, portOffset } from './geometry'
 
 const KIND_META: Record<string, { icon: string; label: string }> = {
   HOST: { icon: 'computer', label: 'Host' },
@@ -75,7 +75,12 @@ export function ReadOnlyTopology({ devices, links, selectedRef, onSelect }: Prop
   return (
     <div
       ref={containerRef}
-      className="flex h-full w-full items-center justify-center overflow-hidden rounded-xl border border-outline-variant bg-background"
+      className="flex h-full w-full items-center justify-center overflow-hidden rounded-lg border-[0.5px] border-trail-line bg-[#0b0b0d]"
+      style={{
+        backgroundImage:
+          'linear-gradient(rgba(255,255,255,0.045) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.045) 1px, transparent 1px)',
+        backgroundSize: '32px 32px',
+      }}
     >
       <div
         className="relative shrink-0"
@@ -108,7 +113,7 @@ export function ReadOnlyTopology({ devices, links, selectedRef, onSelect }: Prop
                 fill="none"
                 strokeWidth={2}
                 strokeDasharray={down ? '6 6' : undefined}
-                stroke={down ? '#ffb4ab' : '#5f7a6c'}
+                stroke={down ? '#f87171' : '#3f3f46'}
               />
             )
           })}
@@ -134,10 +139,10 @@ export function ReadOnlyTopology({ devices, links, selectedRef, onSelect }: Prop
                   onSelect(device.ref)
                 }
               }}
-              className={`absolute cursor-pointer select-none rounded-xl border bg-surface-container shadow-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary ${
+              className={`absolute cursor-pointer select-none rounded-lg border-[0.5px] bg-trail-surface shadow-[0_12px_30px_rgba(0,0,0,0.65)] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white ${
                 selected
-                  ? 'border-primary ring-2 ring-primary/30'
-                  : 'border-outline-variant hover:border-primary/60'
+                  ? 'border-white ring-1 ring-white/20'
+                  : 'border-trail-line hover:border-neutral-600'
               }`}
               style={{
                 left: device.x,
@@ -146,19 +151,20 @@ export function ReadOnlyTopology({ devices, links, selectedRef, onSelect }: Prop
                 height: cardHeight,
               }}
             >
-              <div className="flex h-10 items-center gap-2 border-b border-outline-variant px-3">
-                <span className="material-symbols-outlined text-[18px] text-primary">
+              <div className="flex h-10 items-center gap-2 border-b-[0.5px] border-trail-line px-3">
+                <span className="material-symbols-outlined text-[18px] text-trail-cyan" aria-hidden="true">
                   {meta.icon}
                 </span>
-                <span className="truncate text-xs font-bold text-on-surface">
-                  {device.hostname}
-                </span>
-                <span className="ml-auto text-[9px] font-semibold uppercase tracking-wider text-on-surface-variant">
+                <span className="truncate text-xs font-bold text-white">{device.hostname}</span>
+                <span className="ml-auto text-[9px] font-mono font-semibold uppercase tracking-wider text-trail-muted">
                   {meta.label}
                 </span>
               </div>
 
-              <div className="grid grid-cols-8 gap-x-0 gap-y-0 px-2.5 pt-2">
+              <div
+                className="grid gap-x-0 gap-y-0 px-2.5 pt-2"
+                style={{ gridTemplateColumns: `repeat(${PORT_COLS}, 1fr)` }}
+              >
                 {interfaces.map((intf) => {
                   const linked = linkedPorts.has(`${device.ref}|${intf.name}`)
                   return (
@@ -168,9 +174,9 @@ export function ReadOnlyTopology({ devices, links, selectedRef, onSelect }: Prop
                       className={`mx-auto block h-2 w-2 rounded-sm ${
                         linked
                           ? intf.adminUp
-                            ? 'bg-primary'
-                            : 'bg-error'
-                          : 'bg-outline-variant'
+                            ? 'bg-trail-cyan'
+                            : 'bg-red-400'
+                          : 'bg-neutral-700'
                       }`}
                     />
                   )

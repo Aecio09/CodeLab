@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { API_BASE_URL } from '../constants'
-import { apiLogout } from '../lib/api'
+import { apiLogout, authFetch } from '../lib/api'
 import * as net from '../lib/networkApi'
 import { resolvePhotoUrl } from '../utils'
 import type { UserProfile } from '../types'
@@ -11,9 +11,17 @@ import type {
   NetLink,
   TraceEvent,
 } from '../types/network'
+import { AppSidebar } from '../components/AppSidebar'
+import { AuthBackground } from '../components/AuthBackground'
 import { EditProfileModal } from '../components/EditProfileModal'
 import { NetworkCanvas } from '../components/network/NetworkCanvas'
 import { linkKey } from '../components/network/geometry'
+import { PlaygroundLoading } from '../components/PlaygroundShell'
+import {
+  playgroundDangerButtonClass,
+  playgroundPrimaryButtonClass,
+  playgroundSecondaryButtonClass,
+} from '../lib/playground'
 
 const KIND_ICONS: { kind: string; icon: string; label: string; desc: string }[] = [
   { kind: 'HOST', icon: 'computer', label: 'Host', desc: 'Estação com 1 porta' },
@@ -31,6 +39,8 @@ export function NetworkPlaygroundPage() {
   const [loading, setLoading] = useState(true)
   const [fatal, setFatal] = useState<string | null>(null)
   const [isProfileOpen, setIsProfileOpen] = useState(false)
+  const [mobileNavOpen, setMobileNavOpen] = useState(false)
+  const [avatarFailed, setAvatarFailed] = useState(false)
 
   const [exerciseId, setExerciseId] = useState<string | null>(null)
   const [sessionId, setSessionId] = useState<string | null>(null)
@@ -79,10 +89,7 @@ export function NetworkPlaygroundPage() {
     let cancelled = false
     const boot = async () => {
       try {
-        const meRes = await fetch(`${API_BASE_URL}/api/users/me`, {
-          credentials: 'include',
-          headers: { Authorization: `Bearer ${localStorage.getItem('codelab_token') ?? ''}` },
-        })
+        const meRes = await authFetch(`${API_BASE_URL}/api/users/me`)
         if (!meRes.ok) {
           window.location.href = '/'
           return
@@ -333,443 +340,558 @@ export function NetworkPlaygroundPage() {
 
   // ── Render ──────────────────────────────────────────────────────────────
 
-  if (loading || !user) {
-    return (
-      <div
-        className="flex min-h-screen items-center justify-center bg-background font-body-md text-on-surface"
-        role="status"
-        aria-live="polite"
-      >
-        Montando seu playground de redes...
-      </div>
-    )
+  if (loading) {
+    return <PlaygroundLoading label="Montando seu playground de redes..." />
   }
 
   if (fatal) {
     return (
-      <div className="flex min-h-screen flex-col items-center justify-center gap-3 bg-background px-6 text-center">
-        <span className="material-symbols-outlined text-5xl text-error" aria-hidden="true">
-          error
-        </span>
-        <p className="font-h3 text-on-surface">Não foi possível abrir o laboratório</p>
-        <p className="max-w-md text-sm text-on-surface-variant">{fatal}</p>
-        <button className="btn-primary !h-10" onClick={() => window.location.reload()}>
-          Tentar de novo
-        </button>
+      <div className="relative flex h-screen w-full items-center justify-center overflow-hidden bg-trail-background px-6">
+        <AuthBackground />
+        <div className="relative z-10 w-full max-w-md rounded-lg border-[0.5px] border-red-500/20 bg-trail-surface/95 p-8 text-center shadow-[0_12px_40px_rgba(0,0,0,0.8)]">
+          <span className="material-symbols-outlined text-[44px] text-red-300" aria-hidden="true">
+            error
+          </span>
+          <h1 className="mt-3 font-serif text-2xl text-white">Não foi possível abrir o laboratório</h1>
+          <p className="mt-2 text-sm leading-relaxed text-trail-muted">{fatal}</p>
+          <div className="mt-6 flex flex-wrap justify-center gap-2">
+            <button
+              type="button"
+              onClick={() => window.location.reload()}
+              className={playgroundPrimaryButtonClass}
+            >
+              Tentar de novo
+            </button>
+            <a href="/trilha/redes" className={playgroundSecondaryButtonClass}>
+              Voltar à trilha
+            </a>
+          </div>
+        </div>
       </div>
     )
+  }
+
+  if (!user) {
+    return <PlaygroundLoading label="Carregando seu perfil..." />
   }
 
   const lines = selectedRef ? (history[selectedRef] ?? []) : []
   const selectedLinkData = selectedLink !== null ? links[selectedLink] : null
   const deviceState = state && state.ref === selectedRef ? state.data : null
+  const roleLabel = user.role === 'ADMIN' ? 'Administrador' : 'Estudante'
 
   return (
-    <div className="flex h-screen w-full overflow-hidden bg-background font-body-md text-on-surface">
-      {/* Sidebar */}
-      <aside className="flex w-64 shrink-0 flex-col border-r border-outline-variant bg-surface-container-low px-4 py-6">
-        <div className="mb-6 flex items-center gap-3 px-2">
-          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary shadow-md">
-            <span className="material-symbols-outlined text-on-primary">terminal</span>
+    <div className="relative flex h-screen w-full overflow-hidden bg-trail-background font-sans text-[#e5e1e4] antialiased selection:bg-white selection:text-black">
+      <AuthBackground />
+
+      <AppSidebar
+        items={[
+          { key: 'trilha', label: 'Minha Trilha', icon: 'map', href: '/trilha' },
+          { key: 'playground', label: 'Playground', icon: 'terminal', href: '/playground' },
+          {
+            key: 'net-playground',
+            label: 'Playground de Redes',
+            icon: 'lan',
+            href: '/networkplayground',
+          },
+          {
+            key: 'perfil',
+            label: 'Meu Perfil',
+            icon: 'account_circle',
+            onClick: () => setIsProfileOpen(true),
+          },
+          { key: 'redes', label: 'Trilha de Redes', icon: 'route', href: '/trilha/redes' },
+        ]}
+        activeKey="net-playground"
+        onLogout={() => {
+          void apiLogout()
+        }}
+        mobileOpen={mobileNavOpen}
+        onMobileClose={() => setMobileNavOpen(false)}
+      />
+
+      <main className="relative ml-0 flex h-screen min-w-0 flex-1 flex-col transition-[margin-left] duration-200 md:ml-[var(--sidebar-w)]">
+        <header className="relative z-20 flex h-16 shrink-0 items-center justify-between gap-3 border-b-[0.5px] border-trail-line bg-trail-background/60 px-4 backdrop-blur-md sm:px-6 lg:px-10">
+          <div className="flex min-w-0 items-center gap-3">
+            <button
+              type="button"
+              onClick={() => setMobileNavOpen(true)}
+              className="flex h-9 w-9 shrink-0 items-center justify-center rounded border-[0.5px] border-trail-line bg-white/[0.04] text-neutral-400 transition-colors hover:border-trail-accent hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white md:hidden"
+              aria-label="Abrir menu de navegação"
+              aria-expanded={mobileNavOpen}
+              aria-controls="app-sidebar"
+            >
+              <span className="material-symbols-outlined" aria-hidden="true">
+                menu
+              </span>
+            </button>
+            <div className="hidden min-w-0 sm:block">
+              <p className="truncate font-mono text-[10px] uppercase tracking-[0.25em] text-neutral-400">
+                Playground de redes
+              </p>
+              <p className="truncate font-serif text-lg text-white">Topologia livre</p>
+            </div>
           </div>
-          <h1 className="font-h2 text-lg font-bold tracking-tight text-primary">CodeLab</h1>
-        </div>
 
-        <nav className="space-y-1" aria-label="Navegação principal">
-          <a
-            href="/trilha"
-            className="flex w-full items-center gap-3 rounded-lg px-4 py-2 text-left text-sm font-semibold text-on-surface-variant transition-all hover:bg-surface-container-highest hover:text-on-surface"
-          >
-            <span className="material-symbols-outlined">map</span>
-            Minha Trilha
-          </a>
-          <a
-            href="/playground"
-            className="flex w-full items-center gap-3 rounded-lg px-4 py-2 text-left text-sm font-semibold text-on-surface-variant transition-all hover:bg-surface-container-highest hover:text-on-surface"
-          >
-            <span className="material-symbols-outlined">terminal</span>
-            Playground
-          </a>
-          <a
-            href="/networkplayground"
-            aria-current="page"
-            className="flex w-full items-center gap-3 rounded-lg bg-secondary-container px-4 py-2 text-left text-sm font-semibold text-on-secondary-container"
-          >
-            <span className="material-symbols-outlined">lan</span>
-            Playground de Redes
-          </a>
-          <button
-            onClick={() => setIsProfileOpen(true)}
-            className="flex w-full items-center gap-3 rounded-lg px-4 py-2 text-left text-sm font-semibold text-on-surface-variant transition-all hover:bg-surface-container-highest hover:text-on-surface"
-          >
-            <span className="material-symbols-outlined">account_circle</span>
-            Meu Perfil
-          </button>
-        </nav>
-
-        <div className="mt-6 border-t border-outline-variant pt-4">
-          <p className="form-label !mb-2">Adicionar dispositivo</p>
-          <div className="space-y-1.5">
-            {KIND_ICONS.map((k) => (
-              <button
-                key={k.kind}
-                onClick={() => void handleAddDevice(k.kind)}
-                disabled={busy}
-                className="flex w-full items-center gap-3 rounded-lg border border-outline-variant bg-surface-container px-3 py-2 text-left transition-all hover:border-primary/60 hover:bg-surface-container-high disabled:opacity-50"
+          <div className="flex shrink-0 items-center gap-2 sm:gap-3">
+            <div className="hidden items-center gap-2 xl:flex">
+              <div
+                className="flex items-center gap-1.5 rounded border-[0.5px] border-trail-line bg-white/[0.04] px-2.5 py-1.5 sm:gap-2 sm:px-3"
+                title={`${user.userStreak} dias de sequência`}
               >
-                <span className="material-symbols-outlined text-lg text-primary" aria-hidden="true">
-                  {k.icon}
+                <span
+                  className="material-symbols-outlined text-[16px] text-amber-400"
+                  style={{ fontVariationSettings: "'FILL' 1" }}
+                  aria-hidden="true"
+                >
+                  local_fire_department
                 </span>
-                <span className="min-w-0 flex-1">
-                  <span className="block text-sm font-semibold text-on-surface">{k.label}</span>
-                  <span className="block truncate font-label text-[10px] uppercase tracking-wider text-on-surface-variant">
-                    {k.desc}
+                <span className="font-mono text-xs font-bold text-white">{user.userStreak}</span>
+                <span className="sr-only">{user.userStreak} dias de sequência</span>
+              </div>
+              <div
+                className="flex items-center gap-1.5 rounded border-[0.5px] border-trail-line bg-white/[0.04] px-2.5 py-1.5 sm:gap-2 sm:px-3"
+                title={`${Math.floor(user.userPoints)} pontos acumulados`}
+              >
+                <span
+                  className="material-symbols-outlined text-[16px] text-trail-cyan"
+                  style={{ fontVariationSettings: "'FILL' 1" }}
+                  aria-hidden="true"
+                >
+                  stars
+                </span>
+                <span className="font-mono text-xs font-bold text-white">
+                  {Math.floor(user.userPoints).toLocaleString('pt-BR')}
+                </span>
+                <span className="sr-only">{Math.floor(user.userPoints)} pontos acumulados</span>
+              </div>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => void handleSave()}
+              disabled={busy || !sessionId}
+              className={`${playgroundSecondaryButtonClass} !h-9`}
+              aria-label="Salvar laboratório"
+              title="Salvar laboratório"
+            >
+              <span className="material-symbols-outlined text-[16px]" aria-hidden="true">
+                save
+              </span>
+              <span className="hidden sm:inline">Salvar</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setIsProfileOpen(true)}
+              className="flex items-center gap-2 rounded border-0 pl-2 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white sm:border-l-[0.5px] sm:border-trail-line sm:pl-3"
+              aria-label="Abrir meu perfil"
+              title={`${user.name} (${user.email})`}
+            >
+              <div className="hidden text-right sm:block">
+                <div className="max-w-[120px] truncate text-xs font-medium text-white">{user.name}</div>
+                <div className="font-mono text-[10px] text-trail-muted">{roleLabel}</div>
+              </div>
+              <div className="flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded border-[0.5px] border-trail-line bg-white/[0.04]">
+                {!user.photo || avatarFailed ? (
+                  <span className="material-symbols-outlined text-lg text-trail-muted" aria-hidden="true">
+                    person
                   </span>
+                ) : (
+                  <img
+                    alt=""
+                    className="h-full w-full object-cover"
+                    src={resolvePhotoUrl(user.photo, user.name)}
+                    onError={() => setAvatarFailed(true)}
+                  />
+                )}
+              </div>
+            </button>
+          </div>
+        </header>
+
+        <div className="relative z-10 flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto p-4 sm:p-6 lg:overflow-hidden">
+          <div className="flex shrink-0 flex-wrap items-center gap-2 rounded-lg border-[0.5px] border-trail-line bg-trail-surface/95 px-3 py-2 shadow-[0_8px_30px_rgba(0,0,0,0.35)]">
+            <span className="mr-1 font-mono text-[10px] uppercase tracking-wider text-trail-muted">
+              Adicionar
+            </span>
+            {KIND_ICONS.map((kind) => (
+              <button
+                key={kind.kind}
+                type="button"
+                onClick={() => void handleAddDevice(kind.kind)}
+                disabled={busy}
+                title={kind.desc}
+                className={`${playgroundSecondaryButtonClass} !h-8 !px-2.5 !text-[10px]`}
+              >
+                <span className="material-symbols-outlined text-[15px] text-trail-cyan" aria-hidden="true">
+                  {kind.icon}
                 </span>
+                {kind.label}
               </button>
             ))}
           </div>
-        </div>
 
-        <div className="mt-auto space-y-2 border-t border-outline-variant pt-4">
-          <button onClick={() => void handleSave()} disabled={busy} className="btn-secondary w-full !h-10">
-            <span className="material-symbols-outlined text-[18px]">save</span>
-            Salvar
-          </button>
-          <button onClick={() => void apiLogout()} className="btn-danger w-full !h-10">
-            <span className="material-symbols-outlined text-[18px]">logout</span>
-            Sair
-          </button>
-        </div>
-      </aside>
-
-      {/* Canvas */}
-      <main className="relative min-w-0 flex-1">
-        <div className="flex h-14 items-center justify-between border-b border-outline-variant bg-surface-container-low px-6">
-          <div>
-            <p className="font-label text-xs uppercase tracking-widest text-on-surface-variant">
-              Playground livre
-            </p>
-            <h2 className="font-h3 text-on-surface">Topologia de redes</h2>
-          </div>
-          <div className="flex items-center gap-3">
-            {pendingPort && (
-              <span className="rounded-full border border-primary/50 bg-primary/10 px-3 py-1 font-label text-[11px] uppercase tracking-wider text-primary">
-                {devices.find((d) => d.ref === pendingPort.ref)?.hostname}:{pendingPort.name}
-              </span>
-            )}
-            <span className="font-label text-xs text-on-surface-variant">
-              {devices.length} dispositivos · {links.length} cabos
-            </span>
-            <button
-              onClick={() => setUser((u) => (u ? { ...u } : u))}
-              className="h-9 w-9 overflow-hidden rounded-lg border border-outline-variant"
-              aria-label="Abrir meu perfil"
-            >
-              <img
-                src={resolvePhotoUrl(user.photo, user.name)}
-                alt=""
-                className="h-full w-full object-cover"
-              />
-            </button>
-          </div>
-        </div>
-
-        <NetworkCanvas
-          devices={devices}
-          links={links}
-          linkedPorts={linkedPorts}
-          pendingPort={pendingPort}
-          selectedRef={selectedRef}
-          selectedLink={selectedLink}
-          activeLink={activeLink}
-          onSelectDevice={(ref) => {
-            setSelectedRef(ref)
-            setSelectedLink(null)
-          }}
-          onSelectLink={(index) => {
-            setSelectedLink(index)
-            setSelectedRef(null)
-          }}
-          onPortClick={(ref, name) => void handlePortClick(ref, name)}
-          onMoveDevice={handleMoveDevice}
-          onCanvasClick={() => {
-            setPendingPort(null)
-            setSelectedLink(null)
-          }}
-        />
-
-        {/* Ações do cabo selecionado */}
-        {selectedLinkData && (
-          <div className="absolute bottom-4 left-1/2 flex -translate-x-1/2 items-center gap-2 rounded-xl border border-outline-variant bg-surface-container px-3 py-2 shadow-lg">
-            <span className="font-mono text-xs text-on-surface-variant">
-              {devices.find((d) => d.ref === selectedLinkData.deviceRefA)?.hostname}:
-              {selectedLinkData.interfaceA} ↔ {devices.find((d) => d.ref === selectedLinkData.deviceRefB)?.hostname}:
-              {selectedLinkData.interfaceB}
-            </span>
-            <span
-              className={`rounded px-2 py-0.5 font-label text-[10px] uppercase tracking-wider ${
-                selectedLinkData.status === 'UP' ? 'bg-primary/15 text-primary' : 'bg-error/15 text-error'
-              }`}
-            >
-              {selectedLinkData.status === 'UP' ? 'ativo' : 'cortado'}
-            </span>
-            <button
-              onClick={() => void handleToggleLink(selectedLink!)}
-              className="btn-secondary !h-8 !px-3 !text-[11px]"
-            >
-              <span className="material-symbols-outlined text-[16px]">
-                {selectedLinkData.status === 'UP' ? 'link_off' : 'link'}
-              </span>
-              {selectedLinkData.status === 'UP' ? 'Cortar' : 'Religar'}
-            </button>
-            <button
-              onClick={() => void handleDeleteLink(selectedLink!)}
-              className="btn-danger !h-8 !px-3 !text-[11px]"
-            >
-              <span className="material-symbols-outlined text-[16px]">delete</span>
-              Remover
-            </button>
-          </div>
-        )}
-
-        {selected && !selectedLinkData && (
-          <div className="absolute bottom-4 left-1/2 flex -translate-x-1/2 items-center gap-2 rounded-xl border border-outline-variant bg-surface-container px-3 py-2 shadow-lg">
-            <span className="font-mono text-xs text-on-surface">
-              {selected.hostname}
-              {selected.interfaces.some((i) => i.ipAddress) && (
-                <span className="ml-2 text-on-surface-variant">
-                  {selected.interfaces
-                    .filter((i) => i.ipAddress)
-                    .map((i) => `${i.name} ${i.ipAddress}`)
-                    .join(' · ')}
+          <div className="flex min-h-0 flex-1 flex-col gap-4 lg:flex-row">
+            <section className="relative flex min-h-[360px] min-w-0 flex-1 flex-col overflow-hidden rounded-lg border-[0.5px] border-trail-line bg-trail-surface/95 shadow-[0_12px_40px_rgba(0,0,0,0.55)] lg:min-h-0">
+              <div className="flex shrink-0 flex-wrap items-center gap-2 border-b-[0.5px] border-trail-line bg-trail-background/40 px-4 py-2.5">
+                <span className="material-symbols-outlined text-[16px] text-trail-muted" aria-hidden="true">
+                  hub
                 </span>
+                <span className="font-mono text-[10px] uppercase tracking-wider text-trail-muted">
+                  Topologia
+                </span>
+                <div className="ml-auto flex flex-wrap items-center gap-2">
+                  {pendingPort && (
+                    <span className="rounded border-[0.5px] border-cyan-400/20 bg-cyan-400/[0.06] px-2 py-1 font-mono text-[10px] text-trail-cyan">
+                      {devices.find((d) => d.ref === pendingPort.ref)?.hostname}:{pendingPort.name}
+                    </span>
+                  )}
+                  <span className="font-mono text-[10px] text-trail-muted">
+                    {devices.length} {devices.length === 1 ? 'dispositivo' : 'dispositivos'}
+                  </span>
+                  <span className="font-mono text-[10px] text-trail-muted">
+                    {links.length} {links.length === 1 ? 'cabo' : 'cabos'}
+                  </span>
+                </div>
+              </div>
+
+              <div className="relative min-h-0 flex-1">
+                <NetworkCanvas
+                  devices={devices}
+                  links={links}
+                  linkedPorts={linkedPorts}
+                  pendingPort={pendingPort}
+                  selectedRef={selectedRef}
+                  selectedLink={selectedLink}
+                  activeLink={activeLink}
+                  onSelectDevice={(ref) => {
+                    setSelectedRef(ref)
+                    setSelectedLink(null)
+                  }}
+                  onSelectLink={(index) => {
+                    setSelectedLink(index)
+                    setSelectedRef(null)
+                  }}
+                  onPortClick={(ref, name) => void handlePortClick(ref, name)}
+                  onMoveDevice={handleMoveDevice}
+                  onCanvasClick={() => {
+                    setPendingPort(null)
+                    setSelectedLink(null)
+                  }}
+                />
+
+                {selectedLinkData && (
+                  <div className="absolute bottom-4 left-1/2 z-20 flex max-w-[calc(100%-2rem)] -translate-x-1/2 flex-wrap items-center justify-center gap-2 rounded-lg border-[0.5px] border-trail-line bg-trail-surface/95 px-3 py-2 shadow-[0_12px_30px_rgba(0,0,0,0.6)] backdrop-blur-md">
+                    <span className="font-mono text-[10px] leading-relaxed text-neutral-400">
+                      {devices.find((d) => d.ref === selectedLinkData.deviceRefA)?.hostname}:
+                      {selectedLinkData.interfaceA} ↔{' '}
+                      {devices.find((d) => d.ref === selectedLinkData.deviceRefB)?.hostname}:
+                      {selectedLinkData.interfaceB}
+                    </span>
+                    <span
+                      className={`rounded border-[0.5px] px-2 py-0.5 font-mono text-[10px] uppercase tracking-wider ${
+                        selectedLinkData.status === 'UP'
+                          ? 'border-cyan-400/20 bg-cyan-400/[0.06] text-trail-cyan'
+                          : 'border-red-500/20 bg-red-500/[0.06] text-red-300'
+                      }`}
+                    >
+                      {selectedLinkData.status === 'UP' ? 'ativo' : 'cortado'}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => void handleToggleLink(selectedLink!)}
+                      className={`${playgroundSecondaryButtonClass} !h-8 !px-2.5 !text-[10px]`}
+                    >
+                      <span className="material-symbols-outlined text-[15px]" aria-hidden="true">
+                        {selectedLinkData.status === 'UP' ? 'link_off' : 'link'}
+                      </span>
+                      {selectedLinkData.status === 'UP' ? 'Cortar' : 'Religar'}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => void handleDeleteLink(selectedLink!)}
+                      className={`${playgroundDangerButtonClass} !h-8 !px-2.5 !text-[10px]`}
+                    >
+                      <span className="material-symbols-outlined text-[15px]" aria-hidden="true">
+                        delete
+                      </span>
+                      Remover
+                    </button>
+                  </div>
+                )}
+
+                {selected && !selectedLinkData && (
+                  <div className="absolute bottom-4 left-1/2 z-20 flex max-w-[calc(100%-2rem)] -translate-x-1/2 flex-wrap items-center justify-center gap-2 rounded-lg border-[0.5px] border-trail-line bg-trail-surface/95 px-3 py-2 shadow-[0_12px_30px_rgba(0,0,0,0.6)] backdrop-blur-md">
+                    <span className="font-mono text-xs text-white">
+                      {selected.hostname}
+                      {selected.interfaces.some((i) => i.ipAddress) && (
+                        <span className="ml-2 text-[10px] text-trail-muted">
+                          {selected.interfaces
+                            .filter((i) => i.ipAddress)
+                            .map((i) => `${i.name} ${i.ipAddress}`)
+                            .join(' · ')}
+                        </span>
+                      )}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => void handleMoveCommit()}
+                      className={`${playgroundSecondaryButtonClass} !h-8 !px-2.5 !text-[10px]`}
+                    >
+                      <span className="material-symbols-outlined text-[15px]" aria-hidden="true">
+                        save
+                      </span>
+                      Salvar posição
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => void handleDeleteDevice()}
+                      className={`${playgroundDangerButtonClass} !h-8 !px-2.5 !text-[10px]`}
+                    >
+                      <span className="material-symbols-outlined text-[15px]" aria-hidden="true">
+                        delete
+                      </span>
+                      Remover
+                    </button>
+                  </div>
+                )}
+
+                {selected &&
+                  selected.interfaces.some((i) => i.ipAddress) &&
+                  (() => {
+                    const target = devices.find(
+                      (d) =>
+                        d.ref !== selected.ref &&
+                        d.interfaces.some(
+                          (i) =>
+                            i.ipAddress &&
+                            i.ipAddress !== selected.interfaces.find((x) => x.ipAddress)?.ipAddress
+                        )
+                    )?.interfaces.find((i) => i.ipAddress)?.ipAddress
+                    const own = selected.interfaces.find((i) => i.ipAddress)?.ipAddress
+                    if (!target) return null
+                    return (
+                      <div className="absolute left-1/2 top-3 z-20 flex max-w-[calc(100%-2rem)] -translate-x-1/2 flex-wrap items-center justify-center gap-2 rounded-lg border-[0.5px] border-trail-line bg-trail-surface/95 px-3 py-2 shadow-[0_12px_30px_rgba(0,0,0,0.6)] backdrop-blur-md">
+                        <span className="font-mono text-[10px] uppercase tracking-wider text-trail-muted">
+                          Testar
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => void runCommand(`ping ${target}`)}
+                          className={`${playgroundSecondaryButtonClass} !h-8 !px-2.5 !text-[10px]`}
+                        >
+                          <span className="material-symbols-outlined text-[15px]" aria-hidden="true">
+                            network_ping
+                          </span>
+                          ping {target}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => void runCommand(`traceroute ${target}`)}
+                          className={`${playgroundSecondaryButtonClass} !h-8 !px-2.5 !text-[10px]`}
+                        >
+                          <span className="material-symbols-outlined text-[15px]" aria-hidden="true">
+                            route
+                          </span>
+                          traceroute
+                        </button>
+                        <span className="sr-only">de {own}</span>
+                      </div>
+                    )
+                  })()}
+              </div>
+            </section>
+
+            <section className="flex min-h-[420px] w-full shrink-0 flex-col overflow-hidden rounded-lg border-[0.5px] border-trail-line bg-trail-surface/95 shadow-[0_12px_40px_rgba(0,0,0,0.45)] lg:min-h-0 lg:w-[360px]">
+              <div className="flex h-12 shrink-0 items-center gap-1 border-b-[0.5px] border-trail-line px-3">
+                {(
+                  [
+                    { key: 'terminal' as Tab, label: 'Terminal', icon: 'terminal' },
+                    { key: 'tabelas' as Tab, label: 'Tabelas', icon: 'table_chart' },
+                  ]
+                ).map((t) => (
+                  <button
+                    key={t.key}
+                    type="button"
+                    onClick={() => setTab(t.key)}
+                    aria-current={tab === t.key ? 'page' : undefined}
+                    className={`flex h-8 items-center gap-1.5 rounded border-[0.5px] px-2.5 font-mono text-[10px] uppercase tracking-wider transition-colors ${
+                      tab === t.key
+                        ? 'border-trail-line bg-white/[0.08] text-white'
+                        : 'border-transparent text-trail-muted hover:text-white'
+                    }`}
+                  >
+                    <span className="material-symbols-outlined text-[16px]" aria-hidden="true">
+                      {t.icon}
+                    </span>
+                    {t.label}
+                  </button>
+                ))}
+              </div>
+
+              {!selected ? (
+                <div className="flex flex-1 flex-col items-center justify-center gap-2 px-6 text-center">
+                  <span className="material-symbols-outlined text-4xl text-trail-muted" aria-hidden="true">
+                    touch_app
+                  </span>
+                  <p className="text-xs leading-relaxed text-trail-muted">
+                    Selecione um dispositivo ou um cabo no canvas.
+                  </p>
+                </div>
+              ) : tab === 'terminal' ? (
+                <div className="flex min-h-0 flex-1 flex-col">
+                  <div className="flex shrink-0 items-center gap-2 border-b-[0.5px] border-trail-line bg-trail-background/40 px-4 py-2.5">
+                    <span className="material-symbols-outlined text-[16px] text-trail-cyan" aria-hidden="true">
+                      {KIND_ICONS.find((k) => k.kind === selected.kind)?.icon ?? 'device_hub'}
+                    </span>
+                    <span className="font-mono text-xs text-white">{selected.hostname}</span>
+                    <span className="ml-auto font-mono text-[10px] uppercase tracking-wider text-trail-muted">
+                      {KIND_ICONS.find((k) => k.kind === selected.kind)?.label ?? 'Dispositivo'}
+                    </span>
+                  </div>
+                  <div
+                    className="min-h-0 flex-1 overflow-auto bg-[#151515] px-4 py-3 font-mono text-xs leading-relaxed"
+                    aria-live="polite"
+                  >
+                    {lines.length === 0 && (
+                      <p className="text-trail-muted">
+                        Configure o dispositivo com comandos de rede, como em um switch ou roteador real.
+                        <br />
+                        <br />
+                        <span className="text-neutral-500">ex: enable</span>
+                        <br />
+                        <span className="text-neutral-500">ex: configure terminal</span>
+                        <br />
+                        <span className="text-neutral-500">ex: int eth0</span>
+                        <br />
+                        <span className="text-neutral-500">ex: ip address 10.0.0.1 255.255.255.0</span>
+                      </p>
+                    )}
+                    {lines.map((line) => (
+                      <pre
+                        key={line.id}
+                        className={`whitespace-pre-wrap break-words ${
+                          line.kind === 'in'
+                            ? 'text-trail-cyan'
+                            : line.kind === 'err'
+                              ? 'text-red-300'
+                              : line.kind === 'event'
+                                ? 'text-trail-muted'
+                                : 'text-neutral-200'
+                        }`}
+                      >
+                        {line.kind === 'in' ? `${selected.hostname}${prompt} ${line.text}` : line.text}
+                      </pre>
+                    ))}
+                  </div>
+                  <div className="shrink-0 space-y-2 border-t-[0.5px] border-trail-line bg-trail-surface/95 p-3">
+                    <div className="flex flex-wrap gap-1.5">
+                      {['show ip arp', 'show ip route', 'show ip interface brief', 'show running-config'].map(
+                        (cmd) => (
+                          <button
+                            key={cmd}
+                            type="button"
+                            onClick={() => void runCommand(cmd)}
+                            className="rounded border-[0.5px] border-trail-line bg-white/[0.03] px-2 py-1 font-mono text-[10px] text-trail-muted transition-colors hover:border-trail-accent hover:text-white"
+                          >
+                            {cmd}
+                          </button>
+                        )
+                      )}
+                    </div>
+                    <form onSubmit={handleSubmit} className="flex items-center gap-2">
+                      <label htmlFor="net-cli" className="sr-only">
+                        Comando de rede
+                      </label>
+                      <span className="font-mono text-xs text-trail-cyan">{prompt}</span>
+                      <input
+                        id="net-cli"
+                        value={input}
+                        onChange={(e) => setInput(e.target.value)}
+                        placeholder="digite um comando"
+                        autoComplete="off"
+                        className="min-w-0 flex-1 rounded border-[0.5px] border-trail-line bg-trail-background px-2 py-1.5 font-mono text-xs text-white placeholder:text-neutral-600 focus:border-neutral-600 focus:outline-none"
+                      />
+                      <button
+                        type="submit"
+                        className={`${playgroundPrimaryButtonClass} !h-8 !px-3 !text-[10px]`}
+                      >
+                        Enviar
+                      </button>
+                    </form>
+                  </div>
+                </div>
+              ) : (
+                <div className="min-h-0 flex-1 space-y-3 overflow-auto p-4">
+                  <div className="flex items-center justify-between gap-2">
+                    <p className="font-mono text-[10px] uppercase tracking-wider text-trail-muted">
+                      Estado de {selected.hostname}
+                    </p>
+                    <button
+                      type="button"
+                      onClick={() => void refreshState()}
+                      className="flex h-8 w-8 items-center justify-center rounded border-[0.5px] border-trail-line bg-white/[0.03] text-trail-muted transition-colors hover:border-trail-accent hover:text-white"
+                      aria-label="Atualizar tabelas"
+                    >
+                      <span className="material-symbols-outlined text-[16px]" aria-hidden="true">
+                        refresh
+                      </span>
+                    </button>
+                  </div>
+
+                  <Table
+                    title="Tabela ARP"
+                    empty="Nenhuma entrada"
+                    columns={['IP', 'MAC', 'Porta']}
+                    rows={(deviceState?.arp ?? []).map((r) => [r.ip, r.mac, r.iface])}
+                  />
+                  <Table
+                    title="Tabela MAC"
+                    empty="Nenhuma entrada"
+                    columns={['MAC', 'Porta', 'VLAN']}
+                    rows={(deviceState?.macTable ?? []).map((r) => [r.mac, r.iface, String(r.vlan)])}
+                  />
+                  <Table
+                    title="Tabela de rotas"
+                    empty="Nenhuma rota"
+                    columns={['Rede', 'Próximo salto', 'Porta']}
+                    rows={(deviceState?.routes ?? []).map((r) => [
+                      `${r.network}/${r.prefix}`,
+                      r.nextHop ?? 'direto',
+                      r.iface,
+                    ])}
+                  />
+                  {deviceState && deviceState.vlans.length > 0 && (
+                    <Table
+                      title="VLANs"
+                      empty="Nenhuma VLAN"
+                      columns={['ID', 'Nome']}
+                      rows={deviceState.vlans.map((v) => [String(v.id), v.name])}
+                    />
+                  )}
+                </div>
               )}
-            </span>
-            <button
-              onClick={() => void handleMoveCommit()}
-              className="btn-secondary !h-8 !px-3 !text-[11px]"
-            >
-              <span className="material-symbols-outlined text-[16px]">save</span>
-              Salvar posição
-            </button>
-            <button
-              onClick={() => void handleDeleteDevice()}
-              className="btn-danger !h-8 !px-3 !text-[11px]"
-            >
-              <span className="material-symbols-outlined text-[16px]">delete</span>
-              Remover
-            </button>
+            </section>
           </div>
-        )}
+        </div>
       </main>
 
-      {/* Painel direito */}
-      <section className="flex w-[380px] shrink-0 flex-col border-l border-outline-variant bg-surface-container-low">
-        <div className="flex h-14 shrink-0 items-center gap-1 border-b border-outline-variant px-3">
-          {(
-            [
-              { key: 'terminal' as Tab, label: 'Terminal', icon: 'terminal' },
-              { key: 'tabelas' as Tab, label: 'Tabelas', icon: 'table_chart' },
-            ]
-          ).map((t) => (
-            <button
-              key={t.key}
-              onClick={() => setTab(t.key)}
-              aria-current={tab === t.key ? 'page' : undefined}
-              className={`flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-semibold transition-all ${
-                tab === t.key
-                  ? 'bg-surface-container-high text-primary'
-                  : 'text-on-surface-variant hover:bg-surface-container'
-              }`}
-            >
-              <span className="material-symbols-outlined text-[18px]">{t.icon}</span>
-              {t.label}
-            </button>
-          ))}
-        </div>
-
-        {!selected ? (
-          <div className="flex flex-1 flex-col items-center justify-center gap-2 px-6 text-center">
-            <span className="material-symbols-outlined text-4xl text-outline" aria-hidden="true">
-              touch_app
-            </span>
-            <p className="text-sm text-on-surface-variant">
-              Selecione um dispositivo ou um cabo no canvas.
-            </p>
-          </div>
-        ) : tab === 'terminal' ? (
-          <div className="flex min-h-0 flex-1 flex-col">
-            <div className="flex items-center gap-2 border-b border-outline-variant px-4 py-2">
-              <span className="material-symbols-outlined text-[18px] text-primary" aria-hidden="true">
-                {KIND_ICONS.find((k) => k.kind === selected.kind)?.icon ?? 'device_hub'}
-              </span>
-              <span className="text-sm font-semibold text-on-surface">{selected.hostname}</span>
-            </div>
-            <div
-              className="min-h-0 flex-1 overflow-auto px-4 py-3 font-mono text-xs leading-relaxed"
-              aria-live="polite"
-            >
-              {lines.length === 0 && (
-                <p className="text-on-surface-variant">
-                  Configure o dispositivo com comandos de rede, como em um switch ou roteador real.
-                  <br />
-                  <br />
-                  <span className="text-outline">ex: enable</span>
-                  <br />
-                  <span className="text-outline">ex: configure terminal</span>
-                  <br />
-                  <span className="text-outline">ex: int eth0</span>
-                  <br />
-                  <span className="text-outline">ex: ip address 10.0.0.1 255.255.255.0</span>
-                </p>
-              )}
-              {lines.map((line) => (
-                <pre
-                  key={line.id}
-                  className={`whitespace-pre-wrap break-words ${
-                    line.kind === 'in'
-                      ? 'text-primary'
-                      : line.kind === 'err'
-                        ? 'text-error'
-                        : line.kind === 'event'
-                          ? 'text-on-surface-variant'
-                          : 'text-on-surface'
-                  }`}
-                >
-                  {line.kind === 'in' ? `${selected.hostname}${prompt} ${line.text}` : line.text}
-                </pre>
-              ))}
-            </div>
-            <div className="shrink-0 space-y-2 border-t border-outline-variant p-3">
-              <div className="flex flex-wrap gap-1.5">
-                {['show ip arp', 'show ip route', 'show ip interface brief', 'show running-config'].map(
-                  (cmd) => (
-                    <button
-                      key={cmd}
-                      onClick={() => void runCommand(cmd)}
-                      className="rounded-md border border-outline-variant px-2 py-1 font-mono text-[10px] text-on-surface-variant transition-all hover:border-primary/60 hover:text-primary"
-                    >
-                      {cmd}
-                    </button>
-                  )
-                )}
-              </div>
-              <form onSubmit={handleSubmit} className="flex items-center gap-2">
-                <label htmlFor="net-cli" className="sr-only">
-                  Comando de rede
-                </label>
-                <span className="font-mono text-xs text-primary">{prompt}</span>
-                <input
-                  id="net-cli"
-                  value={input}
-                  onChange={(e) => setInput(e.target.value)}
-                  placeholder="digite um comando"
-                  autoComplete="off"
-                  className="flex-1 rounded-md border border-outline-variant bg-surface-container-highest px-2 py-1.5 font-mono text-xs text-on-surface placeholder:text-outline/60 focus:border-primary focus:outline-none"
-                />
-                <button type="submit" className="btn-primary !h-8 !px-3 !text-[11px]">
-                  Enviar
-                </button>
-              </form>
-            </div>
-          </div>
-        ) : (
-          <div className="min-h-0 flex-1 space-y-4 overflow-auto p-4">
-            <div className="flex items-center justify-between">
-              <p className="form-label !mb-0">Estado de {selected.hostname}</p>
-              <button
-                onClick={() => void refreshState()}
-                className="rounded-md border border-outline-variant p-1.5 text-on-surface-variant hover:text-primary"
-                aria-label="Atualizar tabelas"
-              >
-                <span className="material-symbols-outlined text-[16px]">refresh</span>
-              </button>
-            </div>
-
-            <Table
-              title="Tabela ARP"
-              empty="Nenhuma entrada"
-              columns={['IP', 'MAC', 'Porta']}
-              rows={(deviceState?.arp ?? []).map((r) => [r.ip, r.mac, r.iface])}
-            />
-            <Table
-              title="Tabela MAC"
-              empty="Nenhuma entrada"
-              columns={['MAC', 'Porta', 'VLAN']}
-              rows={(deviceState?.macTable ?? []).map((r) => [r.mac, r.iface, String(r.vlan)])}
-            />
-            <Table
-              title="Tabela de rotas"
-              empty="Nenhuma rota"
-              columns={['Rede', 'Próximo salto', 'Porta']}
-              rows={(deviceState?.routes ?? []).map((r) => [
-                `${r.network}/${r.prefix}`,
-                r.nextHop ?? 'direto',
-                r.iface,
-              ])}
-            />
-            {deviceState && deviceState.vlans.length > 0 && (
-              <Table
-                title="VLANs"
-                empty="Nenhuma VLAN"
-                columns={['ID', 'Nome']}
-                rows={deviceState.vlans.map((v) => [String(v.id), v.name])}
-              />
-            )}
-          </div>
-        )}
-      </section>
-
-      {/* Ações rápidas de rede sobre o dispositivo selecionado */}
-      {selected && selected.interfaces.some((i) => i.ipAddress) && (
-        <div className="absolute left-1/2 top-16 flex -translate-x-1/2 items-center gap-2 rounded-xl border border-outline-variant bg-surface-container px-3 py-2 shadow-lg">
-          <span className="font-label text-[11px] uppercase tracking-wider text-on-surface-variant">
-            Testar
-          </span>
-          {(() => {
-            const target = devices.find(
-              (d) =>
-                d.ref !== selected.ref &&
-                d.interfaces.some((i) => i.ipAddress && i.ipAddress !== selected.interfaces.find((x) => x.ipAddress)?.ipAddress)
-            )?.interfaces.find((i) => i.ipAddress)?.ipAddress
-            const own = selected.interfaces.find((i) => i.ipAddress)?.ipAddress
-            if (!target) return null
-            return (
-              <>
-                <button
-                  onClick={() => void runCommand(`ping ${target}`)}
-                  className="btn-secondary !h-8 !px-3 !text-[11px]"
-                >
-                  <span className="material-symbols-outlined text-[16px]">network_ping</span>
-                  ping {target}
-                </button>
-                <button
-                  onClick={() => void runCommand(`traceroute ${target}`)}
-                  className="btn-secondary !h-8 !px-3 !text-[11px]"
-                >
-                  <span className="material-symbols-outlined text-[16px]">route</span>
-                  traceroute
-                </button>
-                <span className="sr-only">de {own}</span>
-              </>
-            )
-          })()}
-        </div>
-      )}
-
-      {/* Avisos */}
-      <div className="pointer-events-none fixed bottom-4 right-4 z-50 flex flex-col gap-2" role="status" aria-live="polite">
-        {toasts.map((t) => (
+      <div
+        className="pointer-events-none fixed bottom-4 right-4 z-[70] flex max-w-[calc(100vw-2rem)] flex-col gap-2"
+        role="status"
+        aria-live="polite"
+      >
+        {toasts.map((toast) => (
           <div
-            key={t.id}
-            className={`rounded-lg border px-4 py-2 text-sm shadow-lg ${
-              t.tone === 'ok'
-                ? 'border-primary/50 bg-surface-container text-on-surface'
-                : 'border-error/50 bg-surface-container text-error'
+            key={toast.id}
+            className={`rounded-lg border-[0.5px] px-4 py-2 text-xs shadow-[0_12px_30px_rgba(0,0,0,0.5)] ${
+              toast.tone === 'ok'
+                ? 'border-trail-line bg-trail-surface/95 text-neutral-200'
+                : 'border-red-500/20 bg-red-500/[0.08] text-red-300'
             }`}
           >
-            {t.text}
+            {toast.text}
           </div>
         ))}
       </div>
@@ -780,6 +902,7 @@ export function NetworkPlaygroundPage() {
         user={user}
         onUpdate={(updated) => {
           setUser(updated)
+          setAvatarFailed(false)
           setIsProfileOpen(false)
         }}
       />
@@ -799,26 +922,29 @@ function Table({
   empty: string
 }) {
   return (
-    <section className="card-surface !p-3">
-      <h3 className="form-label !mb-2">{title}</h3>
+    <section className="rounded-lg border-[0.5px] border-trail-line bg-trail-background/40 p-3">
+      <h3 className="font-mono text-[10px] uppercase tracking-wider text-trail-muted">{title}</h3>
       {rows.length === 0 ? (
-        <p className="text-xs text-on-surface-variant">{empty}</p>
+        <p className="mt-2 text-xs text-neutral-500">{empty}</p>
       ) : (
-        <table className="w-full font-mono text-[11px]">
+        <table className="mt-2 w-full font-mono text-[11px]">
           <thead>
-            <tr className="text-left text-on-surface-variant">
-              {columns.map((c) => (
-                <th key={c} className="pb-1 font-normal">
-                  {c}
+            <tr className="text-left text-neutral-500">
+              {columns.map((column) => (
+                <th key={column} className="pb-1 font-normal">
+                  {column}
                 </th>
               ))}
             </tr>
           </thead>
           <tbody>
-            {rows.map((row, i) => (
-              <tr key={i} className="border-t border-outline-variant/50 text-on-surface">
-                {row.map((cell, j) => (
-                  <td key={j} className="py-1 pr-2 align-top">
+            {rows.map((row, rowIndex) => (
+              <tr
+                key={rowIndex}
+                className="border-t-[0.5px] border-trail-line/70 text-neutral-300"
+              >
+                {row.map((cell, cellIndex) => (
+                  <td key={cellIndex} className="py-1 pr-2 align-top">
                     {cell}
                   </td>
                 ))}

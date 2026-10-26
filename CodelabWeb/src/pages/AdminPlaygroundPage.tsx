@@ -1,14 +1,10 @@
-import { useEffect, useRef, useState } from 'react'
-import {
-  SandpackConsole,
-  SandpackLayout,
-  SandpackPreview,
-  SandpackProvider,
-} from '@codesandbox/sandpack-react'
+import { useEffect, useState } from 'react'
 import { API_BASE_URL, DEFAULT_PLAYGROUND_CODE } from '../constants'
 import { authFetch } from '../lib/api'
 import type { AnswerReviewResponse, QuestionItem, ReviewApiError, UserProfile } from '../types'
-import { PlaygroundCodeEditor } from '../components/PlaygroundCodeEditor'
+import { PlaygroundLoading, PlaygroundShell } from '../components/PlaygroundShell'
+import { buildPlaygroundInitialCode, playgroundPrimaryButtonClass } from '../lib/playground'
+import { difficultyLabel, topicLabel } from '../utils'
 
 export function AdminPlaygroundPage({ questionId }: { questionId: number }) {
   const [profile, setProfile] = useState<UserProfile | null>(null)
@@ -19,7 +15,6 @@ export function AdminPlaygroundPage({ questionId }: { questionId: number }) {
   const [error, setError] = useState('')
   const [reviewResult, setReviewResult] = useState<AnswerReviewResponse | null>(null)
   const [reviewError, setReviewError] = useState<ReviewApiError | null>(null)
-  const initializedQuestionCodeRef = useRef<number | null>(null)
 
   useEffect(() => {
     let cancelled = false
@@ -44,6 +39,7 @@ export function AdminPlaygroundPage({ questionId }: { questionId: number }) {
         const questionData = (await questionResponse.json()) as QuestionItem
         if (!cancelled) {
           setQuestion(questionData)
+          setCode(buildPlaygroundInitialCode(questionData, 'Questão'))
         }
       } catch {
         if (!cancelled) {
@@ -61,19 +57,6 @@ export function AdminPlaygroundPage({ questionId }: { questionId: number }) {
       cancelled = true
     }
   }, [questionId])
-
-  useEffect(() => {
-    if (!question) return
-    if (initializedQuestionCodeRef.current === question.id) return
-
-    if (question.starterCode && question.starterCode.trim()) {
-      setCode(question.starterCode)
-    } else {
-      const prompt = question.questionBody.replaceAll('*/', '* /')
-      setCode(`/**\n * Questão #${question.id}\n * ${prompt}\n */\n\n${DEFAULT_PLAYGROUND_CODE}`)
-    }
-    initializedQuestionCodeRef.current = question.id
-  }, [question])
 
   const handleSubmitForReview = async () => {
     if (!question) return
@@ -114,129 +97,169 @@ export function AdminPlaygroundPage({ questionId }: { questionId: number }) {
     }
   }
 
+  if (loading || !profile) {
+    return <PlaygroundLoading label="Carregando playground de revisão..." />
+  }
+
+  const approved = reviewResult?.verificationStatus === 'APPROVED'
+  const backHref = profile.role === 'ADMIN' ? '/admin/questions' : '/trilha'
+
   return (
-    <>
-      <header className="flex justify-between items-center h-16 px-gutter w-full sticky top-0 z-30 bg-surface border-b border-outline-variant">
-        <div className="flex items-center gap-md">
-          <span className="text-lg font-h2 font-bold text-primary tracking-tight">CodeLab</span>
-          <div className="h-6 w-[1px] bg-outline-variant mx-sm"></div>
-          <span className="font-label text-label text-on-surface-variant tracking-wider">Playground</span>
-        </div>
-        <div className="flex items-center gap-md">
-          <button
-            type="button"
-            className="btn-secondary !h-9 !px-md"
-            onClick={() => {
-              window.location.href = profile?.role === 'ADMIN' ? '/admin/questions' : '/trilha'
-            }}
+    <PlaygroundShell
+      user={profile}
+      onUserChange={setProfile}
+      code={code}
+      onCodeChange={setCode}
+      loadingEditor={loading || submitting}
+      eyebrow={`Questão #${questionId}`}
+      title={question ? topicLabel(question.topic) : 'Revisão de questão'}
+      challenge={question?.questionBody ?? 'Carregando questão...'}
+      difficulty={
+        question ? (
+          <span className="shrink-0 rounded border-[0.5px] border-trail-line bg-white/[0.04] px-2.5 py-1 font-mono text-[10px] uppercase tracking-wider text-neutral-400">
+            {difficultyLabel(question.difficulty)}
+          </span>
+        ) : null
+      }
+      editorStatus={
+        reviewResult ? (
+          <span
+            className={`flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-wider ${
+              approved ? 'text-trail-cyan' : 'text-red-300'
+            }`}
           >
-            Voltar
-          </button>
-          <div className="text-right">
-            <p className="text-body-sm text-on-surface">{profile?.name ?? 'Administrador'}</p>
-            <p className="text-label text-on-surface-variant">{profile?.email ?? ''}</p>
-          </div>
+            <span className="material-symbols-outlined text-[15px]" aria-hidden="true">
+              {approved ? 'verified' : 'error'}
+            </span>
+            {approved ? 'Aprovado' : 'Revisão necessária'}
+          </span>
+        ) : null
+      }
+      secondaryAction={{
+        label: 'Voltar',
+        icon: 'arrow_back',
+        onClick: () => {
+          window.location.href = backHref
+        },
+      }}
+      primaryAction={{
+        label: 'Enviar para revisão',
+        loadingLabel: 'Enviando...',
+        icon: 'send',
+        onClick: () => {
+          void handleSubmitForReview()
+        },
+        disabled: submitting || loading || !question,
+        loading: submitting,
+      }}
+      showPreview
+      previewLabel="Validação imediata"
+      showTimer={false}
+      consoleLabel="Console"
+      aside={
+        <div className="space-y-3">
+          {loading ? (
+            <p className="font-mono text-[11px] text-trail-muted" role="status" aria-live="polite">
+              Carregando...
+            </p>
+          ) : null}
+
+          {error ? (
+            <p
+              className="rounded-lg border-[0.5px] border-red-500/20 bg-red-500/[0.06] p-3 text-xs leading-relaxed text-red-300"
+              role="alert"
+            >
+              {error}
+            </p>
+          ) : null}
+
+          {reviewResult ? (
+            <section
+              className="space-y-3 rounded-lg border-[0.5px] border-trail-line bg-trail-surface/95 p-4"
+              aria-live="polite"
+            >
+              <div className="flex items-center gap-2">
+                <span
+                  className={`material-symbols-outlined text-[16px] ${
+                    approved ? 'text-trail-cyan' : 'text-red-300'
+                  }`}
+                  aria-hidden="true"
+                >
+                  fact_check
+                </span>
+                <h2 className="font-mono text-[10px] uppercase tracking-wider text-white">
+                  Resultado da revisão
+                </h2>
+              </div>
+
+              <div>
+                <p className="font-mono text-[10px] uppercase tracking-wider text-trail-muted">
+                  Status
+                </p>
+                <p
+                  className={`mt-1 font-mono text-xs font-bold uppercase tracking-wider ${
+                    approved ? 'text-trail-cyan' : 'text-red-300'
+                  }`}
+                >
+                  {reviewResult.verificationStatus}
+                </p>
+              </div>
+
+              <div>
+                <p className="font-mono text-[10px] uppercase tracking-wider text-trail-muted">
+                  Node
+                </p>
+                <p className="mt-1 max-h-32 overflow-auto whitespace-pre-wrap text-xs leading-relaxed text-neutral-400">
+                  {reviewResult.nodeVerificationResult ?? '-'}
+                </p>
+              </div>
+
+              <div>
+                <p className="font-mono text-[10px] uppercase tracking-wider text-trail-muted">
+                  IA
+                </p>
+                <p className="mt-1 max-h-40 overflow-auto whitespace-pre-wrap text-xs leading-relaxed text-neutral-400">
+                  {reviewResult.aiVerificationResult ?? '-'}
+                </p>
+              </div>
+
+              {approved ? (
+                <button
+                  type="button"
+                  onClick={() => {
+                    window.location.href = '/trilha'
+                  }}
+                  className={`${playgroundPrimaryButtonClass} w-full`}
+                >
+                  Voltar para a Trilha
+                  <span className="material-symbols-outlined text-[16px]" aria-hidden="true">
+                    arrow_forward
+                  </span>
+                </button>
+              ) : null}
+            </section>
+          ) : null}
+
+          {reviewError ? (
+            <section
+              className="space-y-1 rounded-lg border-[0.5px] border-red-500/20 bg-red-500/[0.06] p-4"
+              role="alert"
+            >
+              <p className="font-mono text-[10px] uppercase tracking-wider text-red-300">
+                {reviewError.code}
+              </p>
+              <p className="text-xs leading-relaxed text-red-200">{reviewError.message}</p>
+              <p className="font-mono text-[10px] text-red-300/70">HTTP {reviewError.status}</p>
+            </section>
+          ) : null}
+
+          {!reviewResult && !reviewError && !loading && !error ? (
+            <p className="rounded-lg border-[0.5px] border-trail-line bg-trail-surface/95 p-3 text-xs leading-relaxed text-trail-muted">
+              Envie o código para ver o resultado da correção.
+            </p>
+          ) : null}
         </div>
-      </header>
-
-      <SandpackProvider
-        template="vanilla-ts"
-        theme="dark"
-        files={{
-          '/index.ts': code,
-        }}
-        customSetup={{ entry: '/index.ts' }}
-      >
-        <main className="flex-1 flex overflow-hidden">
-          <section className="flex-1 flex flex-col border-r border-outline-variant min-w-0">
-            <div className="h-12 bg-surface-container-low flex items-center justify-between px-md border-b border-outline-variant">
-              <div className="flex items-center gap-sm">
-                <span className="material-symbols-outlined text-primary text-[20px]">terminal</span>
-                <span className="font-label text-label text-on-surface">answer.ts</span>
-              </div>
-              <button
-                type="button"
-                className="btn-primary !h-9 !px-md"
-                onClick={handleSubmitForReview}
-                disabled={submitting || loading || !question}
-              >
-                <span className="material-symbols-outlined text-[18px]">send</span>
-                {submitting ? 'Enviando...' : 'Enviar para revisão'}
-              </button>
-            </div>
-
-            <div className="flex-1 p-gutter bg-surface-container-lowest overflow-auto">
-              <div className="mb-md space-y-xs">
-                <p className="text-label text-on-surface-variant uppercase">Questão #{questionId}</p>
-                <p className="text-body-sm text-on-surface">{question?.questionBody ?? 'Carregando questão...'}</p>
-              </div>
-
-              <SandpackLayout className="!bg-transparent !border-outline-variant !rounded-xl !overflow-hidden !border">
-                <PlaygroundCodeEditor loading={loading} onCodeChange={setCode} />
-              </SandpackLayout>
-            </div>
-          </section>
-
-          <aside className="w-[420px] bg-surface flex flex-col">
-            <div className="h-12 bg-surface-container flex items-center px-md border-b border-outline-variant">
-              <span className="font-label text-label text-on-surface uppercase tracking-tight">Validação Imediata</span>
-            </div>
-
-            <div className="p-md border-b border-outline-variant bg-surface-container-low">
-              <SandpackLayout className="!bg-transparent !border-0 !rounded-none !flex-col !gap-md">
-                <div className="h-32 overflow-hidden rounded-lg border border-outline-variant">
-                  <SandpackPreview showOpenInCodeSandbox={false} showRefreshButton={false} />
-                </div>
-                <div className="max-h-40 overflow-auto rounded-lg border border-outline-variant">
-                  <SandpackConsole resetOnPreviewRestart />
-                </div>
-              </SandpackLayout>
-            </div>
-
-            <div className="h-12 bg-surface-container flex items-center px-md border-b border-outline-variant">
-              <span className="font-label text-label text-on-surface uppercase tracking-tight">Resultado da Revisão</span>
-            </div>
-            <div className="flex-1 p-gutter space-y-md overflow-auto">
-              {loading ? <p className="text-on-surface-variant" role="status" aria-live="polite">Carregando...</p> : null}
-              {error ? <p className="text-error" role="alert">{error}</p> : null}
-
-              {reviewResult ? (
-                <div className="bg-surface-container border border-outline-variant rounded-xl p-md space-y-sm" aria-live="polite">
-                  <p className="text-label text-on-surface-variant uppercase">Status</p>
-                  <p className={`text-h3 font-h3 font-bold ${reviewResult.verificationStatus === 'APPROVED' ? 'text-primary' : 'text-error'}`}>
-                    {reviewResult.verificationStatus}
-                  </p>
-                  <p className="text-label text-on-surface-variant uppercase">Node</p>
-                  <p className="text-body-sm text-on-surface">{reviewResult.nodeVerificationResult ?? '-'}</p>
-                  <p className="text-label text-on-surface-variant uppercase">IA</p>
-                  <p className="text-body-sm text-on-surface">{reviewResult.aiVerificationResult ?? '-'}</p>
-                  
-                  {reviewResult.verificationStatus === 'APPROVED' && (
-                    <button
-                      onClick={() => (window.location.href = '/trilha')}
-                      className="btn-primary w-full mt-4 !h-10"
-                    >
-                      Voltar para a Trilha
-                    </button>
-                  )}
-                </div>
-              ) : null}
-
-              {reviewError ? (
-                <div className="bg-error-container border border-error rounded-xl p-md space-y-xs" role="alert">
-                  <p className="text-label text-on-error-container uppercase">{reviewError.code}</p>
-                  <p className="text-body-sm text-on-error-container">{reviewError.message}</p>
-                  <p className="text-label text-on-error-container">HTTP {reviewError.status}</p>
-                </div>
-              ) : null}
-
-              {!reviewResult && !reviewError && !loading ? (
-                <p className="text-on-surface-variant text-body-sm">Envie o código para ver o resultado da correção.</p>
-              ) : null}
-            </div>
-          </aside>
-        </main>
-      </SandpackProvider>
-    </>
+      }
+    />
   )
 }

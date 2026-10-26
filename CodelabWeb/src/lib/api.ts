@@ -17,7 +17,9 @@ export function clearToken(): void {
 async function performLogout(): Promise<void> {
   try {
     await fetch(`${API_BASE_URL}/logout`, { method: 'POST', credentials: 'include' })
-  } catch {}
+  } catch {
+    /* encerra a sessão local mesmo se o servidor estiver indisponível */
+  }
   clearToken()
   if (window.location.pathname !== '/') {
     window.location.href = '/'
